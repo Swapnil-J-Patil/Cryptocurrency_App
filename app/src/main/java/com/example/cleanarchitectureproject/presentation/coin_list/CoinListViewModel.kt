@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @HiltViewModel
-class CoinDetailViewModel @Inject constructor(
+class CoinListViewModel @Inject constructor(
     private val getCoinsUseCase: GetCoinsUseCase
 ) : ViewModel() {
     //Used to maintain the state
