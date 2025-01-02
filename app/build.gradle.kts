@@ -71,28 +71,35 @@ dependencies {
 
     // Compose dependencies
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1") // Stable version
-    implementation("androidx.navigation:navigation-compose:2.7.4")         // Stable version
-    implementation("com.google.accompanist:accompanist-flowlayout:0.33.0") // Updated
+    implementation("androidx.navigation:navigation-compose:2.7.0")         // Use stable version; alpha/beta may require a higher compileSdk
+    implementation("androidx.compose.foundation:foundation-layout:1.7.0") // Use 1.7.x series for compatibility with compileSdk 34
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
+
     // Coroutine Lifecycle Scopes
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 
+
     // Dagger - Hilt
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
+
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.okhttp3:okhttp:4.11.0") // Stable version
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
 }
 kapt{
     correctErrorTypes = true
+    useBuildCache = true // Optional but helpful for caching
+
 }
