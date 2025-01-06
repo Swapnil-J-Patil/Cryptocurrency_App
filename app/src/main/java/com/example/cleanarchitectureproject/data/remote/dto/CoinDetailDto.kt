@@ -3,6 +3,7 @@ package com.example.cleanarchitectureproject.data.remote.dto
 import com.example.cleanarchitectureproject.domain.model.CoinDetail
 import com.google.gson.annotations.SerializedName
 
+
 data class CoinDetailDto(
     val description: String,
     @SerializedName("development_status")
@@ -41,7 +42,7 @@ data class CoinDetailDto(
     val whitepaper: Whitepaper
 )
 
-fun CoinDetailDto.toCoinDetail(): CoinDetail{
+fun CoinDetailDto.toCoinDetail(): CoinDetail {
     return CoinDetail(
         coinId = id,
         name = name,

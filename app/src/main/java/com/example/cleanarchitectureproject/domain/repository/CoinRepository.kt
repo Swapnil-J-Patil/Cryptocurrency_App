@@ -6,7 +6,7 @@ import com.example.cleanarchitectureproject.domain.model.Coin
 
 interface CoinRepository {
 
-    suspend fun getCoins():List<CoinDto>
+    suspend fun getCoins(): List<CoinDto>
 
     suspend fun getCoinById(coinId: String): CoinDetailDto
 }

@@ -17,31 +17,29 @@ import kotlinx.coroutines.flow.onEach
 @HiltViewModel
 class CoinDetailViewModel @Inject constructor(
     private val getCoinUseCase: GetCoinUseCase,
-    savedStateHandle: SavedStateHandle  //bundle: contains information about state
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    //Used to maintain the state
 
-    private val _state =
-        mutableStateOf(CoinDetailState())  //private : To avoid modifying the list during compositions
+    private val _state = mutableStateOf(CoinDetailState())
     val state: State<CoinDetailState> = _state
 
     init {
-        savedStateHandle.get<String>(Constants.PARAM_COIN_ID)?.let {coinId->
+        savedStateHandle.get<String>(Constants.PARAM_COIN_ID)?.let { coinId ->
             getCoin(coinId)
         }
     }
+
     private fun getCoin(coinId: String) {
         getCoinUseCase(coinId).onEach { result ->
             when (result) {
                 is Resource.Success -> {
-                  _state.value= CoinDetailState(coin = result.data)
+                    _state.value = CoinDetailState(coin = result.data)
                 }
-
                 is Resource.Error -> {
-                    _state.value =
-                        CoinDetailState(error = result.message ?: "An Unexpected error occurred!")
+                    _state.value = CoinDetailState(
+                        error = result.message ?: "An unexpected error occured"
+                    )
                 }
-
                 is Resource.Loading -> {
                     _state.value = CoinDetailState(isLoading = true)
                 }

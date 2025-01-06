@@ -97,6 +97,9 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
 
+    implementation ("com.airbnb.android:lottie-compose:6.0.0") // Add the Lottie Compose dependency
+    implementation("io.coil-kt:coil-compose:2.4.0") // Add Coil Compose dependency
+
 }
 kapt{
     correctErrorTypes = true
