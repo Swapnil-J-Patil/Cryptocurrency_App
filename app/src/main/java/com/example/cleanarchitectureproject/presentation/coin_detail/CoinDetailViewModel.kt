@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.coin_detail
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.example.cleanarchitectureproject.domain.use_case.get_coins.GetCoinsUseCase
@@ -34,6 +35,7 @@ class CoinDetailViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     _state.value = CoinDetailState(coin = result.data)
+                    Log.d("cryptoCurrency", "getCoin: ${result.data}")
                 }
                 is Resource.Error -> {
                     _state.value = CoinDetailState(

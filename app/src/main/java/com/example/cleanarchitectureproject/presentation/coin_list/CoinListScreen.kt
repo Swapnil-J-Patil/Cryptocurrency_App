@@ -59,6 +59,7 @@ fun SharedTransitionScope.CoinListScreen(
     val painter = rememberImagePainter("https://www.shutterstock.com/image-illustration/top-7-cryptocurrency-tokens-by-600nw-2152214777.jpg")
 
     Box(modifier = Modifier.fillMaxSize()
+        .background(Color.White)
         //.padding(top=10.dp)
     ) {
         if(!state.error.isNotBlank() && !state.isLoading)
