@@ -100,6 +100,8 @@ dependencies {
     implementation ("com.airbnb.android:lottie-compose:6.0.0") // Add the Lottie Compose dependency
     implementation("io.coil-kt:coil-compose:2.4.0") // Add Coil Compose dependency
 
+    implementation (libs.compose.charts)
+
 }
 kapt{
     correctErrorTypes = true

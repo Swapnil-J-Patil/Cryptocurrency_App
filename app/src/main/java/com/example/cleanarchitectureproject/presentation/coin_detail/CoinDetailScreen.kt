@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.coin_detail
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -43,6 +44,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.coin_detail.components.CoinTag
+import com.example.cleanarchitectureproject.presentation.coin_detail.components.PriceLineChart
 import com.example.cleanarchitectureproject.presentation.coin_detail.components.TeamListItem
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
@@ -55,6 +57,7 @@ fun SharedTransitionScope.CoinDetailScreen(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val state = viewModel.state.value
+    val cryptoState=viewModel.cryptoState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader)) // Ensure the animation is in res/raw folder
     val progress by animateLottieCompositionAsState(composition)
     val alpha = remember { Animatable(0f) } // Start with full transparency
@@ -129,6 +132,24 @@ fun SharedTransitionScope.CoinDetailScreen(
                                 )
                         )
                         Spacer(modifier = Modifier.height(15.dp))
+                        cryptoState.cryptocurrency?.let { cryptocurrency ->
+                            state.coin?.let { coin ->
+                                val matchingCurrency = cryptocurrency.data.find { it.symbol.equals(coin.symbol, ignoreCase = true) }
+                                matchingCurrency?.let { currency ->
+                                    PriceLineChart(currency = currency,Modifier
+                                        .graphicsLayer(
+                                            alpha = alpha.value,
+                                            translationX = offsetX.value // Offset to create a slide-in effect
+                                        )
+                                        .fillMaxWidth()
+                                        .height(300.dp)
+                                        .padding(horizontal = 10.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             text = "Tags",
                             style = MaterialTheme.typography.bodyLarge,
@@ -199,7 +220,7 @@ fun SharedTransitionScope.CoinDetailScreen(
                 }
             }
         }
-        if (state.error.isNotBlank()) {
+        if (state.error.isNotBlank() || cryptoState.error.isNotBlank()) {
             Text(
                 text = state.error,
                 color = MaterialTheme.colorScheme.error,
@@ -210,7 +231,7 @@ fun SharedTransitionScope.CoinDetailScreen(
                     .align(Alignment.Center)
             )
         }
-        if (state.isLoading) {
+        if (state.isLoading || cryptoState.isLoading) {
             LottieAnimation(
                 composition = composition,
                 progress = { progress },
