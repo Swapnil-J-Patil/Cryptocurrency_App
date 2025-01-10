@@ -1,9 +1,9 @@
-package com.example.cleanarchitectureproject.domain.repository
+package com.example.cleanarchitectureproject.data.remote
 
 import com.example.cleanarchitectureproject.data.remote.dto.coinlore.CryptocurrencyCLDTO
+import retrofit2.http.GET
 
-
-interface CryptoRepository {
+interface CoinLoreApi{
+    @GET("tickers/")
     suspend fun getCurrency(): CryptocurrencyCLDTO
-
 }

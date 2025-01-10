@@ -1,8 +1,8 @@
 package com.example.cleanarchitectureproject.data.repository
 
 import com.example.cleanarchitectureproject.data.remote.CoinPaprikaApi
-import com.example.cleanarchitectureproject.data.remote.dto.CoinDetailDto
-import com.example.cleanarchitectureproject.data.remote.dto.CoinDto
+import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.CoinDetailDto
+import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.CoinDto
 import com.example.cleanarchitectureproject.domain.repository.CoinRepository
 import javax.inject.Inject
 

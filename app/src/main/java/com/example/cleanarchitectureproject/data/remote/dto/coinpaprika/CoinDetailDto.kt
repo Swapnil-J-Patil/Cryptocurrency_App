@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.data.remote.dto
+package com.example.cleanarchitectureproject.data.remote.dto.coinpaprika
 
 import com.example.cleanarchitectureproject.domain.model.CoinDetail
 import com.google.gson.annotations.SerializedName

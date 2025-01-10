@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
-import com.example.cleanarchitectureproject.data.remote.dto.TeamMember
+import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.TeamMember
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 @Composable

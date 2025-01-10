@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.data.remote.dto
+package com.example.cleanarchitectureproject.data.remote.dto.coinpaprika
 
 data class Stats(
     val contributors: Int,

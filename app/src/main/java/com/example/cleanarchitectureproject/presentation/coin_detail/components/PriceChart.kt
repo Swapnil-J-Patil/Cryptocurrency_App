@@ -2,23 +2,20 @@ package com.example.cleanarchitectureproject.presentation.coin_detail.components
 
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
-import com.example.cleanarchitectureproject.domain.model.Currency
+import com.example.cleanarchitectureproject.data.remote.dto.coinlore.CurrencyCL
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.Line
 
 @Composable
-fun PriceLineChart(currency: Currency,modifier: Modifier) {
+fun PriceLineChart(currency: CurrencyCL, modifier: Modifier) {
     // Data preparation
     val priceChanges = listOf(
         currency.percentChange1h.toDouble(),

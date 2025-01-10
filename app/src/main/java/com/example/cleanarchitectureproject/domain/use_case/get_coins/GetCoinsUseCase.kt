@@ -1,7 +1,7 @@
 package com.example.cleanarchitectureproject.domain.use_case.get_coins
 
 import com.example.cleanarchitectureproject.common.Resource
-import com.example.cleanarchitectureproject.data.remote.dto.toCoin
+import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.toCoin
 import com.example.cleanarchitectureproject.domain.model.Coin
 import com.example.cleanarchitectureproject.domain.repository.CoinRepository
 import kotlinx.coroutines.flow.Flow

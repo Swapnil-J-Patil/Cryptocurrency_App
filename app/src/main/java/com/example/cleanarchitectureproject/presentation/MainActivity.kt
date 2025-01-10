@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cleanarchitectureproject.presentation.coin_detail.CoinDetailScreen
 import com.example.cleanarchitectureproject.presentation.coin_list.CoinListScreen
+import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -33,10 +34,17 @@ class MainActivity : ComponentActivity() {
             CleanArchitectureProjectTheme {
                 val navController = rememberNavController()
                 SharedTransitionLayout {
+
+
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.CoinListScreen.route
+                        startDestination = Screen.HomeScreen.route
                     ) {
+                        composable(
+                            route = Screen.HomeScreen.route
+                        ) {
+                            HomeScreen()
+                        }
                         composable(
                             route = Screen.CoinListScreen.route
                         ) {

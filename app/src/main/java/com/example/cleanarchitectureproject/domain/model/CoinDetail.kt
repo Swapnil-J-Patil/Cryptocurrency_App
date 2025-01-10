@@ -1,6 +1,6 @@
 package com.example.cleanarchitectureproject.domain.model
 
-import com.example.cleanarchitectureproject.data.remote.dto.TeamMember
+import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.TeamMember
 
 data class CoinDetail(
     val coinId:String,

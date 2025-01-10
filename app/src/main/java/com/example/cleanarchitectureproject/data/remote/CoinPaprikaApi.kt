@@ -1,7 +1,7 @@
 package com.example.cleanarchitectureproject.data.remote
 
-import com.example.cleanarchitectureproject.data.remote.dto.CoinDetailDto
-import com.example.cleanarchitectureproject.data.remote.dto.CoinDto
+import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.CoinDetailDto
+import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.CoinDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 

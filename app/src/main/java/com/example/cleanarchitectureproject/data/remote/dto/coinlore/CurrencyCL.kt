@@ -1,12 +1,8 @@
-package com.example.cleanarchitectureproject.domain.model
+package com.example.cleanarchitectureproject.data.remote.dto.coinlore
 
 import com.google.gson.annotations.SerializedName
 
-data class Cryptocurrency(
-    val data: List<Currency>
-
-)
-data class Currency(
+data class CurrencyCL(
     @SerializedName("id")
     val id: String,
     @SerializedName("symbol")
@@ -26,4 +22,3 @@ data class Currency(
     @SerializedName("volume24")
     val volume24: Float
 )
-

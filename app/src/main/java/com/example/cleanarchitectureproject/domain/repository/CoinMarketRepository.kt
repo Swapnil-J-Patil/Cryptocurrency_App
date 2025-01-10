@@ -1,11 +1,11 @@
 package com.example.cleanarchitectureproject.domain.repository
 
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptocurrencyCMDTO
 import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.CoinDetailDto
 import com.example.cleanarchitectureproject.data.remote.dto.coinpaprika.CoinDto
 
-interface CoinRepository {
+interface CoinMarketRepository {
 
-    suspend fun getCoins(): List<CoinDto>
+    suspend fun getCryptoCurrency(): CryptocurrencyCMDTO
 
-    suspend fun getCoinById(coinId: String): CoinDetailDto
 }
