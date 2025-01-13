@@ -34,7 +34,8 @@ fun BottomNavItem(
     isSelected: Boolean,
 ) {
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .background( MaterialTheme.colorScheme.tertiary),
         contentAlignment = Alignment.Center,
     ) {
         val animatedHeight by animateDpAsState(targetValue = if (isSelected) 36.dp else 26.dp)
@@ -55,7 +56,7 @@ fun BottomNavItem(
                     shape = RoundedCornerShape(20.dp)
                 )
                 .background(
-                    color = MaterialTheme.colorScheme.surface,
+                    color = MaterialTheme.colorScheme.tertiary,
                     shape = RoundedCornerShape(20.dp)
                 ),
             verticalAlignment = Alignment.CenterVertically,

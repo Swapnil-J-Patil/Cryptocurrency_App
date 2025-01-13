@@ -6,12 +6,14 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +24,7 @@ import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,9 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil.compose.rememberAsyncImagePainter
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
+import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -43,23 +49,24 @@ import kotlin.math.absoluteValue
 @Composable
 fun Carousel(
     imageUrls: List<String>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick:(Int)->Unit,
+    dotsPadding: Dp,
+    currency:List<CryptoCurrencyCM>
 ) {
     BoxWithConstraints(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(230.dp),
+        modifier = modifier,
         contentAlignment = Alignment.TopCenter,
     ) {
         val itemSpacing = 16.dp
-        val pagerState = rememberPagerState(pageCount = { imageUrls.size })
+        val pagerState = rememberPagerState(pageCount = { currency.size})
         val scope = rememberCoroutineScope()
 
         // Auto-scroll functionality
         LaunchedEffect(Unit) {
             while (true) {
-                delay(3000) // Change image every 3 seconds
-                val nextPage = (pagerState.currentPage + 1) % imageUrls.size
+                delay(4000) // Change image every 3 seconds
+                val nextPage = (pagerState.currentPage + 1) % currency.size
                 scope.launch {
                     pagerState.animateScrollToPage(
                         page = nextPage,
@@ -74,23 +81,54 @@ fun Carousel(
 
         // HorizontalPager
         HorizontalPager(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(), // Use a simple modifier
             state = pagerState,
             flingBehavior = PagerDefaults.flingBehavior(
                 state = pagerState,
                 pagerSnapDistance = PagerSnapDistance.atMost(0)
             ),
-            contentPadding = PaddingValues(horizontal = 20.dp),
+            contentPadding = PaddingValues(horizontal = 5.dp),
             pageSpacing = itemSpacing
         ) { page ->
-            Image(
-                painter = rememberAsyncImagePainter(imageUrls[page]),
+
+            PriceLineChart(currencyCM = currency.get(page).quotes[0],
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(horizontal = 10.dp, vertical = 16.dp)
+                    .clickable {
+                        onClick(page)
+                    }
+                    //.background(MaterialTheme.colorScheme.surfaceContainer)
+                   // .clip(RoundedCornerShape(16.dp)) // Rounded corners
+                    .graphicsLayer {
+                        val pageOffset = (
+                                (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                                ).absoluteValue
+
+                        // Smoother scaling and alpha effects
+                        val easingFraction = CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f).transform(
+                            1f - pageOffset.coerceIn(0f, 1f)
+                        )
+
+                        alpha = lerp(start = 0.8f, stop = 1f, fraction = easingFraction)
+                        scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
+                        scaleX = scaleY
+                    },
+                isMoreData = true,
+                labelName = currency.get(page).name
+            )
+            /*Image(
+                painter = rememberAsyncImagePainter(currency[page]),
                 contentDescription = "",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .fillMaxHeight()
                     .padding(top = 10.dp)
+                    .clickable {
+                        onClick(page)
+                    }
                     .clip(RoundedCornerShape(16.dp)) // Rounded corners
                     .graphicsLayer {
                         val pageOffset = (
@@ -106,7 +144,8 @@ fun Carousel(
                         scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
                         scaleX = scaleY
                     }
-            )
+            )*/
+
         }
 
         // Dot Indicators
@@ -115,7 +154,7 @@ fun Carousel(
             currentPage = pagerState.currentPage,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(10.dp)
+                .padding(dotsPadding)
         )
     }
 }

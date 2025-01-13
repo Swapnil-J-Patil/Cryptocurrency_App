@@ -34,7 +34,7 @@ fun BottomNavAnimation(
             .background(color = MaterialTheme.colorScheme.surface)
             .height(64.dp)
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+           // .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
     ) {
         Row(
             Modifier.fillMaxWidth(),

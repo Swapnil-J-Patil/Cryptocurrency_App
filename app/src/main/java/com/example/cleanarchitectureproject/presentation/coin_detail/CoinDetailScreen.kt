@@ -1,26 +1,18 @@
 package com.example.cleanarchitectureproject.presentation.coin_detail
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 
@@ -37,14 +29,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.rememberImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.coin_detail.components.CoinTag
-import com.example.cleanarchitectureproject.presentation.coin_detail.components.PriceLineChart
+import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
 import com.example.cleanarchitectureproject.presentation.coin_detail.components.TeamListItem
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
@@ -143,7 +134,9 @@ fun SharedTransitionScope.CoinDetailScreen(
                                         )
                                         .fillMaxWidth()
                                         .height(300.dp)
-                                        .padding(horizontal = 10.dp)
+                                        .padding(horizontal = 10.dp),
+                                        isMoreData = false,
+                                        labelName = "Price Change (%)"
                                     )
                                 }
                             }
