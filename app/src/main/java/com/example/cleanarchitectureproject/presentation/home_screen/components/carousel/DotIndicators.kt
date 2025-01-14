@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.presentation.home_screen.components
+package com.example.cleanarchitectureproject.presentation.home_screen.components.carousel
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
