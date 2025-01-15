@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.presentation.home_screen.components.carousel
+package com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

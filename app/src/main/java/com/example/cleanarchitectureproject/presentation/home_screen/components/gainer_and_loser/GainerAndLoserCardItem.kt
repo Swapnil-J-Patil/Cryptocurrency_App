@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -60,20 +61,19 @@ fun GainerAndLoserCardItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Currency Logo (10%)
-            Box(
+
+            Image(
+                painter = rememberAsyncImagePainter(logo),
+                contentDescription = "Currency Logo",
+                contentScale = ContentScale.FillBounds,
                 modifier = Modifier
+                    .clip(CircleShape)
+                    .fillMaxHeight()
                     .weight(0.1f)
                     .aspectRatio(1f)
                     .clip(CircleShape)
-                    .background(green.copy(alpha = 0.2f)), // Background color for the icon
-                contentAlignment = Alignment.Center // Center the icon inside the box
-            ) {
-                Image(
-                    painter = rememberAsyncImagePainter(logo),
-                    contentDescription = "Currency Logo",
-                    contentScale = ContentScale.FillBounds,
-                )
-            }
+            )
+
             Spacer(modifier = Modifier.width(12.dp))
 
             // Currency Name and Symbol (30%)
@@ -102,7 +102,7 @@ fun GainerAndLoserCardItem(
 
             // Price and Percentage (20%)
             Column(
-                modifier = Modifier.weight(0.2f),
+                modifier = Modifier.weight(0.25f),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.Start
             ) {
@@ -125,7 +125,7 @@ fun GainerAndLoserCardItem(
             // Graph Image (40%)
             Box(
                 modifier = Modifier
-                    .weight(0.4f)
+                    .weight(0.35f)
                     .padding(horizontal = 10.dp)
                     .aspectRatio(2.5f),
                 contentAlignment = Alignment.Center // Center the icon inside the box
@@ -134,7 +134,7 @@ fun GainerAndLoserCardItem(
                     painter = rememberAsyncImagePainter(
                         model = image,
                         error = painterResource(id = R.drawable.placeholder) // Replace with your drawable resource
-                        ),
+                    ),
                     contentDescription = "Graph Image",
                     contentScale = ContentScale.FillBounds,
                 )

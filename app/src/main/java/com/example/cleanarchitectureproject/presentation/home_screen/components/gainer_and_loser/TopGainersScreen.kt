@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -18,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
@@ -25,9 +30,11 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 
 @Composable
 fun TopGainersScreen(gainers: List<CryptoCurrencyCM>) {
-    val listState = rememberLazyListState()
-
-    LazyColumn(
+    val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val listState = rememberLazyGridState()
+    val halfScreenWidth = if(screenWidth > 600) screenWidth / 3 else screenWidth
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(halfScreenWidth.dp),
         state = listState, // Pass the state here
         modifier = Modifier
             .fillMaxWidth()
@@ -63,7 +70,7 @@ fun TopGainersScreen(gainers: List<CryptoCurrencyCM>) {
             GainerAndLoserCardItem(
                 currencyName = gainer.name,
                 symbol = gainer.symbol,
-                percentage = "+ " + gainer.quotes[0].percentChange24h.toString().substring(0, 5) + " %",
+                percentage = "+" + gainer.quotes[0].percentChange24h.toString().substring(0, 5) + " %",
                 price = "$ " + gainer.quotes[0].price.toString().substring(0, 5),
                 image = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png",
                 color = color,

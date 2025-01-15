@@ -23,12 +23,23 @@ fun TypingAnimation(text: String, modifier: Modifier = Modifier) {
     // Launch the typing animation
     LaunchedEffect(fullText) {
         while (true) {
+            // Typing animation forward
             for (i in fullText.indices) {
                 visibleText = fullText.take(i + 1)
                 delay(100) // Controls the typing speed
             }
-            // Loop the animation after finishing the full text
-            delay(1000) // Wait before starting again
+
+            // Pause for a moment before starting to erase the text
+            delay(1000)
+
+            // Erase animation backward
+            for (i in fullText.length downTo 1) {
+                visibleText = fullText.take(i - 1)
+                delay(50) // Controls the speed of erasing
+            }
+
+            // Pause again before starting the next iteration
+            delay(1000)
         }
     }
 

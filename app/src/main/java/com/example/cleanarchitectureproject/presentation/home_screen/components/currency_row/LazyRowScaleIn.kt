@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.presentation.home_screen.components
+package com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
-import com.example.cleanarchitectureproject.presentation.home_screen.components.carousel.CurrencyCardItem
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 
