@@ -1,8 +1,12 @@
 package com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,17 +32,23 @@ import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCur
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun TopGainersScreen(gainers: List<CryptoCurrencyCM>) {
-    val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+fun SharedTransitionScope.TopGainersScreen(
+    gainers: List<CryptoCurrencyCM>,
+    onItemClick:(CryptoCurrencyCM,Boolean)->Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
+    val screenWidth =
+        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
     val listState = rememberLazyGridState()
-    val halfScreenWidth = if(screenWidth > 600) screenWidth / 3 else screenWidth
+    val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
     LazyVerticalGrid(
         columns = GridCells.Adaptive(halfScreenWidth.dp),
         state = listState, // Pass the state here
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min=1000.dp,max = 2000.dp)
+            .heightIn(min = 1000.dp, max = 2000.dp)
             .padding(top = 8.dp)
     ) {
         itemsIndexed(gainers) { index, gainer ->
@@ -70,7 +80,8 @@ fun TopGainersScreen(gainers: List<CryptoCurrencyCM>) {
             GainerAndLoserCardItem(
                 currencyName = gainer.name,
                 symbol = gainer.symbol,
-                percentage = "+" + gainer.quotes[0].percentChange24h.toString().substring(0, 5) + " %",
+                percentage = "+" + gainer.quotes[0].percentChange24h.toString()
+                    .substring(0, 5) + " %",
                 price = "$ " + gainer.quotes[0].price.toString().substring(0, 5),
                 image = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png",
                 color = color,
@@ -79,6 +90,13 @@ fun TopGainersScreen(gainers: List<CryptoCurrencyCM>) {
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 15.dp)
                     .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
+                    .clickable {
+                        onItemClick(gainer,true)
+                    }
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "coinCard/${gainer.id}"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    ),
             )
         }
     }

@@ -2,8 +2,12 @@ package com.example.cleanarchitectureproject.presentation.home_screen
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -32,21 +36,26 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.Navbar
+import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.navbar.BottomNavAnimation
 import com.example.cleanarchitectureproject.presentation.home_screen.components.carousel.Carousel
-import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.GainersLosersTabs
+import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.LazyRowScaleIn
 import com.example.cleanarchitectureproject.presentation.home_screen.components.TypingAnimation
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun HomeScreen(
+fun SharedTransitionScope.HomeScreen(
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val state = viewModel.statsState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
@@ -63,7 +72,7 @@ fun HomeScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val carouselHeight = if (screenWidth > 600.dp) 330.dp else 290.dp
     val dotsPadding = if (screenWidth > 600.dp) 8.dp else 4.dp
-
+    val tabTitles = listOf("Top Gainers", "Top Losers")
     // Define a scale animation using animateFloatAsState
     val scale by animateFloatAsState(
         targetValue = if (!(state.error.isNotBlank() || state.isLoading)) 1f else 0f,
@@ -143,7 +152,18 @@ fun HomeScreen(
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
-                        GainersLosersTabs(gainers = topGainers, losers = topLosers)
+                        Tabs(gainers = topGainers, losers = topLosers, onItemClick = { item, isGainer->
+
+                            ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
+                            val price="$ " + if(item.quotes[0].price.toString().length>10)item.quotes[0].price.toString().substring(0, 10) else item.quotes[0].price.toString()
+                            val percentage=item.quotes[0].percentChange24h.toString().substring(0, 5)
+                            val isSaved=false
+                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}")
+                        },
+                            animatedVisibilityScope,
+                            "home",
+                            tabTitles,
+                            )
                     }
                 }
             }

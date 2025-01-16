@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cleanarchitectureproject.presentation.coin_detail.CoinDetailScreen
 import com.example.cleanarchitectureproject.presentation.coin_list.CoinListScreen
+import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
                         composable(
                             route = Screen.HomeScreen.route
                         ) {
-                            HomeScreen()
+                            HomeScreen(navController, animatedVisibilityScope = this)
                         }
                         composable(
                             route = Screen.CoinListScreen.route
@@ -60,6 +61,39 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val coinId = it.arguments?.getString("coinId") ?: ""
                             CoinDetailScreen(coinId = coinId, animatedVisibilityScope = this)
+                        }
+
+                        composable(
+                            route = Screen.CoinLivePriceScreen.route + "/{coinId}/{coinSymbol}/{price}/{coinPercentage}/{isGainer}/{isSaved}",
+                            arguments = listOf(
+                                navArgument("coinId") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("coinSymbol") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("price") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("coinPercentage") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("isGainer") {
+                                    type = NavType.BoolType
+                                },
+                                navArgument("isSaved") {
+                                    type = NavType.BoolType
+                                }
+                            )
+                        ) {
+                            val coinId = it.arguments?.getString("coinId") ?: ""
+                            val coinSymbol = it.arguments?.getString("coinSymbol") ?: ""
+                            val coinPrice = it.arguments?.getString("price") ?: ""
+                            val coinPercentage = it.arguments?.getString("coinPercentage") ?: ""
+                            val isGainer = it.arguments?.getBoolean("isGainer") ?: false
+                            val isSaved = it.arguments?.getBoolean("isSaved") ?: false
+
+                            CoinLivePriceScreen(coinId=coinId,coinSymbol = coinSymbol,coinPrice=coinPrice, coinPercentage = coinPercentage, isGainer = isGainer, isSaved = isSaved, animatedVisibilityScope = this)
                         }
                     }
                 }

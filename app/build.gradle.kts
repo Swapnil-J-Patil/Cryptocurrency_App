@@ -101,6 +101,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.4.0") // Add Coil Compose dependency
 
     implementation (libs.compose.charts)
+    implementation ("androidx.compose.material:material-icons-extended:1.7.6")
 
 }
 kapt{

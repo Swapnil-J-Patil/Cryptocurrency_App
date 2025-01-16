@@ -39,7 +39,7 @@ fun TypingAnimation(text: String, modifier: Modifier = Modifier) {
             }
 
             // Pause again before starting the next iteration
-            delay(1000)
+            //delay(500)
         }
     }
 

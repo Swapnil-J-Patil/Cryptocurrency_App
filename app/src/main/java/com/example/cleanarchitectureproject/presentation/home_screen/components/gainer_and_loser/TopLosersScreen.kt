@@ -1,8 +1,12 @@
 package com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -28,8 +32,13 @@ import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCur
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun TopLosersScreen(losers: List<CryptoCurrencyCM>) {
+fun SharedTransitionScope.TopLosersScreen(
+    losers: List<CryptoCurrencyCM>,
+    onItemClick:(CryptoCurrencyCM,Boolean)->Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
     val listState = rememberLazyGridState()
     val halfScreenWidth = if(screenWidth > 600) screenWidth / 3 else screenWidth
@@ -80,6 +89,13 @@ fun TopLosersScreen(losers: List<CryptoCurrencyCM>) {
                     .fillMaxWidth()
                     .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
                     .padding(vertical = 8.dp, horizontal = 15.dp)
+                    .clickable {
+                        onItemClick(loser,false)
+                    }
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "coinCard/${loser.id}"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    ),
             )
         }
     }
