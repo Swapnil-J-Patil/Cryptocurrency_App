@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -39,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
@@ -59,7 +61,8 @@ fun SharedTransitionScope.HomeScreen(
 ) {
     val state = viewModel.statsState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
-    val progress by animateLottieCompositionAsState(composition)
+    val progress by animateLottieCompositionAsState(composition,iterations = LottieConstants.IterateForever // Infinite repeat mode
+    )
 
     val screen = listOf(
         Navbar.Home,
@@ -152,7 +155,52 @@ fun SharedTransitionScope.HomeScreen(
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
-                        Tabs(gainers = topGainers, losers = topLosers, onItemClick = { item, isGainer->
+                        val gainerPercentageList= remember(topGainers) {
+                            topGainers.map { gainer ->
+                                "+" + gainer.quotes[0].percentChange24h.toString()
+                                    .substring(0, 5) + " %"
+                            }
+                        }
+                        val gainerPriceList= remember(topGainers) {
+                            topGainers.map { gainer ->
+                                "$ " + gainer.quotes[0].price.toString().substring(0, 5)
+                            }
+                        }
+
+                        val gainerLogoList= remember(topGainers) {
+                            topGainers.map { gainer ->
+                                "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png"
+
+                            }
+                        }
+                        val gainerGraphList= remember(topGainers) {
+                            topGainers.map { gainer ->
+                                "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png"
+                            }
+                        }
+                        val loserPercentageList= remember(topLosers) {
+                            topLosers.map { loser ->
+                               loser.quotes[0].percentChange24h.toString()
+                                    .substring(0, 5) + " %"
+                            }
+                        }
+                        val loserPriceList= remember(topGainers) {
+                            topGainers.map { gainer ->
+                                "$ " + gainer.quotes[0].price.toString().substring(0, 5)
+                            }
+                        }
+                        val loserLogoList= remember(topLosers) {
+                            topLosers.map { loser ->
+                                "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png"
+
+                            }
+                        }
+                        val loserGraphList= remember(topLosers) {
+                            topLosers.map { loser ->
+                                "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
+                            }
+                        }
+                        Tabs(gainers = topGainers, losers = topLosers, gainersPercentage = gainerPercentageList, losersPercentage = loserPercentageList, onItemClick = { item, isGainer->
 
                             ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
                             val price="$ " + if(item.quotes[0].price.toString().length>10)item.quotes[0].price.toString().substring(0, 10) else item.quotes[0].price.toString()
@@ -163,6 +211,12 @@ fun SharedTransitionScope.HomeScreen(
                             animatedVisibilityScope,
                             "home",
                             tabTitles,
+                            gainersPrice = gainerPriceList,
+                            losersPrice = loserPriceList,
+                            gainersLogo = gainerLogoList,
+                            losersLogo=loserLogoList,
+                            gainersGraph = gainerGraphList,
+                            losersGraph = loserGraphList
                             )
                     }
                 }

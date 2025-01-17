@@ -1,5 +1,8 @@
 package com.example.cleanarchitectureproject.data.remote.dto.coinmarket
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class CryptoCurrencyCM(
     val id: Int,
     val name: String,

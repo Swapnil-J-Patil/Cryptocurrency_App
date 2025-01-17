@@ -29,10 +29,18 @@ import kotlinx.coroutines.launch
 fun SharedTransitionScope.Tabs(
     gainers: List<CryptoCurrencyCM>? = emptyList(),
     losers: List<CryptoCurrencyCM>? = emptyList(),
+    gainersPercentage: List<String>? = emptyList(),
+    losersPercentage: List<String>? = emptyList(),
     onItemClick: (CryptoCurrencyCM, Boolean) -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
     screen: String,
-    tabTitles: List<String>
+    tabTitles: List<String>,
+    gainersPrice: List<String>? = emptyList(),
+    losersPrice: List<String>? = emptyList(),
+    gainersLogo: List<String>? = emptyList(),
+    losersLogo: List<String>? = emptyList(),
+    gainersGraph: List<String>? = emptyList(),
+    losersGraph: List<String>? = emptyList(),
 ) {
     // val tabTitles = listOf("Top Gainers", "Top Losers")
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
@@ -91,14 +99,22 @@ fun SharedTransitionScope.Tabs(
                         TopGainersScreen(
                             it,
                             onItemClick = { item, isGainer -> onItemClick(item, isGainer) },
-                            animatedVisibilityScope
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            gainersPercentage = gainersPercentage,
+                            gainersPrice = gainersPrice,
+                            gainersLogo = gainersLogo,
+                            gainersGraph=gainersGraph
                         )
                     } // Content for "Top Gainers"
                     1 -> losers?.let {
                         TopLosersScreen(
                             it,
                             onItemClick = { item, isGainer -> onItemClick(item, isGainer) },
-                            animatedVisibilityScope
+                            animatedVisibilityScope,
+                            losersPercentage = losersPercentage,
+                            losersPrice = losersPrice,
+                            losersLogo = losersLogo,
+                            losersGraph = losersGraph
                         )
                     }   // Content for "Top Losers"
                 }
@@ -138,7 +154,13 @@ fun SharedTransitionScope.Tabs(
                     )
                 }
             }
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxSize() // Let the pager take up the remaining space
+            ) { page ->
 
+            }
         }
 
 

@@ -37,22 +37,29 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 fun SharedTransitionScope.TopLosersScreen(
     losers: List<CryptoCurrencyCM>,
     onItemClick:(CryptoCurrencyCM,Boolean)->Unit,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    losersPercentage: List<String>? = emptyList(),
+    losersPrice: List<String>? = emptyList(),
+    losersLogo: List<String>? = emptyList(),
+    losersGraph: List<String>? = emptyList(),
 ) {
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
+
     val listState = rememberLazyGridState()
     val halfScreenWidth = if(screenWidth > 600) screenWidth / 3 else screenWidth
+    val adaptiveHeight = screenHeight *0.5
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(halfScreenWidth.dp),
         state = listState, // Pass the state here
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min=1000.dp,max = 2000.dp)
+            .height(adaptiveHeight.dp)
             .padding(top = 8.dp)
     ) {
         itemsIndexed(losers) { index, loser ->
-            val color = if (loser.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
+           // val color = if (loser.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
 
             // Animate visibility
             val isVisible = remember {
@@ -62,29 +69,30 @@ fun SharedTransitionScope.TopLosersScreen(
                 }
             }
             val scale = remember { Animatable(0f) }
-            val hasAnimated = remember { mutableStateOf(false) }
+            //val hasAnimated = remember { mutableStateOf(false) }
 
             LaunchedEffect(isVisible.value) {
-                if (isVisible.value && !hasAnimated.value) {
+                if (isVisible.value) {
                     scale.animateTo(
                         targetValue = 1f,
                         animationSpec = tween(
-                            durationMillis = 300,
+                            durationMillis = 300, // Adjust as needed for smoothness
                             easing = FastOutSlowInEasing
                         )
                     )
-                    hasAnimated.value = true
+                } else {
+                    scale.snapTo(0f) // Reset scale when not visible
                 }
             }
 
             GainerAndLoserCardItem(
                 currencyName = loser.name,
                 symbol = loser.symbol,
-                percentage = loser.quotes[0].percentChange24h.toString().substring(0, 5) + " %",
-                price = "$ " + loser.quotes[0].price.toString().substring(0, 5),
-                image = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png",
-                color = color,
-                logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png",
+                percentage = losersPercentage?.get(index) ?: "",
+                price = losersPrice?.get(index) ?: "",
+                image = losersGraph?.get(index) ?: "",
+                color = darkRed,
+                logo = losersLogo?.get(index) ?: "",
                 modifier = Modifier
                     .fillMaxWidth()
                     .graphicsLayer(scaleX = scale.value, scaleY = scale.value)

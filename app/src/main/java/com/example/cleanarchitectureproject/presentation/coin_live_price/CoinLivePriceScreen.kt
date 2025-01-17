@@ -75,7 +75,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hour", "1 Day", "1 Week", "1 Month")
 
     val adaptiveHeight = if (screenWidth > 600) screenWidth*0.2 else screenWidth*0.25
-    val adaptiveWeight= if (screenWidth > 600) 0.1f else 0.2f
+    val adaptiveWeightLogo= if (screenWidth > 600) 0.1f else 0.2f
+    val adaptiveWeightDetails= if (screenWidth > 600) 0.7f else 0.53f
+    val adaptiveWeightGraph= if (screenWidth > 600) 0.2f else 0.27f
+
     val iconSize=if (screenWidth > 600) 50.dp else 40.dp
     Column(
         modifier = Modifier
@@ -88,10 +91,6 @@ fun SharedTransitionScope.CoinLivePriceScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .sharedElement(
-                    state = rememberSharedContentState(key = "coinCard/${coinId}"),
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
         ) {
 
             Box(
@@ -126,6 +125,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(adaptiveHeight.dp)
+                    .sharedElement(
+                        state = rememberSharedContentState(key = "coinCard/${coinId}"),
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
                     .padding(vertical = 8.dp, horizontal = 8.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
                 elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
@@ -147,7 +150,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                         modifier = Modifier
                             .clip(CircleShape)
                             .fillMaxHeight()
-                            .weight(adaptiveWeight)
+                            .weight(adaptiveWeightLogo)
                             .aspectRatio(1f)
                             .clip(CircleShape)
                     )
@@ -156,7 +159,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
                     // Price and Percentage (20%)
                     Column(
-                        modifier = Modifier.weight(0.5f),
+                        modifier = Modifier.weight(adaptiveWeightDetails),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.Start
                     ) {
@@ -177,13 +180,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     }
 
                     // Graph Image (40%)
-                    Box(
-                        modifier = Modifier
-                            .weight(0.3f)
-                            .padding(horizontal = 10.dp)
-                            .aspectRatio(2.5f),
-                        contentAlignment = Alignment.Center // Center the icon inside the box
-                    ) {
+
                         Image(
                             painter = rememberAsyncImagePainter(
                                 model = graph,
@@ -191,9 +188,12 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             ),
                             contentDescription = "Graph Image",
                             contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .weight(adaptiveWeightGraph)
+                                .padding(end = 10.dp),
                         )
                     }
-                }
+
             }
 
             Spacer(modifier = Modifier.height(12.dp))

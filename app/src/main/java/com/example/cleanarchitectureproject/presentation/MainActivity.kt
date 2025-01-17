@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 SharedTransitionLayout {
 
-
                     NavHost(
                         navController = navController,
                         startDestination = Screen.HomeScreen.route

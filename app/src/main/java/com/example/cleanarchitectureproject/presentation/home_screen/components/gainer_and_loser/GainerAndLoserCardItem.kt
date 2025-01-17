@@ -27,12 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.max
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
@@ -62,8 +65,11 @@ fun GainerAndLoserCardItem(
         ) {
             // Currency Logo (10%)
 
-            Image(
-                painter = rememberAsyncImagePainter(logo),
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(logo)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = "Currency Logo",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
@@ -73,6 +79,7 @@ fun GainerAndLoserCardItem(
                     .aspectRatio(1f)
                     .clip(CircleShape)
             )
+
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -130,11 +137,13 @@ fun GainerAndLoserCardItem(
                     .aspectRatio(2.5f),
                 contentAlignment = Alignment.Center // Center the icon inside the box
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = image,
-                        error = painterResource(id = R.drawable.placeholder) // Replace with your drawable resource
-                    ),
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(image)
+                        .crossfade(true) // Enable crossfade animation
+                        .placeholder(R.drawable.placeholder) // Placeholder drawable
+                        .error(R.drawable.placeholder) // Error drawable
+                        .build(),
                     contentDescription = "Graph Image",
                     contentScale = ContentScale.FillBounds,
                 )

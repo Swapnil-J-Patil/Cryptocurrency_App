@@ -36,25 +36,33 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 @Composable
 fun SharedTransitionScope.TopGainersScreen(
     gainers: List<CryptoCurrencyCM>,
-    onItemClick:(CryptoCurrencyCM,Boolean)->Unit,
-    animatedVisibilityScope: AnimatedVisibilityScope
-) {
-    val screenWidth =
-        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    onItemClick: (CryptoCurrencyCM, Boolean) -> Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    gainersPercentage: List<String>? = emptyList(),
+    gainersPrice: List<String>? = emptyList(),
+    gainersLogo: List<String>? = emptyList(),
+    gainersGraph: List<String>? = emptyList(),
+    ) {
+    val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
+
     val listState = rememberLazyGridState()
     val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
+    val adaptiveHeight = screenHeight *0.5
+    // Precompute visible indices
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(halfScreenWidth.dp),
-        state = listState, // Pass the state here
+        state = listState,
         modifier = Modifier
             .fillMaxWidth()
-            .heightIn(min = 1000.dp, max = 2000.dp)
+            .height(adaptiveHeight.dp)
             .padding(top = 8.dp)
     ) {
         itemsIndexed(gainers) { index, gainer ->
-            val color = if (gainer.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
+           // val color = if (gainer.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
 
-            // Animate visibility
+            // Check visibility
             val isVisible = remember {
                 derivedStateOf {
                     val visibleItems = listState.layoutInfo.visibleItemsInfo
@@ -62,36 +70,36 @@ fun SharedTransitionScope.TopGainersScreen(
                 }
             }
             val scale = remember { Animatable(0f) }
-            val hasAnimated = remember { mutableStateOf(false) }
+           // val hasAnimated = remember { mutableStateOf(false) }
 
             LaunchedEffect(isVisible.value) {
-                if (isVisible.value && !hasAnimated.value) {
+                if (isVisible.value) {
                     scale.animateTo(
                         targetValue = 1f,
                         animationSpec = tween(
-                            durationMillis = 300,
+                            durationMillis = 300, // Adjust as needed for smoothness
                             easing = FastOutSlowInEasing
                         )
                     )
-                    hasAnimated.value = true
+                } else {
+                    scale.snapTo(0f) // Reset scale when not visible
                 }
             }
 
             GainerAndLoserCardItem(
                 currencyName = gainer.name,
                 symbol = gainer.symbol,
-                percentage = "+" + gainer.quotes[0].percentChange24h.toString()
-                    .substring(0, 5) + " %",
-                price = "$ " + gainer.quotes[0].price.toString().substring(0, 5),
-                image = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png",
-                color = color,
-                logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png",
+                percentage = gainersPercentage?.get(index) ?: "",
+                price = gainersPrice?.get(index) ?: "",
+                image = gainersGraph?.get(index) ?: "",
+                color = darkGreen,
+                logo = gainersLogo?.get(index) ?: "",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 15.dp)
                     .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
                     .clickable {
-                        onItemClick(gainer,true)
+                        onItemClick(gainer, true)
                     }
                     .sharedElement(
                         state = rememberSharedContentState(key = "coinCard/${gainer.id}"),
