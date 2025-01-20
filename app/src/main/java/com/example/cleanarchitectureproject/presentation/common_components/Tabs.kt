@@ -1,8 +1,18 @@
 package com.example.cleanarchitectureproject.presentation.common_components
 
+import android.content.Context
+import android.util.Log
+import android.view.ViewGroup
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.rememberPagerState
@@ -16,10 +26,13 @@ import androidx.compose.foundation.pager.HorizontalPager
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.example.cleanarchitectureproject.presentation.coin_live_price.components.WebViewItem
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopGainersScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopLosersScreen
 import kotlinx.coroutines.launch
@@ -41,34 +54,49 @@ fun SharedTransitionScope.Tabs(
     losersLogo: List<String>? = emptyList(),
     gainersGraph: List<String>? = emptyList(),
     losersGraph: List<String>? = emptyList(),
+    symbol: String? = null,
 ) {
-    // val tabTitles = listOf("Top Gainers", "Top Losers")
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
-    val coroutineScope = rememberCoroutineScope() // Use Compose's coroutine scope
-    val screenWidth =
-        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
-    val width = screenWidth * 0.3
-    Column(modifier = Modifier.fillMaxSize()) {
+    val coroutineScope = rememberCoroutineScope()
+    val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
 
-        if (screen.equals("home")) {
-            // Tabs
+    val width = screenWidth * 0.3
+    val height=if(screenWidth> 600) screenHeight*0.7 else screenHeight*0.5
+    val isDarkTheme = isSystemInDarkTheme()
+    val theme=if(isDarkTheme)"Dark" else "Light"
+
+    val urls = remember {
+        listOf(
+            "https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=${symbol}USD&interval=15&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&hideideas=1&theme=$theme&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en&utm_source=coinmarketcap.com&utm_medium=widget&utm_campaign=chart&utm_term=BTCUSDT",
+            "https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=${symbol}USD&interval=1H&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&hideideas=1&theme=$theme&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en&utm_source=coinmarketcap.com&utm_medium=widget&utm_campaign=chart&utm_term=BTCUSDT",
+            "https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=${symbol}USD&interval=4H&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&hideideas=1&theme=$theme&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en&utm_source=coinmarketcap.com&utm_medium=widget&utm_campaign=chart&utm_term=BTCUSDT",
+            "https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=${symbol}USD&interval=D&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&hideideas=1&theme=$theme&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en&utm_source=coinmarketcap.com&utm_medium=widget&utm_campaign=chart&utm_term=BTCUSDT",
+            "https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=${symbol}USD&interval=W&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&hideideas=1&theme=$theme&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en&utm_source=coinmarketcap.com&utm_medium=widget&utm_campaign=chart&utm_term=BTCUSDT",
+            "https://s.tradingview.com/widgetembed/?frameElementId=tradingview_76d87&symbol=${symbol}USD&interval=M&hidesidetoolbar=1&hidetoptoolbar=1&symboledit=1&saveimage=1&toolbarbg=F1F3F6&studies=[]&hideideas=1&theme=$theme&style=1&timezone=Etc%2FUTC&studies_overrides={}&overrides={}&enabled_features=[]&disabled_features=[]&locale=en&utm_source=coinmarketcap.com&utm_medium=widget&utm_campaign=chart&utm_term=BTCUSDT",
+
+            )
+    }
+
+    // var time by remember { mutableStateOf("15") }
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (screen == "home") {
             TabRow(
                 selectedTabIndex = pagerState.currentPage,
                 modifier = Modifier.fillMaxWidth(),
                 indicator = { tabPositions ->
                     TabRowDefaults.Indicator(
-                        Modifier.tabIndicatorOffset(currentTabPosition = tabPositions[pagerState.currentPage])
+                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
                     )
                 }
             ) {
                 tabTitles.forEachIndexed { index, title ->
                     Tab(
-                        modifier = Modifier.weight(1f), // Ensure equal width for tabs
+                        modifier = Modifier.weight(1f),
                         selected = pagerState.currentPage == index,
                         onClick = {
-                            // Use the coroutine scope from Compose
                             coroutineScope.launch {
-                                pagerState.animateScrollToPage(index) // Smooth animation between tabs
+                                pagerState.animateScrollToPage(index)
                             }
                         },
                         text = {
@@ -80,20 +108,19 @@ fun SharedTransitionScope.Tabs(
                                         MaterialTheme.colorScheme.primary
                                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 ),
-                                modifier = Modifier.fillMaxWidth(), // Align text properly in full width
-                                textAlign = TextAlign.Center // Center the text within the tab
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
                             )
                         }
                     )
                 }
             }
-            // Pager for smooth animations
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
-                    .fillMaxSize() // Let the pager take up the remaining space
+                    .fillMaxSize()
             ) { page ->
-
                 when (page) {
                     0 -> gainers?.let {
                         TopGainersScreen(
@@ -103,9 +130,9 @@ fun SharedTransitionScope.Tabs(
                             gainersPercentage = gainersPercentage,
                             gainersPrice = gainersPrice,
                             gainersLogo = gainersLogo,
-                            gainersGraph=gainersGraph
+                            gainersGraph = gainersGraph
                         )
-                    } // Content for "Top Gainers"
+                    }
                     1 -> losers?.let {
                         TopLosersScreen(
                             it,
@@ -116,14 +143,15 @@ fun SharedTransitionScope.Tabs(
                             losersLogo = losersLogo,
                             losersGraph = losersGraph
                         )
-                    }   // Content for "Top Losers"
+                    }
                 }
             }
-        } else {
+        }
+        else {
             ScrollableTabRow(
                 selectedTabIndex = pagerState.currentPage,
                 modifier = Modifier.width(screenWidth.dp),
-                edgePadding = 0.dp, // Remove padding to ensure tabs start at the edge
+                edgePadding = 0.dp,
                 indicator = { tabPositions ->
                     TabRowDefaults.Indicator(
                         Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
@@ -135,10 +163,10 @@ fun SharedTransitionScope.Tabs(
                         selected = pagerState.currentPage == index,
                         onClick = {
                             coroutineScope.launch {
-                                pagerState.animateScrollToPage(index) // Smooth animation between tabs
+                                pagerState.animateScrollToPage(index)
                             }
                         },
-                        modifier = Modifier.width(width.dp), // Ensures tabs take equal width
+                        modifier = Modifier.width(width.dp).background(MaterialTheme.colorScheme.background),
                         text = {
                             Text(
                                 text = title,
@@ -154,17 +182,21 @@ fun SharedTransitionScope.Tabs(
                     )
                 }
             }
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
-                    .fillMaxSize() // Let the pager take up the remaining space
-            ) { page ->
+                    .fillMaxSize()
+                    .padding(top=24.dp,bottom=10.dp)
+                    .background(MaterialTheme.colorScheme.background),
+                verticalAlignment = Alignment.Top
 
+            ) { page ->
+                WebViewItem(url = urls[page], Modifier.height(height.dp).background(MaterialTheme.colorScheme.background))
             }
         }
-
-
     }
 }
+
 
 

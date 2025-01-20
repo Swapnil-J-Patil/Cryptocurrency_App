@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,7 +62,8 @@ fun SharedTransitionScope.HomeScreen(
 ) {
     val state = viewModel.statsState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
-    val progress by animateLottieCompositionAsState(composition,iterations = LottieConstants.IterateForever // Infinite repeat mode
+    val progress by animateLottieCompositionAsState(
+        composition, iterations = LottieConstants.IterateForever // Infinite repeat mode
     )
 
     val screen = listOf(
@@ -143,7 +145,10 @@ fun SharedTransitionScope.HomeScreen(
                                     Log.d("carousel", "clicked item: $item")
                                 },
                                 dotsPadding = dotsPadding,
-                                currency = state.cryptocurrency!!.data.cryptoCurrencyList.subList(0, 3)
+                                currency = state.cryptocurrency!!.data.cryptoCurrencyList.subList(
+                                    0,
+                                    3
+                                )
                             )
                         }
 
@@ -155,69 +160,77 @@ fun SharedTransitionScope.HomeScreen(
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
-                        val gainerPercentageList= remember(topGainers) {
+                        val gainerPercentageList = remember(topGainers) {
                             topGainers.map { gainer ->
                                 "+" + gainer.quotes[0].percentChange24h.toString()
                                     .substring(0, 5) + " %"
                             }
                         }
-                        val gainerPriceList= remember(topGainers) {
+                        val gainerPriceList = remember(topGainers) {
                             topGainers.map { gainer ->
                                 "$ " + gainer.quotes[0].price.toString().substring(0, 5)
                             }
                         }
 
-                        val gainerLogoList= remember(topGainers) {
+                        val gainerLogoList = remember(topGainers) {
                             topGainers.map { gainer ->
                                 "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png"
 
                             }
                         }
-                        val gainerGraphList= remember(topGainers) {
+                        val gainerGraphList = remember(topGainers) {
                             topGainers.map { gainer ->
                                 "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png"
                             }
                         }
-                        val loserPercentageList= remember(topLosers) {
+                        val loserPercentageList = remember(topLosers) {
                             topLosers.map { loser ->
-                               loser.quotes[0].percentChange24h.toString()
+                                loser.quotes[0].percentChange24h.toString()
                                     .substring(0, 5) + " %"
                             }
                         }
-                        val loserPriceList= remember(topGainers) {
+                        val loserPriceList = remember(topGainers) {
                             topGainers.map { gainer ->
                                 "$ " + gainer.quotes[0].price.toString().substring(0, 5)
                             }
                         }
-                        val loserLogoList= remember(topLosers) {
+                        val loserLogoList = remember(topLosers) {
                             topLosers.map { loser ->
                                 "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png"
 
                             }
                         }
-                        val loserGraphList= remember(topLosers) {
+                        val loserGraphList = remember(topLosers) {
                             topLosers.map { loser ->
                                 "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
                             }
                         }
-                        Tabs(gainers = topGainers, losers = topLosers, gainersPercentage = gainerPercentageList, losersPercentage = loserPercentageList, onItemClick = { item, isGainer->
+                        Tabs(
+                            gainers = topGainers,
+                            losers = topLosers,
+                            gainersPercentage = gainerPercentageList,
+                            losersPercentage = loserPercentageList,
+                            onItemClick = { item, isGainer ->
 
-                            ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
-                            val price="$ " + if(item.quotes[0].price.toString().length>10)item.quotes[0].price.toString().substring(0, 10) else item.quotes[0].price.toString()
-                            val percentage=item.quotes[0].percentChange24h.toString().substring(0, 5)
-                            val isSaved=false
-                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}")
-                        },
+                                ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
+                                val price =
+                                    "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
+                                        .substring(0, 10) else item.quotes[0].price.toString()
+                                val percentage =
+                                    item.quotes[0].percentChange24h.toString().substring(0, 5)
+                                val isSaved = false
+                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}")
+                            },
                             animatedVisibilityScope,
                             "home",
                             tabTitles,
                             gainersPrice = gainerPriceList,
                             losersPrice = loserPriceList,
                             gainersLogo = gainerLogoList,
-                            losersLogo=loserLogoList,
+                            losersLogo = loserLogoList,
                             gainersGraph = gainerGraphList,
                             losersGraph = loserGraphList
-                            )
+                        )
                     }
                 }
             }

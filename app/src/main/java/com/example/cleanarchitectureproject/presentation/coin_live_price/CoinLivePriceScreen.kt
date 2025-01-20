@@ -20,8 +20,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
@@ -34,7 +36,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,143 +76,146 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val prefix = if (isGainer) "+ " else ""
     val color = if (isGainer) darkGreen else darkRed
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
-    val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
-    val tabTitles = listOf("15 Min", "1 Hour", "4 Hour", "1 Day", "1 Week", "1 Month")
+    val screenWidth =
+        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
-    val adaptiveHeight = if (screenWidth > 600) screenWidth*0.2 else screenWidth*0.25
-    val adaptiveWeightLogo= if (screenWidth > 600) 0.1f else 0.2f
-    val adaptiveWeightDetails= if (screenWidth > 600) 0.7f else 0.53f
-    val adaptiveWeightGraph= if (screenWidth > 600) 0.2f else 0.27f
+    val adaptiveHeight = if (screenWidth > 600) screenWidth * 0.2 else screenWidth * 0.25
+    val adaptiveWeightLogo = if (screenWidth > 600) 0.1f else 0.2f
+    val adaptiveWeightDetails = if (screenWidth > 600) 0.7f else 0.53f
+    val adaptiveWeightGraph = if (screenWidth > 600) 0.2f else 0.27f
 
-    val iconSize=if (screenWidth > 600) 50.dp else 40.dp
+    val iconSize = if (screenWidth > 600) 50.dp else 40.dp
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
             .padding(top = 45.dp, start = 8.dp, end = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Row: Coin Symbol and Save Icon
-        Column(
+
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(bottom = 16.dp),
         ) {
-
-            Box(
+            Text(
+                text = coinSymbol,
+                color = MaterialTheme.colorScheme.secondary,
+                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-            ) {
-                Text(
-                    text = coinSymbol,
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.TopCenter)
-                )
-
-                Icon(
-                    imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                    contentDescription = if (isSaved) "Bookmarked" else "Bookmark",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(iconSize)
-                        .padding(end = 8.dp, bottom = 5.dp)
-                )
-
-            }
-            // Row: Coin Image, Price, and Percentage
-
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(adaptiveHeight.dp)
-                    .sharedElement(
-                        state = rememberSharedContentState(key = "coinCard/${coinId}"),
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
-                    .padding(vertical = 8.dp, horizontal = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
-                elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
-                shape = RoundedCornerShape(8.dp) // Rounded corners
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.Transparent)
-                        .padding(horizontal = 8.dp, vertical = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    // Currency Logo (10%)
-
-                    Image(
-                        painter = rememberAsyncImagePainter(coinImage),
-                        contentDescription = "Currency Logo",
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .fillMaxHeight()
-                            .weight(adaptiveWeightLogo)
-                            .aspectRatio(1f)
-                            .clip(CircleShape)
-                    )
-
-                    Spacer(modifier = Modifier.width(20.dp))
-
-                    // Price and Percentage (20%)
-                    Column(
-                        modifier = Modifier.weight(adaptiveWeightDetails),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            text = coinPrice,
-                            maxLines = 1,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "$prefix$coinPercentage%",
-                            maxLines = 1,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontStyle = FontStyle.Italic,
-                            color = color,
-                        )
-                    }
-
-                    // Graph Image (40%)
-
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = graph,
-                                error = painterResource(id = R.drawable.placeholder) // Replace with your drawable resource
-                            ),
-                            contentDescription = "Graph Image",
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier
-                                .weight(adaptiveWeightGraph)
-                                .padding(end = 10.dp),
-                        )
-                    }
-
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-            Tabs(
-                screen = "livePrice",
-                animatedVisibilityScope = animatedVisibilityScope,
-                tabTitles = tabTitles,
-                onItemClick = {item, flag->
-
-                }
+                    .align(Alignment.TopCenter)
             )
+
+            Icon(
+                imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                contentDescription = if (isSaved) "Bookmarked" else "Bookmark",
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(iconSize)
+                    .padding(end = 8.dp, bottom = 5.dp)
+            )
+
+        }
+        // Row: Coin Image, Price, and Percentage
+
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(adaptiveHeight.dp)
+                .sharedElement(
+                    state = rememberSharedContentState(key = "coinCard/${coinId}"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+                .padding(vertical = 8.dp, horizontal = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
+            elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
+            shape = RoundedCornerShape(8.dp) // Rounded corners
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(horizontal = 8.dp, vertical = 5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Currency Logo (10%)
+
+                Image(
+                    painter = rememberAsyncImagePainter(coinImage),
+                    contentDescription = "Currency Logo",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .fillMaxHeight()
+                        .weight(adaptiveWeightLogo)
+                        .aspectRatio(1f)
+                        .clip(CircleShape)
+                )
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                // Price and Percentage (20%)
+                Column(
+                    modifier = Modifier.weight(adaptiveWeightDetails),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = coinPrice,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "$prefix$coinPercentage%",
+                        maxLines = 1,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontStyle = FontStyle.Italic,
+                        color = color,
+                    )
+                }
+
+                // Graph Image (40%)
+
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = graph,
+                        error = painterResource(id = R.drawable.placeholder) // Replace with your drawable resource
+                    ),
+                    contentDescription = "Graph Image",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier
+                        .weight(adaptiveWeightGraph)
+                        .padding(end = 10.dp),
+                )
+            }
+
         }
 
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Tabs(
+            screen = "livePrice",
+            animatedVisibilityScope = animatedVisibilityScope,
+            tabTitles = tabTitles,
+            onItemClick = { item, flag ->
+
+            },
+            symbol = coinSymbol
+        )
 
     }
+
+
 }
 
