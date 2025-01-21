@@ -168,7 +168,14 @@ fun SharedTransitionScope.HomeScreen(
                         }
                         val gainerPriceList = remember(topGainers) {
                             topGainers.map { gainer ->
-                                "$ " + gainer.quotes[0].price.toString().substring(0, 5)
+                                if(gainer.quotes[0].price < 1000)
+                                {
+                                    "$ " + gainer.quotes[0].price.toString().substring(0, 5)
+                                }
+                                else
+                                {
+                                    "$ " + gainer.quotes[0].price.toString().substring(0, 3)+".."
+                                }
                             }
                         }
 
