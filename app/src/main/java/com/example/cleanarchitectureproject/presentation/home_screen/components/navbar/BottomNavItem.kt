@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.home_screen.components.navbar
 
+import android.graphics.fonts.FontStyle
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.presentation.Navbar
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 @Composable
 fun BottomNavItem(
@@ -77,6 +79,7 @@ fun BottomNavItem(
                 Text(
                     text = screen.title,
                     modifier = Modifier.padding(start = 8.dp, end = 10.dp),
+                    color = green,
                     maxLines = 1,
                 )
             }

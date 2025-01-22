@@ -62,7 +62,7 @@ fun SharedTransitionScope.Tabs(
     val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
 
     val width = screenWidth * 0.3
-    val height=if(screenWidth> 600) screenHeight*0.7 else screenHeight*0.5
+    val height=if(screenWidth> 600) screenHeight*0.9 else screenHeight*0.5
     val isDarkTheme = isSystemInDarkTheme()
     val theme=if(isDarkTheme)"Dark" else "Light"
 
