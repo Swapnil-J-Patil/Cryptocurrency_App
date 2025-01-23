@@ -19,9 +19,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.cleanarchitectureproject.data.remote.dto.coinlore.CurrencyCL
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.white
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DotProperties
@@ -29,42 +32,44 @@ import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties.Rotation.Mode
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.LineProperties
 import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
 
 @Composable
 fun PriceLineChart(
-    currency: CurrencyCL?=null, modifier: Modifier,currencyCM: QuoteCM?=null, isMoreData: Boolean, labelName: String ?=null) {
+    currency: CurrencyCL? = null,
+    modifier: Modifier,
+    currencyCM: QuoteCM? = null,
+    isMoreData: Boolean,
+    labelName: String? = null
+) {
     // Data preparation
-    val priceChanges = if(!isMoreData)currency?.percentChange1h?.let {
+    val priceChanges = if (!isMoreData) currency?.percentChange1h?.let {
         listOf(
-        it.toDouble(),
-        currency.percentChange24h.toDouble(),
-        currency.percentChange7d.toDouble()
-    )
+            it.toDouble(),
+            currency.percentChange24h.toDouble(),
+            currency.percentChange7d.toDouble()
+        )
     } else currencyCM?.let {
-        listOf( currencyCM.percentChange1h,
+        listOf(
+            currencyCM.percentChange1y,
+            currencyCM.percentChange90d,
+            currencyCM.percentChange30d,
+            currencyCM.percentChange7d,
             it.percentChange24h,
-        currencyCM.percentChange24h,
-        currencyCM.percentChange7d,
-        currencyCM.percentChange30d,
-        currencyCM.percentChange90d,
-        currencyCM.percentChange1y,
+            currencyCM.percentChange1h,
         )
     }
 
+    val labels = if (!isMoreData) {
+        listOf("1H", "24H", "7D")
+    } else {
+        listOf("1Y", "90D", "30D", "7D", "24H", "1H")
+    }
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                vertical = 5.dp
-            ), // Add vertical padding for spacing between cards
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
-        elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
-        shape = RoundedCornerShape(8.dp) // Rounded corners
-    ) {
+
         LineChart(
             modifier = modifier,
             data = remember {
@@ -83,18 +88,31 @@ fun PriceLineChart(
                         drawStyle = DrawStyle.Stroke(width = 2.dp)
                     ),
 
-                )
+                    )
             },
 
-            labelHelperProperties = LabelHelperProperties(enabled = true,
-                textStyle = TextStyle(color = MaterialTheme.colorScheme.secondary, fontWeight = FontWeight.Bold)
+            labelHelperProperties = LabelHelperProperties(
+                enabled = true,
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontWeight = FontWeight.Bold
+                )
             ),
-            indicatorProperties = HorizontalIndicatorProperties(enabled = true,
+            indicatorProperties = HorizontalIndicatorProperties(
+                enabled = true,
                 textStyle = TextStyle(color = MaterialTheme.colorScheme.secondary)
             ),
-            animationMode = AnimationMode.Together(delayBuilder = { it * 500L })
+            animationMode = AnimationMode.Together(delayBuilder = { it * 500L }),
+            labelProperties = LabelProperties(
+                enabled = true,
+                rotation = LabelProperties.Rotation(Mode.IfNecessary, 0.0f),
+                labels = labels,
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.secondary
+                ),
+            ),
         )
-    }
+
 }
 
 

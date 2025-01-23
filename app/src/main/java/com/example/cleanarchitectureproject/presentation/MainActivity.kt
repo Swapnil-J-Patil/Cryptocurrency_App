@@ -18,11 +18,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
+import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_detail.CoinDetailScreen
 import com.example.cleanarchitectureproject.presentation.coin_list.CoinListScreen
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -63,7 +66,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(
-                            route = Screen.CoinLivePriceScreen.route + "/{coinId}/{coinSymbol}/{price}/{coinPercentage}/{isGainer}/{isSaved}",
+                            route = Screen.CoinLivePriceScreen.route + "/{coinId}/{coinSymbol}/{price}/{coinPercentage}/{isGainer}/{isSaved}/{coinData}",
                             arguments = listOf(
                                 navArgument("coinId") {
                                     type = NavType.StringType
@@ -82,17 +85,34 @@ class MainActivity : ComponentActivity() {
                                 },
                                 navArgument("isSaved") {
                                     type = NavType.BoolType
-                                }
+                                },
+                                navArgument("coinData")
+                                { type = NavType.StringType }
+
                             )
                         ) {
+                            val gson = Gson() // Or use kotlinx.serialization
                             val coinId = it.arguments?.getString("coinId") ?: ""
                             val coinSymbol = it.arguments?.getString("coinSymbol") ?: ""
                             val coinPrice = it.arguments?.getString("price") ?: ""
                             val coinPercentage = it.arguments?.getString("coinPercentage") ?: ""
                             val isGainer = it.arguments?.getBoolean("isGainer") ?: false
                             val isSaved = it.arguments?.getBoolean("isSaved") ?: false
-
-                            CoinLivePriceScreen(coinId=coinId,coinSymbol = coinSymbol,coinPrice=coinPrice, coinPercentage = coinPercentage, isGainer = isGainer, isSaved = isSaved, animatedVisibilityScope = this)
+                            val coinDataJson = it.arguments?.getString("coinData") ?: ""
+                            val coinData = gson.fromJson(
+                                coinDataJson,
+                                CryptoCoin::class.java
+                            ) // Deserialize
+                            CoinLivePriceScreen(
+                                coinId = coinId,
+                                coinSymbol = coinSymbol,
+                                coinPrice = coinPrice,
+                                coinPercentage = coinPercentage,
+                                isGainer = isGainer,
+                                isSaved = isSaved,
+                                animatedVisibilityScope = this,
+                                coinData = coinData
+                            )
                         }
                     }
                 }

@@ -16,6 +16,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.PagerSnapDistance
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -76,8 +80,7 @@ fun Carousel(
             contentPadding = PaddingValues(horizontal = 5.dp),
             pageSpacing = itemSpacing
         ) { page ->
-
-            PriceLineChart(currencyCM = currency.get(page).quotes[0],
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
@@ -86,24 +89,58 @@ fun Carousel(
                         onClick(page)
                     }
                     //.background(MaterialTheme.colorScheme.surfaceContainer)
-                   // .clip(RoundedCornerShape(16.dp)) // Rounded corners
+                    // .clip(RoundedCornerShape(16.dp)) // Rounded corners
                     .graphicsLayer {
                         val pageOffset = (
                                 (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
                                 ).absoluteValue
 
                         // Smoother scaling and alpha effects
-                        val easingFraction = CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f).transform(
-                            1f - pageOffset.coerceIn(0f, 1f)
-                        )
+                        val easingFraction =
+                            CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f).transform(
+                                1f - pageOffset.coerceIn(0f, 1f)
+                            )
 
                         alpha = lerp(start = 0.8f, stop = 1f, fraction = easingFraction)
                         scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
                         scaleX = scaleY
-                    },
-                isMoreData = true,
-                labelName = currency.get(page).name
-            )
+                    }
+                    .padding(
+                        vertical = 5.dp
+                    ), // Add vertical padding for spacing between cards
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
+                elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
+                shape = RoundedCornerShape(8.dp) // Rounded corners
+            ) {
+                PriceLineChart(currencyCM = currency.get(page).quotes[0],
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .padding(horizontal = 10.dp, vertical = 16.dp)
+                        .clickable {
+                            onClick(page)
+                        }
+                        //.background(MaterialTheme.colorScheme.surfaceContainer)
+                        // .clip(RoundedCornerShape(16.dp)) // Rounded corners
+                        .graphicsLayer {
+                            val pageOffset = (
+                                    (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                                    ).absoluteValue
+
+                            // Smoother scaling and alpha effects
+                            val easingFraction =
+                                CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f).transform(
+                                    1f - pageOffset.coerceIn(0f, 1f)
+                                )
+
+                            alpha = lerp(start = 0.8f, stop = 1f, fraction = easingFraction)
+                            scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
+                            scaleX = scaleY
+                        },
+                    isMoreData = true,
+                    labelName = currency.get(page).name
+                )
+            }
         }
 
         // Dot Indicators

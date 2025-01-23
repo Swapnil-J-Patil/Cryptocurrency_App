@@ -1,10 +1,14 @@
 package com.example.cleanarchitectureproject.presentation.coin_live_price
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -47,6 +52,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
@@ -54,12 +60,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
+import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
+import com.example.cleanarchitectureproject.presentation.coin_live_price.components.SupplyInfoCard
+import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
+import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -70,29 +82,34 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     coinPercentage: String,
     isSaved: Boolean,
     isGainer: Boolean,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    coinData: CryptoCoin
 ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
     val color = if (isGainer) darkGreen else darkRed
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
-    val screenWidth =
-        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
-    val adaptiveHeight = if (screenWidth > 600) screenWidth * 0.2 else screenWidth * 0.25
-    val adaptiveWeightLogo = if (screenWidth > 600) 0.1f else 0.2f
-    val adaptiveWeightDetails = if (screenWidth > 600) 0.7f else 0.53f
-    val adaptiveWeightGraph = if (screenWidth > 600) 0.2f else 0.27f
+    val adaptiveHeight = if (screenWidth > 600.dp) screenWidth * 0.2f else screenWidth * 0.25f
+    val adaptiveWeightLogo = if (screenWidth > 600.dp) 0.1f else 0.2f
+    val adaptiveWeightDetails = if (screenWidth > 600.dp) 0.7f else 0.53f
+    val adaptiveWeightGraph = if (screenWidth > 600.dp) 0.2f else 0.27f
+    val circularPercentage = if (coinData.totalSupply != null) {
+        (coinData.circulatingSupply / coinData.totalSupply) * 100
+    } else {
+        0f
+    }
+    val iconSize = if (screenWidth > 600.dp) 50.dp else 40.dp
 
-    val iconSize = if (screenWidth > 600) 50.dp else 40.dp
-
+    Log.d("cryptoData", "CoinLivePriceScreen: $coinData")
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
             .padding(top = 45.dp, start = 8.dp, end = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -130,7 +147,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(adaptiveHeight.dp)
+                .height(adaptiveHeight)
                 .sharedElement(
                     state = rememberSharedContentState(key = "coinCard/${coinId}"),
                     animatedVisibilityScope = animatedVisibilityScope
@@ -204,16 +221,55 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Tabs(
-            screen = "livePrice",
-            animatedVisibilityScope = animatedVisibilityScope,
-            tabTitles = tabTitles,
-            onItemClick = { item, flag ->
 
-            },
-            symbol = coinSymbol
-        )
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 8.dp)
+        ) {
+            item {
+                Tabs(
+                    screen = "livePrice",
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    tabTitles = tabTitles,
+                    onItemClick = { item, flag ->
 
+                    },
+                    symbol = coinSymbol
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+            }
+            item {
+                SupplyInfoCard(
+                    circulatingSupply = coinData.circulatingSupply,
+                    maxSupply = coinData.maxSupply,
+                    totalSupply = coinData.totalSupply,
+                    symbol = coinSymbol,
+                    circulatingPercentage = circularPercentage.toFloat()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
+                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                ) {
+                    PriceLineChart(
+                        currencyCM = coinData.quotes[0],
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)
+                            .padding(16.dp),
+                        isMoreData = true,
+                        labelName = coinSymbol
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
     }
 
 

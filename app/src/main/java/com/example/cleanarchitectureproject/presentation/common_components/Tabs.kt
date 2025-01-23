@@ -59,10 +59,9 @@ fun SharedTransitionScope.Tabs(
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
-    val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
 
     val width = screenWidth * 0.3
-    val height=if(screenWidth> 600) screenHeight*0.9 else screenHeight*0.5
+    val height=if(screenWidth> 600) 400.0 else 300.0
     val isDarkTheme = isSystemInDarkTheme()
     val theme=if(isDarkTheme)"Dark" else "Light"
 
@@ -186,7 +185,7 @@ fun SharedTransitionScope.Tabs(
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(top=24.dp,bottom=10.dp)
                     .background(MaterialTheme.colorScheme.background),
                 verticalAlignment = Alignment.Top

@@ -45,6 +45,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Navbar
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.navbar.BottomNavAnimation
@@ -52,6 +53,7 @@ import com.example.cleanarchitectureproject.presentation.home_screen.components.
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.LazyRowScaleIn
 import com.example.cleanarchitectureproject.presentation.home_screen.components.TypingAnimation
+import com.google.gson.Gson
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -75,7 +77,7 @@ fun SharedTransitionScope.HomeScreen(
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
-    val carouselHeight = if (screenWidth > 600.dp) 330.dp else 290.dp
+    val carouselHeight = if (screenWidth > 600.dp) 350.dp else 320.dp
     val dotsPadding = if (screenWidth > 600.dp) 8.dp else 4.dp
     val tabTitles = listOf("Top Gainers", "Top Losers")
     // Define a scale animation using animateFloatAsState
@@ -226,7 +228,10 @@ fun SharedTransitionScope.HomeScreen(
                                 val percentage =
                                     item.quotes[0].percentChange24h.toString().substring(0, 5)
                                 val isSaved = false
-                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}")
+                                val coinData=item.toCryptoCoin()
+                                val gson = Gson() // Or use kotlinx.serialization
+                                val coinDataJson = gson.toJson(coinData)
+                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
                             },
                             animatedVisibilityScope,
                             "home",
