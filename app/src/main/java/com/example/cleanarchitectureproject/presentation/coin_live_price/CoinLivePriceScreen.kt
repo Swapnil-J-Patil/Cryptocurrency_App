@@ -1,10 +1,13 @@
 package com.example.cleanarchitectureproject.presentation.coin_live_price
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,6 +46,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,8 +54,12 @@ import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -59,6 +68,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil.compose.rememberAsyncImagePainter
@@ -93,10 +103,12 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
-    val adaptiveHeight = if (screenWidth > 600.dp) screenWidth * 0.2f else screenWidth * 0.25f
+    val adaptiveHeight = if (screenWidth > 600.dp) 150.dp else 120.dp
     val adaptiveWeightLogo = if (screenWidth > 600.dp) 0.1f else 0.2f
     val adaptiveWeightDetails = if (screenWidth > 600.dp) 0.7f else 0.53f
     val adaptiveWeightGraph = if (screenWidth > 600.dp) 0.2f else 0.27f
+    val lazyColumnPadding=if (screenWidth > 600.dp) 45.dp else 35.dp
+
     val circularPercentage = if (coinData.totalSupply != null) {
         (coinData.circulatingSupply / coinData.totalSupply) * 100
     } else {
@@ -104,17 +116,40 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     }
     val iconSize = if (screenWidth > 600.dp) 50.dp else 40.dp
 
-    Log.d("cryptoData", "CoinLivePriceScreen: $coinData")
+    var cardHeight by remember { mutableStateOf(adaptiveHeight) }
 
-    Column(
+    val maxCardHeight = adaptiveHeight
+    val minCardHeight = 0.dp
+    var imageScale by remember { mutableFloatStateOf(1f) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                // Calculate the change in image size based on scroll delta
+                val delta = available.y
+                val newImageSize = cardHeight + delta.dp
+                val previousImageSize = cardHeight
+
+                // Constrain the image size within the allowed bounds
+                cardHeight = newImageSize.coerceIn(minCardHeight, maxCardHeight)
+                val consumed = cardHeight - previousImageSize
+
+                // Calculate the scale for the image
+                imageScale = cardHeight / maxCardHeight
+
+                // Return the consumed scroll amount
+                return Offset(0f, consumed.value)
+            }
+        }
+    }
+    Box(
         modifier = Modifier
             .fillMaxSize()
+            .nestedScroll(nestedScrollConnection)
             .background(MaterialTheme.colorScheme.background)
             .padding(top = 45.dp, start = 8.dp, end = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Top Row: Coin Symbol and Save Icon
-
 
         Box(
             modifier = Modifier
@@ -148,11 +183,17 @@ fun SharedTransitionScope.CoinLivePriceScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(adaptiveHeight)
+                .graphicsLayer {
+                    scaleX = imageScale
+                    scaleY = imageScale
+                    // Center the image vertically as it scales
+                    translationY = -(maxCardHeight.toPx() - cardHeight.toPx()) / 2f
+                }
                 .sharedElement(
                     state = rememberSharedContentState(key = "coinCard/${coinId}"),
                     animatedVisibilityScope = animatedVisibilityScope
                 )
-                .padding(vertical = 8.dp, horizontal = 8.dp),
+                .padding(start =  8.dp, end=8.dp,top=55.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
             elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
             shape = RoundedCornerShape(8.dp) // Rounded corners
@@ -219,13 +260,15 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
 
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 8.dp)
+                .padding(top = lazyColumnPadding)
+                .offset {
+                    IntOffset(0, cardHeight.roundToPx())
+                }
         ) {
             item {
                 Tabs(
