@@ -235,7 +235,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "$prefix$coinPercentage%",
+                        text = "$prefix$coinPercentage %",
                         maxLines = 1,
                         style = MaterialTheme.typography.titleMedium,
                         fontStyle = FontStyle.Italic,

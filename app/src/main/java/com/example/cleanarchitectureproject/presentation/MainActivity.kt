@@ -20,8 +20,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
-import com.example.cleanarchitectureproject.presentation.coin_detail.CoinDetailScreen
-import com.example.cleanarchitectureproject.presentation.coin_list.CoinListScreen
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
@@ -47,22 +45,6 @@ class MainActivity : ComponentActivity() {
                             route = Screen.HomeScreen.route
                         ) {
                             HomeScreen(navController, animatedVisibilityScope = this)
-                        }
-                        composable(
-                            route = Screen.CoinListScreen.route
-                        ) {
-                            CoinListScreen(navController, animatedVisibilityScope = this)
-                        }
-                        composable(
-                            route = Screen.CoinDetailScreen.route + "/{coinId}",
-                            arguments = listOf(
-                                navArgument("coinId") {
-                                    type = NavType.StringType
-                                }
-                            )
-                        ) {
-                            val coinId = it.arguments?.getString("coinId") ?: ""
-                            CoinDetailScreen(coinId = coinId, animatedVisibilityScope = this)
                         }
 
                         composable(

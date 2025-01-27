@@ -164,19 +164,20 @@ fun SharedTransitionScope.HomeScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         val gainerPercentageList = remember(topGainers) {
                             topGainers.map { gainer ->
-                                "+" + gainer.quotes[0].percentChange24h.toString()
-                                    .substring(0, 5) + " %"
+                                if (gainer.quotes[0].percentChange1h.toString().length > 5) {
+                                    "+" + gainer.quotes[0].percentChange1h.toString()
+                                        .substring(0, 5) + " %"
+                                } else {
+                                    "+" + gainer.quotes[0].percentChange1h.toString() + " %"
+                                }
                             }
                         }
                         val gainerPriceList = remember(topGainers) {
                             topGainers.map { gainer ->
-                                if(gainer.quotes[0].price < 1000)
-                                {
+                                if (gainer.quotes[0].price < 1000) {
                                     "$ " + gainer.quotes[0].price.toString().substring(0, 5)
-                                }
-                                else
-                                {
-                                    "$ " + gainer.quotes[0].price.toString().substring(0, 3)+".."
+                                } else {
+                                    "$ " + gainer.quotes[0].price.toString().substring(0, 3) + ".."
                                 }
                             }
                         }
@@ -194,8 +195,12 @@ fun SharedTransitionScope.HomeScreen(
                         }
                         val loserPercentageList = remember(topLosers) {
                             topLosers.map { loser ->
-                                loser.quotes[0].percentChange24h.toString()
-                                    .substring(0, 5) + " %"
+                                if (loser.quotes[0].percentChange1h.toString().length > 5) {
+                                    loser.quotes[0].percentChange1h.toString()
+                                        .substring(0, 5) + " %"
+                                } else {
+                                    loser.quotes[0].percentChange1h.toString() + " %"
+                                }
                             }
                         }
                         val loserPriceList = remember(topGainers) {
@@ -225,10 +230,10 @@ fun SharedTransitionScope.HomeScreen(
                                 val price =
                                     "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
                                         .substring(0, 10) else item.quotes[0].price.toString()
-                                val percentage =
-                                    item.quotes[0].percentChange24h.toString().substring(0, 5)
+                                val percentage = item.quotes[0].percentChange1h.toString()
+
                                 val isSaved = false
-                                val coinData=item.toCryptoCoin()
+                                val coinData = item.toCryptoCoin()
                                 val gson = Gson() // Or use kotlinx.serialization
                                 val coinDataJson = gson.toJson(coinData)
                                 navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")

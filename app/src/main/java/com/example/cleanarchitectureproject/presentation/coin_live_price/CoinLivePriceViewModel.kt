@@ -9,11 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.common.Constants
 import com.example.cleanarchitectureproject.common.Resource
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
-import com.example.cleanarchitectureproject.domain.use_case.get_coin.GetCoinUseCase
-import com.example.cleanarchitectureproject.domain.use_case.get_cryptocurrency.GetCryptoUseCase
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
-import com.example.cleanarchitectureproject.presentation.coin_detail.CoinDetailState
-import com.example.cleanarchitectureproject.presentation.coin_detail.CryptoCurrencyState
+
 import com.example.cleanarchitectureproject.presentation.home_screen.CoinStatsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

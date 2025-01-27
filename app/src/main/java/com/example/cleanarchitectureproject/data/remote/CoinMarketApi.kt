@@ -1,6 +1,5 @@
 package com.example.cleanarchitectureproject.data.remote
 
-import com.example.cleanarchitectureproject.data.remote.dto.coinlore.CryptocurrencyCLDTO
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptocurrencyCMDTO
 import retrofit2.http.GET
 

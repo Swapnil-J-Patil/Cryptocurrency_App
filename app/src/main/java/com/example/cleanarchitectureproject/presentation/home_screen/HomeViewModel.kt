@@ -9,11 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.common.Constants
 import com.example.cleanarchitectureproject.common.Resource
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
-import com.example.cleanarchitectureproject.domain.use_case.get_coin.GetCoinUseCase
-import com.example.cleanarchitectureproject.domain.use_case.get_cryptocurrency.GetCryptoUseCase
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
-import com.example.cleanarchitectureproject.presentation.coin_detail.CoinDetailState
-import com.example.cleanarchitectureproject.presentation.coin_detail.CryptoCurrencyState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,7 +62,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val sortedCryptocurrencies = cryptoCurrencyList?.sortedWith { o1, o2 ->
                 // Sort by `percentChange24h` in descending order
-                o2.quotes[0].percentChange24h.compareTo(o1.quotes[0].percentChange24h)
+                o2.quotes[0].percentChange1h.compareTo(o1.quotes[0].percentChange1h)
             } ?: emptyList()
 
             // Update state with the sorted list
@@ -79,7 +75,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val sortedCryptocurrencies = cryptoCurrencyList.sortedWith { o1, o2 ->
                 // Sort by `percentChange24h` in ascending order
-                o1.quotes[0].percentChange24h.compareTo(o2.quotes[0].percentChange24h)
+                o1.quotes[0].percentChange1h.compareTo(o2.quotes[0].percentChange1h)
             }
 
             // Update state with the sorted list

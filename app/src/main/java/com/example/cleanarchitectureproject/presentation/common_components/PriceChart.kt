@@ -20,7 +20,6 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cleanarchitectureproject.data.remote.dto.coinlore.CurrencyCL
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
@@ -39,20 +38,13 @@ import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
 
 @Composable
 fun PriceLineChart(
-    currency: CurrencyCL? = null,
     modifier: Modifier,
     currencyCM: QuoteCM? = null,
     isMoreData: Boolean,
     labelName: String? = null
 ) {
     // Data preparation
-    val priceChanges = if (!isMoreData) currency?.percentChange1h?.let {
-        listOf(
-            it.toDouble(),
-            currency.percentChange24h.toDouble(),
-            currency.percentChange7d.toDouble()
-        )
-    } else currencyCM?.let {
+    val priceChanges = currencyCM?.let {
         listOf(
             currencyCM.percentChange1y,
             currencyCM.percentChange90d,
@@ -62,7 +54,6 @@ fun PriceLineChart(
             currencyCM.percentChange1h,
         )
     }
-
     val labels = if (!isMoreData) {
         listOf("1H", "24H", "7D")
     } else {
