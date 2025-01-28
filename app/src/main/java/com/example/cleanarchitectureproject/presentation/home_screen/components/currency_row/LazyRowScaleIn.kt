@@ -1,5 +1,8 @@
 package com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -20,8 +23,12 @@ import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCur
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun LazyRowScaleIn(items: List<CryptoCurrencyCM>) {
+fun SharedTransitionScope.LazyRowScaleIn(
+    items: List<CryptoCurrencyCM>,
+    onCardClicked:(CryptoCurrencyCM)->Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope) {
     val listState = rememberLazyListState()
 
     LazyRow(
@@ -41,8 +48,8 @@ fun LazyRowScaleIn(items: List<CryptoCurrencyCM>) {
             }
 
             val scale = remember { Animatable(0f) }
-            val prefix = if (item.quotes[0].percentChange24h > 0.0) "+" else ""
-            val color = if (item.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
+            val prefix = if (item.quotes[0].percentChange1h > 0.0) "+" else ""
+            val color = if (item.quotes[0].percentChange1h > 0.0) darkGreen else darkRed
 
             // Trigger animation when the item becomes visible
             LaunchedEffect(isVisible.value) {
@@ -61,12 +68,15 @@ fun LazyRowScaleIn(items: List<CryptoCurrencyCM>) {
 
             CurrencyCardItem(
                 currency = item.name,
-                percentage = "$prefix ${item.quotes[0].percentChange24h} %",
+                percentage = "$prefix ${item.quotes[0].percentChange1h} %",
                 image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${item.id}.png",
                 modifier = Modifier
                     .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
                     .padding(5.dp),
-                color = color
+                color = color,
+                onCardClicked = { onCardClicked(item)},
+                animatedVisibilityScope = animatedVisibilityScope,
+                currencyId = item.id.toString()
             )
         }
     }

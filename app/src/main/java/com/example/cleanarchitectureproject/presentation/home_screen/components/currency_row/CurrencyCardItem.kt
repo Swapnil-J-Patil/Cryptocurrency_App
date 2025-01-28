@@ -1,7 +1,11 @@
 package com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,16 +32,26 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun CurrencyCardItem(
+fun SharedTransitionScope.CurrencyCardItem(
     currency: String,
     percentage: String,
     image: String,
     modifier: Modifier = Modifier,
-    color: Color
+    color: Color,
+    onCardClicked:()->Unit,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    currencyId: String
     ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable {
+            onCardClicked()
+        }
+            .sharedElement(
+                state = rememberSharedContentState(key = "coinCard/${currencyId}"),
+                animatedVisibilityScope = animatedVisibilityScope
+            ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
         elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
         shape = RoundedCornerShape(8.dp) // Rounded corners

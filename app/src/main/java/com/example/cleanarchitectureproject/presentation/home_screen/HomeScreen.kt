@@ -53,6 +53,8 @@ import com.example.cleanarchitectureproject.presentation.home_screen.components.
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.LazyRowScaleIn
 import com.example.cleanarchitectureproject.presentation.home_screen.components.TypingAnimation
+import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
+import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 import com.google.gson.Gson
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -158,7 +160,26 @@ fun SharedTransitionScope.HomeScreen(
                             horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.padding(top = 10.dp)
                         ) {
-                            state.cryptocurrency?.data?.let { LazyRowScaleIn(items = it.cryptoCurrencyList) }
+                            state.cryptocurrency?.data?.let { LazyRowScaleIn(
+                                items = it.cryptoCurrencyList,
+                                onCardClicked = { item->
+
+                                ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
+                                val price =
+                                    "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
+                                        .substring(0, 10) else item.quotes[0].price.toString()
+                                val percentage = item.quotes[0].percentChange1h.toString()
+
+                                val isSaved = false
+                                val coinData = item.toCryptoCoin()
+                                val isGainer = if (item.quotes[0].percentChange1h > 0.0) true else false
+
+                                val gson = Gson() // Or use kotlinx.serialization
+                                val coinDataJson = gson.toJson(coinData)
+                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
+
+                            },
+                             animatedVisibilityScope = animatedVisibilityScope   ) }
                         }
 
                         Spacer(modifier = Modifier.height(8.dp))
