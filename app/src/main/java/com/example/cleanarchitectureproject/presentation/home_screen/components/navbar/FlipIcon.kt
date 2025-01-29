@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -22,9 +23,12 @@ fun FlipIcon(
     activeIcon: ImageVector,
     inactiveIcon: ImageVector,
     contentDescription: String,
+    color: Color,
+    rotationMax: Float,
+    rotationMin: Float
 ) {
     val animationRotation by animateFloatAsState(
-        targetValue = if (isActive) 180f else 0f,
+        targetValue = if (isActive) rotationMax else rotationMin,
         animationSpec = spring(
             stiffness = Spring.StiffnessLow,
             dampingRatio = Spring.DampingRatioMediumBouncy
@@ -41,7 +45,7 @@ fun FlipIcon(
 
             ),
             contentDescription = contentDescription,
-            tint = if (isActive) green else MaterialTheme.colorScheme.onSurface
+            tint = color
 
         )
     }

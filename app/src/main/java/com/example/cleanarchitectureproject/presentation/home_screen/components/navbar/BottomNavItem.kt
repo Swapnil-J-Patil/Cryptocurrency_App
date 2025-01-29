@@ -50,6 +50,7 @@ fun BottomNavItem(
                 dampingRatio = Spring.DampingRatioMediumBouncy
             )
         )
+        val color=if (isSelected) green else MaterialTheme.colorScheme.onSurface
         Row(
             modifier = Modifier
                 .height(animatedHeight)
@@ -74,7 +75,10 @@ fun BottomNavItem(
                 isActive = isSelected,
                 activeIcon = screen.activeIcon,
                 inactiveIcon = screen.inactiveIcon,
-                contentDescription = "Bottom Navigation Icon"
+                contentDescription = "Bottom Navigation Icon",
+                color = color,
+                rotationMax = 180f,
+                rotationMin = 0f
             )
 
             if (isSelected) {

@@ -6,6 +6,10 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -38,6 +42,7 @@ import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -45,6 +50,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -53,7 +59,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -79,8 +87,11 @@ import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.coin_live_price.components.SupplyInfoCard
 import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
+import com.example.cleanarchitectureproject.presentation.home_screen.components.navbar.FlipIcon
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -100,6 +111,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val color = if (isGainer) darkGreen else darkRed
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
     val configuration = LocalConfiguration.current
+
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
@@ -115,13 +127,26 @@ fun SharedTransitionScope.CoinLivePriceScreen(
         0f
     }
     val iconSize = if (screenWidth > 600.dp) 50.dp else 40.dp
+    val degree= if(isGainer) 270f else 90f
+    val rotationMax= 360f
+    val rotationMin= 0f
 
+    val isSelected= remember {
+        mutableStateOf(false)
+    }
+    val animatedAlpha by animateFloatAsState(targetValue = if (isSelected.value) 1f else .5f)
+    val animatedIconSize by animateDpAsState(
+        targetValue = if (isSelected.value) 26.dp else 20.dp,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessLow,
+            dampingRatio = Spring.DampingRatioMediumBouncy
+        )
+    )
     var cardHeight by remember { mutableStateOf(adaptiveHeight) }
 
     val maxCardHeight = adaptiveHeight
     val minCardHeight = 0.dp
     var imageScale by remember { mutableFloatStateOf(1f) }
-
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -141,6 +166,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                 return Offset(0f, consumed.value)
             }
         }
+    }
+    LaunchedEffect(Unit) {
+        delay(1000L) // Delay for 1 second (1000 milliseconds)
+        isSelected.value = true
     }
     Box(
         modifier = Modifier
@@ -193,7 +222,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     state = rememberSharedContentState(key = "coinCard/${coinId}"),
                     animatedVisibilityScope = animatedVisibilityScope
                 )
-                .padding(start =  8.dp, end=8.dp,top=55.dp),
+                .padding(start = 8.dp, end = 8.dp, top = 55.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
             elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
             shape = RoundedCornerShape(8.dp) // Rounded corners
@@ -223,7 +252,9 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
                 // Price and Percentage (20%)
                 Column(
-                    modifier = Modifier.weight(adaptiveWeightDetails),
+                    modifier = Modifier
+                        .weight(adaptiveWeightDetails)
+                        .padding(top = 2.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
                 ) {
@@ -234,13 +265,35 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                         color = MaterialTheme.colorScheme.secondary,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "$prefix$coinPercentage %",
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontStyle = FontStyle.Italic,
-                        color = color,
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .offset(x = -6.dp)
+                    ) {
+                        FlipIcon(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .alpha(animatedAlpha)
+                                .rotate(degree)
+                                .size(animatedIconSize),
+                            isActive = isSelected.value,
+                            activeIcon = Icons.Filled.PlayArrow,
+                            inactiveIcon = Icons.Filled.PlayArrow,
+                            contentDescription = "Bottom Navigation Icon",
+                            color = color,
+                            rotationMax = rotationMax,
+                            rotationMin = rotationMin
+                        )
+                        Text(
+                            text = "$prefix$coinPercentage %",
+                            maxLines = 1,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontStyle = FontStyle.Italic,
+                            color = color,
+                        )
+                    }
                 }
 
                 // Graph Image (40%)
