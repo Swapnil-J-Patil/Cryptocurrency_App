@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.common_components
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +29,7 @@ import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.DotProperties
 import ir.ehsannarmani.compose_charts.models.DrawStyle
+import ir.ehsannarmani.compose_charts.models.GridProperties
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
@@ -40,7 +42,6 @@ import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
 fun PriceLineChart(
     modifier: Modifier,
     currencyCM: QuoteCM? = null,
-    isMoreData: Boolean,
     labelName: String? = null
 ) {
     // Data preparation
@@ -54,12 +55,8 @@ fun PriceLineChart(
             currencyCM.percentChange1h,
         )
     }
-    val labels = if (!isMoreData) {
-        listOf("1H", "24H", "7D")
-    } else {
-        listOf("1Y", "90D", "30D", "7D", "24H", "1H")
-    }
 
+    val labels:List<String> = listOf("1Y", "90D", "30D", "7D", "24H", "1H")
 
         LineChart(
             modifier = modifier,
@@ -93,6 +90,7 @@ fun PriceLineChart(
                 enabled = true,
                 textStyle = TextStyle(color = MaterialTheme.colorScheme.secondary)
             ),
+            gridProperties = GridProperties(enabled = true, yAxisProperties = GridProperties.AxisProperties(lineCount = labels.size)),
             animationMode = AnimationMode.Together(delayBuilder = { it * 500L }),
             labelProperties = LabelProperties(
                 enabled = true,

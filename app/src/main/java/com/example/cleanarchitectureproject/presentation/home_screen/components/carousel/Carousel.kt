@@ -1,6 +1,9 @@
 package com.example.cleanarchitectureproject.presentation.home_screen.components.carousel
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -22,6 +25,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,14 +42,16 @@ import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
 @SuppressLint("UnusedBoxWithConstraintsScope", "UnrememberedMutableInteractionSource")
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun Carousel(
+fun SharedTransitionScope.Carousel(
     modifier: Modifier = Modifier,
-    onClick:(Int)->Unit,
+    onClick:(CryptoCurrencyCM)->Unit,
     dotsPadding: Dp,
-    currency:List<CryptoCurrencyCM>
+    currency:List<CryptoCurrencyCM>,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
+
     BoxWithConstraints(
         modifier = modifier,
         contentAlignment = Alignment.TopCenter,
@@ -61,7 +69,7 @@ fun Carousel(
                     pagerState.animateScrollToPage(
                         page = nextPage,
                         animationSpec = tween(
-                            durationMillis = 800, // Smooth scroll duration
+                            durationMillis = 1000, // Smooth scroll duration
                             easing = LinearOutSlowInEasing // Smooth easing
                         )
                     )
@@ -78,47 +86,23 @@ fun Carousel(
                 pagerSnapDistance = PagerSnapDistance.atMost(0)
             ),
             contentPadding = PaddingValues(horizontal = 5.dp),
-            pageSpacing = itemSpacing
-        ) { page ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(horizontal = 10.dp, vertical = 16.dp)
-                    .clickable {
-                        onClick(page)
-                    }
-                    //.background(MaterialTheme.colorScheme.surfaceContainer)
-                    // .clip(RoundedCornerShape(16.dp)) // Rounded corners
-                    .graphicsLayer {
-                        val pageOffset = (
-                                (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
-                                ).absoluteValue
+            pageSpacing = itemSpacing,
 
-                        // Smoother scaling and alpha effects
-                        val easingFraction =
-                            CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f).transform(
-                                1f - pageOffset.coerceIn(0f, 1f)
-                            )
-
-                        alpha = lerp(start = 0.8f, stop = 1f, fraction = easingFraction)
-                        scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
-                        scaleX = scaleY
-                    }
-                    .padding(
-                        vertical = 5.dp
-                    ), // Add vertical padding for spacing between cards
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
-                elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
-                shape = RoundedCornerShape(8.dp) // Rounded corners
-            ) {
-                PriceLineChart(currencyCM = currency.get(page).quotes[0],
+            ) { page ->
+            val symbol=currency.get(page).symbol
+            key(currency[page].id)
+            {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
                         .padding(horizontal = 10.dp, vertical = 16.dp)
+                        .sharedElement(
+                            state = rememberSharedContentState(key = "coinChart/${symbol}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
                         .clickable {
-                            onClick(page)
+                            onClick(currency.get(page))
                         }
                         //.background(MaterialTheme.colorScheme.surfaceContainer)
                         // .clip(RoundedCornerShape(16.dp)) // Rounded corners
@@ -136,10 +120,24 @@ fun Carousel(
                             alpha = lerp(start = 0.8f, stop = 1f, fraction = easingFraction)
                             scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
                             scaleX = scaleY
-                        },
-                    isMoreData = true,
-                    labelName = currency.get(page).name
-                )
+                        }
+
+                        .padding(
+                            vertical = 5.dp
+                        ), // Add vertical padding for spacing between cards
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
+                    elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
+                    shape = RoundedCornerShape(8.dp) // Rounded corners
+                ) {
+                    PriceLineChart(
+                        currencyCM = currency.get(page).quotes[0],
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(horizontal = 10.dp, vertical = 16.dp),
+                        labelName = currency.get(page).symbol
+                    )
+                }
             }
         }
 

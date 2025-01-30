@@ -22,6 +22,7 @@ import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCur
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
+import com.example.cleanarchitectureproject.presentation.home_screen.components.carousel.ZoomedChart
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +46,31 @@ class MainActivity : ComponentActivity() {
                             route = Screen.HomeScreen.route
                         ) {
                             HomeScreen(navController, animatedVisibilityScope = this)
+                        }
+                        composable(
+                            route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}",
+                            arguments = listOf(
+                                navArgument("coinSymbol") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("coinData") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("isHome") {
+                                    type = NavType.BoolType
+                                }
+                            )
+                        ){
+                            val gson = Gson() // Or use kotlinx.serialization
+                            val coinSymbol = it.arguments?.getString("coinSymbol") ?: ""
+                            val isHome = it.arguments?.getBoolean("isHome") ?: false
+                            val coinDataJson = it.arguments?.getString("coinData") ?: ""
+
+                            val coinData = gson.fromJson(
+                                coinDataJson,
+                                CryptoCoin::class.java
+                            )
+                            ZoomedChart(currency = coinData, symbol = coinSymbol, isHomeScreen = isHome, animatedVisibilityScope = this)
                         }
 
                         composable(
@@ -93,7 +119,8 @@ class MainActivity : ComponentActivity() {
                                 isGainer = isGainer,
                                 isSaved = isSaved,
                                 animatedVisibilityScope = this,
-                                coinData = coinData
+                                coinData = coinData,
+                                navController = navController
                             )
                         }
                     }

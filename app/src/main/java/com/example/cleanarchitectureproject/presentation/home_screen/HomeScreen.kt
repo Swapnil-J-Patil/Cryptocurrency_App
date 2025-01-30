@@ -45,6 +45,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Navbar
 import com.example.cleanarchitectureproject.presentation.Screen
@@ -125,6 +126,9 @@ fun SharedTransitionScope.HomeScreen(
 
                     val topGainers by viewModel.topGainers.collectAsState()
                     val topLosers by viewModel.topLosers.collectAsState()
+                    val list = state.cryptocurrency!!.data.cryptoCurrencyList
+                        .subList(0, 3)
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -146,13 +150,16 @@ fun SharedTransitionScope.HomeScreen(
                                     .fillMaxWidth()
                                     .height(carouselHeight),
                                 onClick = { item ->
-                                    Log.d("carousel", "clicked item: $item")
+
+                                    val coinData = item.toCryptoCoin()
+                                    val gson = Gson() // Or use kotlinx.serialization
+                                    val coinDataJson = gson.toJson(coinData)
+                                    val flag=true
+                                    navController.navigate(Screen.ZoomedChart.route + "/${item.symbol}/${coinDataJson}/${flag}")
                                 },
                                 dotsPadding = dotsPadding,
-                                currency = state.cryptocurrency!!.data.cryptoCurrencyList.subList(
-                                    0,
-                                    3
-                                )
+                                currency = list,
+                                animatedVisibilityScope=animatedVisibilityScope,
                             )
                         }
 

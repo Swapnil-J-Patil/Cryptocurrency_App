@@ -79,10 +79,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
+import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.coin_live_price.components.SupplyInfoCard
 import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
@@ -91,6 +93,7 @@ import com.example.cleanarchitectureproject.presentation.home_screen.components.
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
 
@@ -104,7 +107,8 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     isSaved: Boolean,
     isGainer: Boolean,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    coinData: CryptoCoin
+    coinData: CryptoCoin,
+    navController: NavController
 ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
@@ -351,6 +355,16 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
+                        .sharedElement(
+                            state = rememberSharedContentState(key = "coinChart/${coinSymbol}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                        .clickable {
+                            val gson = Gson() // Or use kotlinx.serialization
+                            val coinDataJson = gson.toJson(coinData)
+                            val flag=false
+                            navController.navigate(Screen.ZoomedChart.route + "/${coinSymbol}/${coinDataJson}/${flag}")
+                        }
                         .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 ) {
                     PriceLineChart(
@@ -359,7 +373,6 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             .fillMaxWidth()
                             .height(300.dp)
                             .padding(16.dp),
-                        isMoreData = true,
                         labelName = coinSymbol
                     )
                 }
