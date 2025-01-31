@@ -1,6 +1,5 @@
 package com.example.cleanarchitectureproject.presentation.home_screen.components.navbar
 
-import android.graphics.fonts.FontStyle
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -24,10 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.presentation.Navbar
+import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 @Composable
