@@ -103,6 +103,8 @@ dependencies {
     implementation (libs.compose.charts)
     implementation ("androidx.compose.material:material-icons-extended:1.7.6")
 
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
+    
 }
 kapt{
     correctErrorTypes = true

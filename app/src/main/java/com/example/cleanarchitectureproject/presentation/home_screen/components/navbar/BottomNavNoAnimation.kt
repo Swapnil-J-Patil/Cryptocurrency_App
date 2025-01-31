@@ -4,10 +4,18 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,9 +30,12 @@ import com.example.cleanarchitectureproject.presentation.Navbar
 
 @Composable
 fun BottomNavAnimation(
-    screens: List<Navbar>
+    screens: List<Navbar>,
+    isTab:Boolean
 ) {
     var selectedScreen by remember { mutableStateOf(0) }
+    if (!isTab)
+    {
     Box(
         Modifier
             .shadow(5.dp)
@@ -55,10 +66,60 @@ fun BottomNavAnimation(
                             selectedScreen = screens.indexOf(screen)
                         },
                         screen = screen,
-                        isSelected = isSelected
+                        isSelected = isSelected,
+                        isTab = isTab
                     )
                 }
             }
         }
+    }
+    }
+    else
+    {
+        Box(
+            Modifier
+                .shadow(5.dp)
+                .background(color = MaterialTheme.colorScheme.surface)
+                .fillMaxHeight() // Ensure the Box takes full height
+                .width(140.dp) // Adjust width for vertical layout
+        ) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.tertiary),
+                 // Fill available space
+                verticalArrangement = Arrangement.Top, // Align items at the top
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(20.dp))
+                for (screen in screens) {
+                    val isSelected = screen == screens[selectedScreen]
+                    val animatedWeight by animateFloatAsState(
+                        targetValue = if (isSelected) 1.5f else 1f
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .weight(animatedWeight, fill = false) // Allow flexible spacing
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val interactionSource = remember { MutableInteractionSource() }
+                        BottomNavItem(
+                            modifier = Modifier.clickable(
+                                interactionSource = interactionSource,
+                                indication = null
+                            ) {
+                                selectedScreen = screens.indexOf(screen)
+                            },
+                            screen = screen,
+                            isSelected = isSelected,
+                            isTab = isTab
+                        )
+                    }
+                }
+            }
+        }
+
     }
 }

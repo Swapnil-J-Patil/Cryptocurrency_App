@@ -3,6 +3,8 @@ package com.example.cleanarchitectureproject.presentation.common_components
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,11 +13,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,11 +48,15 @@ import ir.ehsannarmani.compose_charts.models.ZeroLineProperties
 
 @Composable
 fun PriceLineChart(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     currencyCM: QuoteCM? = null,
     labelName: String? = null
 ) {
-    // Data preparation
+    val labels = listOf("1Y", "90D", "30D", "7D", "24H", "1H")
+
+    // Track visibility state
+    var isVisible by remember { mutableStateOf(false) }
+
     val priceChanges = currencyCM?.let {
         listOf(
             currencyCM.percentChange1y,
@@ -54,31 +66,40 @@ fun PriceLineChart(
             it.percentChange24h,
             currencyCM.percentChange1h,
         )
+    } ?: emptyList()
+
+    LaunchedEffect(isVisible) {
+        if (isVisible) {
+            // Triggers recomposition when the chart becomes visible
+        }
     }
 
-    val labels:List<String> = listOf("1Y", "90D", "30D", "7D", "24H", "1H")
-
+    Box(
+        modifier = modifier
+            .onGloballyPositioned { coordinates ->
+                isVisible = coordinates.isAttached
+            }
+            .drawWithContent {
+                if (!isVisible) return@drawWithContent
+                drawContent()
+            }
+    ) {
         LineChart(
-            modifier = modifier,
-            data = remember {
+            modifier = Modifier.fillMaxSize(),
+            data = remember(isVisible) { // Recomposition happens when `isVisible` changes
                 listOf(
                     Line(
-                        label = labelName!!,
-                        values = priceChanges ?: emptyList(),
+                        label = labelName ?: "",
+                        values = priceChanges,
                         color = SolidColor(Color(0xFF23af92)),
                         firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
                         secondGradientFillColor = Color.Transparent,
-                        strokeAnimationSpec = tween(
-                            2000,
-                            easing = EaseInOutCubic
-                        ), // Line stroke animation
-                        gradientAnimationDelay = 1000, // Delay for gradient fill
+                        strokeAnimationSpec = tween(2000, easing = EaseInOutCubic),
+                        gradientAnimationDelay = 1000,
                         drawStyle = DrawStyle.Stroke(width = 2.dp)
                     ),
-
-                    )
+                )
             },
-
             labelHelperProperties = LabelHelperProperties(
                 enabled = true,
                 textStyle = TextStyle(
@@ -90,7 +111,10 @@ fun PriceLineChart(
                 enabled = true,
                 textStyle = TextStyle(color = MaterialTheme.colorScheme.secondary)
             ),
-            gridProperties = GridProperties(enabled = true, yAxisProperties = GridProperties.AxisProperties(lineCount = labels.size)),
+            gridProperties = GridProperties(
+                enabled = true,
+                yAxisProperties = GridProperties.AxisProperties(lineCount = labels.size)
+            ),
             animationMode = AnimationMode.Together(delayBuilder = { it * 500L }),
             labelProperties = LabelProperties(
                 enabled = true,
@@ -101,8 +125,9 @@ fun PriceLineChart(
                 ),
             ),
         )
-
+    }
 }
+
 
 
 

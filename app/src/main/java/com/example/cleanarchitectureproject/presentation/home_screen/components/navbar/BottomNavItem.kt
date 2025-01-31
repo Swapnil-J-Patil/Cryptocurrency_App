@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,63 +35,131 @@ fun BottomNavItem(
     modifier: Modifier = Modifier,
     screen: Navbar,
     isSelected: Boolean,
+    isTab: Boolean
 ) {
-    Box(
-        modifier = modifier.fillMaxSize()
-            .background( MaterialTheme.colorScheme.tertiary),
-        contentAlignment = Alignment.Center,
-    ) {
-        val animatedHeight by animateDpAsState(targetValue = if (isSelected) 36.dp else 26.dp)
-        val animatedElevation by animateDpAsState(targetValue = if (isSelected) 15.dp else 0.dp)
-        val animatedAlpha by animateFloatAsState(targetValue = if (isSelected) 1f else .5f)
-        val animatedIconSize by animateDpAsState(
-            targetValue = if (isSelected) 26.dp else 20.dp,
-            animationSpec = spring(
-                stiffness = Spring.StiffnessLow,
-                dampingRatio = Spring.DampingRatioMediumBouncy
-            )
-        )
-        val color=if (isSelected) green else MaterialTheme.colorScheme.onSurface
-        Row(
-            modifier = Modifier
-                .height(animatedHeight)
-                .shadow(
-                    elevation = animatedElevation,
-                    shape = RoundedCornerShape(20.dp)
-                )
-                .background(
-                    color = MaterialTheme.colorScheme.tertiary,
-                    shape = RoundedCornerShape(20.dp)
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
+    if(!isTab) {
+        Box(
+            modifier = modifier.fillMaxSize()
+                .background(MaterialTheme.colorScheme.tertiary),
+            contentAlignment = Alignment.Center,
         ) {
-            FlipIcon(
-                modifier = Modifier
-                    .align(Alignment.CenterVertically)
-                    .fillMaxHeight()
-                    .padding(start = 11.dp)
-                    .alpha(animatedAlpha)
-                    .size(animatedIconSize),
-                isActive = isSelected,
-                activeIcon = screen.activeIcon,
-                inactiveIcon = screen.inactiveIcon,
-                contentDescription = "Bottom Navigation Icon",
-                color = color,
-                rotationMax = 180f,
-                rotationMin = 0f
-            )
-
-            if (isSelected) {
-                Text(
-                    text = screen.title,
-                    modifier = Modifier.padding(start = 8.dp, end = 10.dp),
-                    color = green,
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.Bold),
-                    maxLines = 1,
+            val animatedHeight by animateDpAsState(targetValue = if (isSelected) 36.dp else 26.dp)
+            val animatedElevation by animateDpAsState(targetValue = if (isSelected) 15.dp else 0.dp)
+            val animatedAlpha by animateFloatAsState(targetValue = if (isSelected) 1f else .5f)
+            val animatedIconSize by animateDpAsState(
+                targetValue = if (isSelected) 26.dp else 20.dp,
+                animationSpec = spring(
+                    stiffness = Spring.StiffnessLow,
+                    dampingRatio = Spring.DampingRatioMediumBouncy
                 )
+            )
+            val color = if (isSelected) green else MaterialTheme.colorScheme.onSurface
+            Row(
+                modifier = Modifier
+                    .height(animatedHeight)
+                    .shadow(
+                        elevation = animatedElevation,
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(20.dp)
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                FlipIcon(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .fillMaxHeight()
+                        .padding(start = 11.dp)
+                        .alpha(animatedAlpha)
+                        .size(animatedIconSize),
+                    isActive = isSelected,
+                    activeIcon = screen.activeIcon,
+                    inactiveIcon = screen.inactiveIcon,
+                    contentDescription = "Bottom Navigation Icon",
+                    color = color,
+                    rotationMax = 180f,
+                    rotationMin = 0f
+                )
+
+                if (isSelected) {
+                    Text(
+                        text = screen.title,
+                        modifier = Modifier.padding(start = 8.dp, end = 10.dp),
+                        color = green,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        maxLines = 1,
+                    )
+                }
             }
         }
     }
+    else
+    {
+        Box(
+            modifier = modifier.fillMaxWidth()
+                .height(64.dp)
+                .background(MaterialTheme.colorScheme.tertiary),
+            contentAlignment = Alignment.Center,
+        ) {
+            val animatedHeight by animateDpAsState(targetValue = if (isSelected) 36.dp else 26.dp)
+            val animatedElevation by animateDpAsState(targetValue = if (isSelected) 15.dp else 0.dp)
+            val animatedAlpha by animateFloatAsState(targetValue = if (isSelected) 1f else .5f)
+            val animatedIconSize by animateDpAsState(
+                targetValue = if (isSelected) 26.dp else 20.dp,
+                animationSpec = spring(
+                    stiffness = Spring.StiffnessLow,
+                    dampingRatio = Spring.DampingRatioMediumBouncy
+                )
+            )
+            val color = if (isSelected) green else MaterialTheme.colorScheme.onSurface
+            Row(
+                modifier = Modifier
+                    .height(animatedHeight)
+                    .shadow(
+                        elevation = animatedElevation,
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                    .background(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        shape = RoundedCornerShape(20.dp)
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                FlipIcon(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .fillMaxHeight()
+                        .padding(start = 11.dp)
+                        .alpha(animatedAlpha)
+                        .size(animatedIconSize),
+                    isActive = isSelected,
+                    activeIcon = screen.activeIcon,
+                    inactiveIcon = screen.inactiveIcon,
+                    contentDescription = "Bottom Navigation Icon",
+                    color = color,
+                    rotationMax = 180f,
+                    rotationMin = 0f
+                )
+
+                if (isSelected) {
+                    Text(
+                        text = screen.title,
+                        modifier = Modifier.padding(start = 8.dp, end = 10.dp),
+                        color = green,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+
 }

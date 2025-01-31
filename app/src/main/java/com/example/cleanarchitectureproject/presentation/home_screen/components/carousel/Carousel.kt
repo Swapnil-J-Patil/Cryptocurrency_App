@@ -90,7 +90,7 @@ fun SharedTransitionScope.Carousel(
 
             ) { page ->
             val symbol=currency.get(page).symbol
-            key(currency[page].id)
+            key(currency[page].symbol)
             {
                 Card(
                     modifier = Modifier

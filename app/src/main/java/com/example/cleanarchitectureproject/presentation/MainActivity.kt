@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             HomeScreen(navController, animatedVisibilityScope = this)
                         }
+
                         composable(
                             route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}",
                             arguments = listOf(
@@ -123,6 +124,7 @@ class MainActivity : ComponentActivity() {
                                 navController = navController
                             )
                         }
+
                     }
                 }
             }
