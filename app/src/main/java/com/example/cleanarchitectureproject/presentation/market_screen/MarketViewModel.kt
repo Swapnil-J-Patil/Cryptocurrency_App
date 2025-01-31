@@ -24,6 +24,9 @@ class MarketViewModel @Inject constructor(
     private val _coinList = mutableStateOf(CoinListState())
     val coinList: State<CoinListState> = _coinList
 
+    private val _coins = MutableStateFlow<List<CryptoCurrencyCM>>(emptyList())
+    val coins: StateFlow<List<CryptoCurrencyCM>> = _coins
+
     init {
         getCoinStats()
     }
@@ -33,6 +36,7 @@ class MarketViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     _coinList.value = CoinListState(cryptocurrency = result.data)
+                    _coins.value= result.data?.data!!.cryptoCurrencyList
                     Log.d("cryptoCurrency", "getCoin: ${result.data}")
                 }
 
