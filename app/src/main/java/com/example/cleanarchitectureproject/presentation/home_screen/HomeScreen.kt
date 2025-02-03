@@ -27,9 +27,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -71,8 +71,10 @@ fun SharedTransitionScope.HomeScreen(
 ) {
     val state = viewModel.statsState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
+    var isPlaying by remember { mutableStateOf(true) } // Control animation state
+
     val progress by animateLottieCompositionAsState(
-        composition, iterations = LottieConstants.IterateForever // Infinite repeat mode
+        composition, iterations = LottieConstants.IterateForever, isPlaying = isPlaying // Infinite repeat mode
     )
 
     val screen = listOf(
@@ -108,13 +110,6 @@ fun SharedTransitionScope.HomeScreen(
     val loserGraphList by viewModel.loserGraphList.collectAsState()
     val topGainers by viewModel.topGainers.collectAsState()
     val topLosers by viewModel.topLosers.collectAsState()
-    LaunchedEffect(topGainers, topLosers) {
-        viewModel.processGainersAndLosers(topGainers, topLosers)
-    }
-    LaunchedEffect(Unit) {
-        viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
-        viewModel.getLosers(state.cryptocurrency!!.data.cryptoCurrencyList)
-    }
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -152,6 +147,11 @@ fun SharedTransitionScope.HomeScreen(
                                 bottomBarVisibility = true
                                 // Apply scaling animation along with visibility change
 
+                              /*  viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
+                                viewModel.getLosers(state.cryptocurrency!!.data.cryptoCurrencyList)*/
+
+                              /*  val topGainers by viewModel.topGainers.collectAsState()
+                                val topLosers by viewModel.topLosers.collectAsState()*/
                                 val list = state.cryptocurrency!!.data.cryptoCurrencyList
                                     .subList(0, 3)
 
@@ -181,11 +181,13 @@ fun SharedTransitionScope.HomeScreen(
                                                 val gson = Gson() // Or use kotlinx.serialization
                                                 val coinDataJson = gson.toJson(coinData)
                                                 val flag = true
-                                                navController.navigate(Screen.ZoomedChart.route + "/${item.symbol}/${coinDataJson}/${flag}")
+                                                val listType="carousel"
+                                                navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}")
                                             },
                                             dotsPadding = dotsPadding,
                                             currency = list,
                                             animatedVisibilityScope = animatedVisibilityScope,
+                                            listType = "carousel"
                                         )
                                     }
 
@@ -194,7 +196,10 @@ fun SharedTransitionScope.HomeScreen(
                                         modifier = Modifier.padding(top = 10.dp)
                                     ) {
                                         state.cryptocurrency?.data?.let {
+                                            isPlaying = false
+
                                             LazyRowScaleIn(
+
                                                 items = it.cryptoCurrencyList,
                                                 onCardClicked = { item ->
 
@@ -216,7 +221,8 @@ fun SharedTransitionScope.HomeScreen(
                                                     val gson =
                                                         Gson() // Or use kotlinx.serialization
                                                     val coinDataJson = gson.toJson(coinData)
-                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
+                                                    val listType="lazyRow"
+                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
 
                                                 },
                                                 animatedVisibilityScope = animatedVisibilityScope
@@ -225,7 +231,7 @@ fun SharedTransitionScope.HomeScreen(
                                     }
 
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    /*val gainerPercentageList = remember(topGainers) {
+                                   /* val gainerPercentageList = remember(topGainers) {
                                         topGainers.map { gainer ->
                                             if (gainer.quotes[0].percentChange1h.toString().length > 5) {
                                                 "+" + gainer.quotes[0].percentChange1h.toString()
@@ -305,7 +311,9 @@ fun SharedTransitionScope.HomeScreen(
                                             val coinData = item.toCryptoCoin()
                                             val gson = Gson() // Or use kotlinx.serialization
                                             val coinDataJson = gson.toJson(coinData)
-                                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
+                                            val listType="gainersAndLosers"
+
+                                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
                                         },
                                         animatedVisibilityScope,
                                         "home",
@@ -315,7 +323,8 @@ fun SharedTransitionScope.HomeScreen(
                                         gainersLogo = gainerLogoList,
                                         losersLogo = loserLogoList,
                                         gainersGraph = gainerGraphList,
-                                        losersGraph = loserGraphList
+                                        losersGraph = loserGraphList,
+                                        listType = "gainersAndLosers"
                                     )
                                 }
                             }
@@ -425,11 +434,11 @@ fun SharedTransitionScope.HomeScreen(
 
                                 // Apply scaling animation along with visibility change
 
-                                viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
+                            /*    viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
                                 viewModel.getLosers(state.cryptocurrency!!.data.cryptoCurrencyList)
-
-                                val topGainers by viewModel.topGainers.collectAsState()
-                                val topLosers by viewModel.topLosers.collectAsState()
+*/
+                              /*  val topGainers by viewModel.topGainers.collectAsState()
+                                val topLosers by viewModel.topLosers.collectAsState()*/
                                 val list = state.cryptocurrency!!.data.cryptoCurrencyList
                                     .subList(0, 3)
 
@@ -464,11 +473,13 @@ fun SharedTransitionScope.HomeScreen(
                                                     Gson() // Or use kotlinx.serialization
                                                 val coinDataJson = gson.toJson(coinData)
                                                 val flag = true
-                                                navController.navigate(Screen.ZoomedChart.route + "/${item.symbol}/${coinDataJson}/${flag}")
+                                                val listType="carousel"
+                                                navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}")
                                             },
                                             dotsPadding = dotsPadding,
                                             currency = list,
                                             animatedVisibilityScope = animatedVisibilityScope,
+                                            listType = "carousel"
                                         )
                                     }
 
@@ -477,6 +488,8 @@ fun SharedTransitionScope.HomeScreen(
                                         modifier = Modifier.padding(top = 10.dp)
                                     ) {
                                         state.cryptocurrency?.data?.let {
+                                            isPlaying = false
+
                                             LazyRowScaleIn(
                                                 items = it.cryptoCurrencyList,
                                                 onCardClicked = { item ->
@@ -499,7 +512,8 @@ fun SharedTransitionScope.HomeScreen(
                                                     val gson =
                                                         Gson() // Or use kotlinx.serialization
                                                     val coinDataJson = gson.toJson(coinData)
-                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
+                                                    val listType="lazyRow"
+                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
 
                                                 },
                                                 animatedVisibilityScope = animatedVisibilityScope
@@ -508,7 +522,7 @@ fun SharedTransitionScope.HomeScreen(
                                     }
 
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    val gainerPercentageList = remember(topGainers) {
+                                  /*  val gainerPercentageList = remember(topGainers) {
                                         topGainers.map { gainer ->
                                             if (gainer.quotes[0].percentChange1h.toString().length > 5) {
                                                 "+" + gainer.quotes[0].percentChange1h.toString()
@@ -567,7 +581,7 @@ fun SharedTransitionScope.HomeScreen(
                                         topLosers.map { loser ->
                                             "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
                                         }
-                                    }
+                                    }*/
                                     Tabs(
                                         gainers = topGainers,
                                         losers = topLosers,
@@ -590,7 +604,8 @@ fun SharedTransitionScope.HomeScreen(
                                             val gson =
                                                 Gson() // Or use kotlinx.serialization
                                             val coinDataJson = gson.toJson(coinData)
-                                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
+                                            val listType="gainersAndLosers"
+                                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
                                         },
                                         animatedVisibilityScope,
                                         "home",
@@ -600,7 +615,8 @@ fun SharedTransitionScope.HomeScreen(
                                         gainersLogo = gainerLogoList,
                                         losersLogo = loserLogoList,
                                         gainersGraph = gainerGraphList,
-                                        losersGraph = loserGraphList
+                                        losersGraph = loserGraphList,
+                                        listType = "gainersAndLosers"
                                     )
                                 }
                             }

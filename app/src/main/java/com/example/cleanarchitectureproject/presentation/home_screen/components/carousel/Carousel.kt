@@ -49,7 +49,8 @@ fun SharedTransitionScope.Carousel(
     onClick:(CryptoCurrencyCM)->Unit,
     dotsPadding: Dp,
     currency:List<CryptoCurrencyCM>,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    listType: String
 ) {
 
     BoxWithConstraints(
@@ -89,8 +90,8 @@ fun SharedTransitionScope.Carousel(
             pageSpacing = itemSpacing,
 
             ) { page ->
-            val symbol=currency.get(page).symbol
-            key(currency[page].symbol)
+            val id=currency.get(page).id
+            key(currency[page].id)
             {
                 Card(
                     modifier = Modifier
@@ -98,7 +99,7 @@ fun SharedTransitionScope.Carousel(
                         .fillMaxHeight()
                         .padding(horizontal = 10.dp, vertical = 16.dp)
                         .sharedElement(
-                            state = rememberSharedContentState(key = "coinChart/${symbol}"),
+                            state = rememberSharedContentState(key = "coinChart/${listType}_${id}"),
                             animatedVisibilityScope = animatedVisibilityScope
                         )
                         .clickable {

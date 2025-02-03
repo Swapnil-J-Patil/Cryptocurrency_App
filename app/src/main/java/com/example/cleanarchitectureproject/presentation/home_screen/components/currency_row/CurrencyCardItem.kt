@@ -42,14 +42,15 @@ fun SharedTransitionScope.CurrencyCardItem(
     color: Color,
     onCardClicked:()->Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    currencyId: String
+    currencyId: String,
+    listType: String
     ) {
     Card(
         modifier = modifier.clickable {
             onCardClicked()
         }
             .sharedElement(
-                state = rememberSharedContentState(key = "coinCard/${currencyId}"),
+                state = rememberSharedContentState(key = "coinCard/${listType}_${currencyId}"),
                 animatedVisibilityScope = animatedVisibilityScope
             ),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color

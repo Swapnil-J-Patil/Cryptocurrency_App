@@ -36,6 +36,7 @@ fun SharedTransitionScope.TopLosersScreen(
     losersPrice: List<String>? = emptyList(),
     losersLogo: List<String>? = emptyList(),
     losersGraph: List<String>? = emptyList(),
+    listType:String
 ) {
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
     val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
@@ -95,7 +96,7 @@ fun SharedTransitionScope.TopLosersScreen(
                         onItemClick(loser,false)
                     }
                     .sharedElement(
-                        state = rememberSharedContentState(key = "coinCard/${loser.id}"),
+                        state = rememberSharedContentState(key = "coinCard/${listType}_${loser.id}"),
                         animatedVisibilityScope = animatedVisibilityScope
                     ),
             )

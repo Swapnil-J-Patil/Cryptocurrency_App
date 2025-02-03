@@ -55,6 +55,7 @@ fun SharedTransitionScope.Tabs(
     gainersGraph: List<String>? = emptyList(),
     losersGraph: List<String>? = emptyList(),
     symbol: String? = null,
+    listType: String?=null
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
@@ -130,7 +131,8 @@ fun SharedTransitionScope.Tabs(
                             gainersPercentage = gainersPercentage,
                             gainersPrice = gainersPrice,
                             gainersLogo = gainersLogo,
-                            gainersGraph = gainersGraph
+                            gainersGraph = gainersGraph,
+                            listType = listType!!
                         )
                     }
                     1 -> losers?.let {
@@ -141,7 +143,8 @@ fun SharedTransitionScope.Tabs(
                             losersPercentage = losersPercentage,
                             losersPrice = losersPrice,
                             losersLogo = losersLogo,
-                            losersGraph = losersGraph
+                            losersGraph = losersGraph,
+                            listType = listType!!
                         )
                     }
                 }

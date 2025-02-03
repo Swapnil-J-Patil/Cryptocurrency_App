@@ -88,7 +88,8 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     isGainer: Boolean,
     animatedVisibilityScope: AnimatedVisibilityScope,
     coinData: CryptoCoin,
-    navController: NavController
+    navController: NavController,
+    listType: String
 ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
@@ -203,7 +204,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     translationY = -(maxCardHeight.toPx() - cardHeight.toPx()) / 2f
                 }
                 .sharedElement(
-                    state = rememberSharedContentState(key = "coinCard/${coinId}"),
+                    state = rememberSharedContentState(key = "coinCard/${listType}_${coinId}"),
                     animatedVisibilityScope = animatedVisibilityScope
                 )
                 .padding(start = 8.dp, end = 8.dp, top = 55.dp),
@@ -331,19 +332,20 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
+                val listTypeNew="lineChart"
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
                         .sharedElement(
-                            state = rememberSharedContentState(key = "coinChart/${coinSymbol}"),
+                            state = rememberSharedContentState(key = "coinChart/${listTypeNew}_${coinId}"),
                             animatedVisibilityScope = animatedVisibilityScope
                         )
                         .clickable {
                             val gson = Gson() // Or use kotlinx.serialization
                             val coinDataJson = gson.toJson(coinData)
                             val flag=false
-                            navController.navigate(Screen.ZoomedChart.route + "/${coinSymbol}/${coinDataJson}/${flag}")
+                            navController.navigate(Screen.ZoomedChart.route + "/${coinId}/${coinDataJson}/${flag}/${listTypeNew}")
                         }
                         .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 ) {

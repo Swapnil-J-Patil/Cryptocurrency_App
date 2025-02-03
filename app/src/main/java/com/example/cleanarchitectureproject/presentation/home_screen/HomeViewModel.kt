@@ -67,6 +67,9 @@ class HomeViewModel @Inject constructor(
                 is Resource.Success -> {
                     _statsState.value = CoinStatsState(cryptocurrency = result.data)
                     Log.d("cryptoCurrency", "getCoin: ${result.data}")
+                    getGainers(_statsState.value.cryptocurrency!!.data.cryptoCurrencyList)
+                    getLosers(_statsState.value.cryptocurrency!!.data.cryptoCurrencyList)
+                    processGainersAndLosers(_topGainers.value, _topLosers.value)
                 }
 
                 is Resource.Error -> {
@@ -145,5 +148,4 @@ class HomeViewModel @Inject constructor(
             Log.d("cryptoCurrency", "Sorted Losers: $sortedCryptocurrencies")
         }
     }
-
 }

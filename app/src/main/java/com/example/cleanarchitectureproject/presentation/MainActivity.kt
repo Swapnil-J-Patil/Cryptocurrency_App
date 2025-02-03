@@ -41,7 +41,7 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(
-                            route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}",
+                            route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}/{listType}",
                             arguments = listOf(
                                 navArgument("coinSymbol") {
                                     type = NavType.StringType
@@ -51,11 +51,15 @@ class MainActivity : ComponentActivity() {
                                 },
                                 navArgument("isHome") {
                                     type = NavType.BoolType
-                                }
+                                },
+                                navArgument("listType") {
+                                    type = NavType.StringType
+                                },
                             )
                         ){
                             val gson = Gson() // Or use kotlinx.serialization
                             val coinSymbol = it.arguments?.getString("coinSymbol") ?: ""
+                            val listType = it.arguments?.getString("listType") ?: ""
                             val isHome = it.arguments?.getBoolean("isHome") ?: false
                             val coinDataJson = it.arguments?.getString("coinData") ?: ""
 
@@ -63,11 +67,11 @@ class MainActivity : ComponentActivity() {
                                 coinDataJson,
                                 CryptoCoin::class.java
                             )
-                            ZoomedChart(currency = coinData, symbol = coinSymbol, isHomeScreen = isHome, animatedVisibilityScope = this)
+                            ZoomedChart(currency = coinData, id = coinSymbol, isHomeScreen = isHome, animatedVisibilityScope = this,listType)
                         }
 
                         composable(
-                            route = Screen.CoinLivePriceScreen.route + "/{coinId}/{coinSymbol}/{price}/{coinPercentage}/{isGainer}/{isSaved}/{coinData}",
+                            route = Screen.CoinLivePriceScreen.route + "/{coinId}/{coinSymbol}/{price}/{coinPercentage}/{isGainer}/{isSaved}/{coinData}/{listType}",
                             arguments = listOf(
                                 navArgument("coinId") {
                                     type = NavType.StringType
@@ -88,6 +92,8 @@ class MainActivity : ComponentActivity() {
                                     type = NavType.BoolType
                                 },
                                 navArgument("coinData")
+                                { type = NavType.StringType },
+                                navArgument("listType")
                                 { type = NavType.StringType }
 
                             )
@@ -99,6 +105,7 @@ class MainActivity : ComponentActivity() {
                             val coinPercentage = it.arguments?.getString("coinPercentage") ?: ""
                             val isGainer = it.arguments?.getBoolean("isGainer") ?: false
                             val isSaved = it.arguments?.getBoolean("isSaved") ?: false
+                            val listType = it.arguments?.getString("listType") ?: ""
                             val coinDataJson = it.arguments?.getString("coinData") ?: ""
                             val coinData = gson.fromJson(
                                 coinDataJson,
@@ -113,7 +120,8 @@ class MainActivity : ComponentActivity() {
                                 isSaved = isSaved,
                                 animatedVisibilityScope = this,
                                 coinData = coinData,
-                                navController = navController
+                                navController = navController,
+                                listType = listType
                             )
                         }
 

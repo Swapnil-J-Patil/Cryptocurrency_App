@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -38,7 +39,7 @@ fun SharedTransitionScope.LazyRowScaleIn(
             .fillMaxWidth()
             .padding(horizontal = 10.dp)
     ) {
-        itemsIndexed(items) { index, item ->
+        itemsIndexed(items, key = { _, items -> items.symbol }) { index, item ->
             // Check if the item is visible
             val isVisible = remember {
                 derivedStateOf {
@@ -76,7 +77,8 @@ fun SharedTransitionScope.LazyRowScaleIn(
                 color = color,
                 onCardClicked = { onCardClicked(item)},
                 animatedVisibilityScope = animatedVisibilityScope,
-                currencyId = item.id.toString()
+                currencyId = item.id.toString(),
+                listType = "lazyRow"
             )
         }
     }

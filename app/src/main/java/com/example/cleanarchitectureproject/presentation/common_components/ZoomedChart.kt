@@ -26,9 +26,10 @@ import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 @Composable
 fun SharedTransitionScope.ZoomedChart(
     currency: CryptoCoin,
-    symbol:String,
+    id:String,
     isHomeScreen: Boolean,
-    animatedVisibilityScope:AnimatedVisibilityScope
+    animatedVisibilityScope:AnimatedVisibilityScope,
+    listType:String
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -54,7 +55,7 @@ fun SharedTransitionScope.ZoomedChart(
                         // onClick(page)
                     }
                     .sharedElement(
-                        state = rememberSharedContentState(key = "coinChart/${symbol}"),
+                        state = rememberSharedContentState(key = "coinChart/${listType}_${id}"),
                         animatedVisibilityScope = animatedVisibilityScope
                     ),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color

@@ -36,6 +36,7 @@ fun SharedTransitionScope.TopGainersScreen(
     gainersPrice: List<String>? = emptyList(),
     gainersLogo: List<String>? = emptyList(),
     gainersGraph: List<String>? = emptyList(),
+    listType: String
     ) {
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
     val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
@@ -53,10 +54,7 @@ fun SharedTransitionScope.TopGainersScreen(
             .height(adaptiveHeight.dp)
             .padding(top = 8.dp)
     ) {
-        itemsIndexed(gainers) { index, gainer ->
-           // val color = if (gainer.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
-
-            // Check visibility
+        itemsIndexed(gainers, key = { _, gainer -> gainer.id }) { index, gainer ->  // Use key
             val isVisible = remember {
                 derivedStateOf {
                     val visibleItems = listState.layoutInfo.visibleItemsInfo
@@ -64,14 +62,13 @@ fun SharedTransitionScope.TopGainersScreen(
                 }
             }
             val scale = remember { Animatable(0f) }
-           // val hasAnimated = remember { mutableStateOf(false) }
 
             LaunchedEffect(isVisible.value) {
                 if (isVisible.value) {
                     scale.animateTo(
                         targetValue = 1f,
                         animationSpec = tween(
-                            durationMillis = 300, // Adjust as needed for smoothness
+                            durationMillis = 300,
                             easing = FastOutSlowInEasing
                         )
                     )
@@ -83,11 +80,11 @@ fun SharedTransitionScope.TopGainersScreen(
             CoinCardItem(
                 currencyName = gainer.name,
                 symbol = gainer.symbol,
-                percentage = gainersPercentage?.get(index) ?: "",
-                price = gainersPrice?.get(index) ?: "",
-                image = gainersGraph?.get(index) ?: "",
+                percentage = gainersPercentage?.getOrNull(index) ?: "",
+                price = gainersPrice?.getOrNull(index) ?: "",
+                image = gainersGraph?.getOrNull(index) ?: "",
                 color = darkGreen,
-                logo = gainersLogo?.get(index) ?: "",
+                logo = gainersLogo?.getOrNull(index) ?: "",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp, horizontal = 15.dp)
@@ -96,11 +93,12 @@ fun SharedTransitionScope.TopGainersScreen(
                         onItemClick(gainer, true)
                     }
                     .sharedElement(
-                        state = rememberSharedContentState(key = "coinCard/${gainer.id}"),
+                        state = rememberSharedContentState(key = "coinCard/${listType}_${gainer.id}"),
                         animatedVisibilityScope = animatedVisibilityScope
                     ),
             )
         }
     }
+
 }
 
