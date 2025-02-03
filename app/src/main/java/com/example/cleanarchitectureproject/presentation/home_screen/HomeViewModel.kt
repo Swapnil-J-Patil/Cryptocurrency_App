@@ -33,6 +33,30 @@ class HomeViewModel @Inject constructor(
     private val _topLosers = MutableStateFlow<List<CryptoCurrencyCM>>(emptyList())
     val topLosers: StateFlow<List<CryptoCurrencyCM>> = _topLosers
 
+    private val _gainerPercentageList = MutableStateFlow<List<String>>(emptyList())
+    val gainerPercentageList: StateFlow<List<String>> = _gainerPercentageList
+
+    private val _gainerPriceList = MutableStateFlow<List<String>>(emptyList())
+    val gainerPriceList: StateFlow<List<String>> = _gainerPriceList
+
+    private val _gainerLogoList = MutableStateFlow<List<String>>(emptyList())
+    val gainerLogoList: StateFlow<List<String>> = _gainerLogoList
+
+    private val _gainerGraphList = MutableStateFlow<List<String>>(emptyList())
+    val gainerGraphList: StateFlow<List<String>> = _gainerGraphList
+
+    private val _loserPercentageList = MutableStateFlow<List<String>>(emptyList())
+    val loserPercentageList: StateFlow<List<String>> = _loserPercentageList
+
+    private val _loserPriceList = MutableStateFlow<List<String>>(emptyList())
+    val loserPriceList: StateFlow<List<String>> = _loserPriceList
+
+    private val _loserLogoList = MutableStateFlow<List<String>>(emptyList())
+    val loserLogoList: StateFlow<List<String>> = _loserLogoList
+
+    private val _loserGraphList = MutableStateFlow<List<String>>(emptyList())
+    val loserGraphList: StateFlow<List<String>> = _loserGraphList
+
     init {
         getCoinStats()
     }
@@ -58,6 +82,44 @@ class HomeViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun processGainersAndLosers(topGainers: List<CryptoCurrencyCM>, topLosers: List<CryptoCurrencyCM>) {
+        viewModelScope.launch {
+            _gainerPercentageList.value = topGainers.map { gainer ->
+                val percentage = gainer.quotes[0].percentChange1h.toString()
+                "+" + if (percentage.length > 5) percentage.substring(0, 5) else percentage + " %"
+            }
+
+            _gainerPriceList.value = topGainers.map { gainer ->
+                val price = gainer.quotes[0].price
+                "$ " + if (price < 1000) price.toString().substring(0, 5) else price.toString().substring(0, 3) + ".."
+            }
+
+            _gainerLogoList.value = topGainers.map { gainer ->
+                "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png"
+            }
+
+            _gainerGraphList.value = topGainers.map { gainer ->
+                "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png"
+            }
+
+            _loserPercentageList.value = topLosers.map { loser ->
+                val percentage = loser.quotes[0].percentChange1h.toString()
+                if (percentage.length > 5) percentage.substring(0, 5) else percentage + " %"
+            }
+
+            _loserPriceList.value = topLosers.map { loser ->
+                "$ " + loser.quotes[0].price.toString().substring(0, 5)
+            }
+
+            _loserLogoList.value = topLosers.map { loser ->
+                "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png"
+            }
+
+            _loserGraphList.value = topLosers.map { loser ->
+                "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
+            }
+        }
+    }
     fun getGainers(cryptoCurrencyList: List<CryptoCurrencyCM>) {
         viewModelScope.launch {
             val sortedCryptocurrencies = cryptoCurrencyList?.sortedWith { o1, o2 ->

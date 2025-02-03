@@ -27,9 +27,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
@@ -54,6 +57,7 @@ import com.example.cleanarchitectureproject.presentation.home_screen.components.
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.LazyRowScaleIn
 import com.example.cleanarchitectureproject.presentation.home_screen.components.TypingAnimation
+import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 import com.google.gson.Gson
@@ -79,7 +83,7 @@ fun SharedTransitionScope.HomeScreen(
     )
 
     val configuration = LocalConfiguration.current
-    val isTab = configuration.screenWidthDp.dp> 600.dp
+    val isTab = configuration.screenWidthDp.dp > 600.dp
     val carouselHeight = if (isTab) 350.dp else 320.dp
     val dotsPadding = if (isTab) 8.dp else 4.dp
     val tabTitles = listOf("Top Gainers", "Top Losers")
@@ -91,15 +95,35 @@ fun SharedTransitionScope.HomeScreen(
             easing = FastOutSlowInEasing
         )
     )
+    var selectedTab by remember { mutableStateOf(0) }
+    var bottomBarVisibility by remember { mutableStateOf(true) }
+    val gainerPercentageList by viewModel.gainerPercentageList.collectAsState()
+    val gainerPriceList by viewModel.gainerPriceList.collectAsState()
+    val gainerLogoList by viewModel.gainerLogoList.collectAsState()
+    val gainerGraphList by viewModel.gainerGraphList.collectAsState()
 
+    val loserPercentageList by viewModel.loserPercentageList.collectAsState()
+    val loserPriceList by viewModel.loserPriceList.collectAsState()
+    val loserLogoList by viewModel.loserLogoList.collectAsState()
+    val loserGraphList by viewModel.loserGraphList.collectAsState()
+    val topGainers by viewModel.topGainers.collectAsState()
+    val topLosers by viewModel.topLosers.collectAsState()
+    LaunchedEffect(topGainers, topLosers) {
+        viewModel.processGainersAndLosers(topGainers, topLosers)
+    }
+    LaunchedEffect(Unit) {
+        viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
+        viewModel.getLosers(state.cryptocurrency!!.data.cryptoCurrencyList)
+    }
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        if(isTab)
-        {
-            Box(modifier = Modifier.fillMaxSize()
-                ) {
+        if (isTab) {
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 AnimatedVisibility(
                     visible = !(state.error.isNotBlank() || state.isLoading),
                     enter = fadeIn(
@@ -115,65 +139,157 @@ fun SharedTransitionScope.HomeScreen(
                         )
                     )
                 ) {
-                    // Apply scaling animation along with visibility change
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(start = 140.dp)
                             .graphicsLayer(
                                 scaleX = scale,
                                 scaleY = scale
                             )
                     ) {
-                        viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
-                        viewModel.getLosers(state.cryptocurrency!!.data.cryptoCurrencyList)
+                        when (selectedTab) {
+                            0 -> {
+                                bottomBarVisibility = true
+                                // Apply scaling animation along with visibility change
 
-                        val topGainers by viewModel.topGainers.collectAsState()
-                        val topLosers by viewModel.topLosers.collectAsState()
-                        val list = state.cryptocurrency!!.data.cryptoCurrencyList
-                            .subList(0, 3)
+                                val list = state.cryptocurrency!!.data.cryptoCurrencyList
+                                    .subList(0, 3)
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            TypingAnimation(
-                                text = "Let's Dive Into the Market!",
-                                modifier = Modifier
-                                    .padding(top = 45.dp, start = 15.dp, end = 15.dp)
-                            )
-
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.Top,
-                            ) {
-                                Carousel(
+                                Column(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(carouselHeight),
-                                    onClick = { item ->
+                                        .fillMaxSize()
+                                        .padding(start = 140.dp)
+                                        .verticalScroll(rememberScrollState())
+                                ) {
+                                    TypingAnimation(
+                                        text = "Let's Dive Into the Market!",
+                                        modifier = Modifier
+                                            .padding(top = 45.dp, start = 15.dp, end = 15.dp)
+                                    )
 
-                                        val coinData = item.toCryptoCoin()
-                                        val gson = Gson() // Or use kotlinx.serialization
-                                        val coinDataJson = gson.toJson(coinData)
-                                        val flag = true
-                                        navController.navigate(Screen.ZoomedChart.route + "/${item.symbol}/${coinDataJson}/${flag}")
-                                    },
-                                    dotsPadding = dotsPadding,
-                                    currency = list,
-                                    animatedVisibilityScope = animatedVisibilityScope,
-                                )
-                            }
+                                    Row(
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.Top,
+                                    ) {
+                                        Carousel(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(carouselHeight),
+                                            onClick = { item ->
 
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(top = 10.dp)
-                            ) {
-                                state.cryptocurrency?.data?.let {
-                                    LazyRowScaleIn(
-                                        items = it.cryptoCurrencyList,
-                                        onCardClicked = { item ->
+                                                val coinData = item.toCryptoCoin()
+                                                val gson = Gson() // Or use kotlinx.serialization
+                                                val coinDataJson = gson.toJson(coinData)
+                                                val flag = true
+                                                navController.navigate(Screen.ZoomedChart.route + "/${item.symbol}/${coinDataJson}/${flag}")
+                                            },
+                                            dotsPadding = dotsPadding,
+                                            currency = list,
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                        )
+                                    }
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.Center,
+                                        modifier = Modifier.padding(top = 10.dp)
+                                    ) {
+                                        state.cryptocurrency?.data?.let {
+                                            LazyRowScaleIn(
+                                                items = it.cryptoCurrencyList,
+                                                onCardClicked = { item ->
+
+                                                    ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
+                                                    val price =
+                                                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
+                                                            .substring(
+                                                                0,
+                                                                10
+                                                            ) else item.quotes[0].price.toString()
+                                                    val percentage =
+                                                        item.quotes[0].percentChange1h.toString()
+
+                                                    val isSaved = false
+                                                    val coinData = item.toCryptoCoin()
+                                                    val isGainer =
+                                                        if (item.quotes[0].percentChange1h > 0.0) true else false
+
+                                                    val gson =
+                                                        Gson() // Or use kotlinx.serialization
+                                                    val coinDataJson = gson.toJson(coinData)
+                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
+
+                                                },
+                                                animatedVisibilityScope = animatedVisibilityScope
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    /*val gainerPercentageList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            if (gainer.quotes[0].percentChange1h.toString().length > 5) {
+                                                "+" + gainer.quotes[0].percentChange1h.toString()
+                                                    .substring(0, 5) + " %"
+                                            } else {
+                                                "+" + gainer.quotes[0].percentChange1h.toString() + " %"
+                                            }
+                                        }
+                                    }
+                                    val gainerPriceList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            if (gainer.quotes[0].price < 1000) {
+                                                "$ " + gainer.quotes[0].price.toString()
+                                                    .substring(0, 5)
+                                            } else {
+                                                "$ " + gainer.quotes[0].price.toString()
+                                                    .substring(0, 3) + ".."
+                                            }
+                                        }
+                                    }
+
+                                    val gainerLogoList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png"
+
+                                        }
+                                    }
+                                    val gainerGraphList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png"
+                                        }
+                                    }
+                                    val loserPercentageList = remember(topLosers) {
+                                        topLosers.map { loser ->
+                                            if (loser.quotes[0].percentChange1h.toString().length > 5) {
+                                                loser.quotes[0].percentChange1h.toString()
+                                                    .substring(0, 5) + " %"
+                                            } else {
+                                                loser.quotes[0].percentChange1h.toString() + " %"
+                                            }
+                                        }
+                                    }
+                                    val loserPriceList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            "$ " + gainer.quotes[0].price.toString().substring(0, 5)
+                                        }
+                                    }
+                                    val loserLogoList = remember(topLosers) {
+                                        topLosers.map { loser ->
+                                            "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png"
+
+                                        }
+                                    }
+                                    val loserGraphList = remember(topLosers) {
+                                        topLosers.map { loser ->
+                                            "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
+                                        }
+                                    }*/
+                                    Tabs(
+                                        gainers = topGainers,
+                                        losers = topLosers,
+                                        gainersPercentage = gainerPercentageList,
+                                        losersPercentage = loserPercentageList,
+                                        onItemClick = { item, isGainer ->
 
                                             ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
                                             val price =
@@ -187,141 +303,71 @@ fun SharedTransitionScope.HomeScreen(
 
                                             val isSaved = false
                                             val coinData = item.toCryptoCoin()
-                                            val isGainer =
-                                                if (item.quotes[0].percentChange1h > 0.0) true else false
-
                                             val gson = Gson() // Or use kotlinx.serialization
                                             val coinDataJson = gson.toJson(coinData)
                                             navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
-
                                         },
-                                        animatedVisibilityScope = animatedVisibilityScope
+                                        animatedVisibilityScope,
+                                        "home",
+                                        tabTitles,
+                                        gainersPrice = gainerPriceList,
+                                        losersPrice = loserPriceList,
+                                        gainersLogo = gainerLogoList,
+                                        losersLogo = loserLogoList,
+                                        gainersGraph = gainerGraphList,
+                                        losersGraph = loserGraphList
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
-                            val gainerPercentageList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    if (gainer.quotes[0].percentChange1h.toString().length > 5) {
-                                        "+" + gainer.quotes[0].percentChange1h.toString()
-                                            .substring(0, 5) + " %"
-                                    } else {
-                                        "+" + gainer.quotes[0].percentChange1h.toString() + " %"
-                                    }
-                                }
-                            }
-                            val gainerPriceList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    if (gainer.quotes[0].price < 1000) {
-                                        "$ " + gainer.quotes[0].price.toString().substring(0, 5)
-                                    } else {
-                                        "$ " + gainer.quotes[0].price.toString()
-                                            .substring(0, 3) + ".."
-                                    }
-                                }
-                            }
+                            1 -> {
+                                bottomBarVisibility = true
 
-                            val gainerLogoList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png"
-
-                                }
+                                MarketScreen(
+                                    navController = navController,
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
                             }
-                            val gainerGraphList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png"
-                                }
-                            }
-                            val loserPercentageList = remember(topLosers) {
-                                topLosers.map { loser ->
-                                    if (loser.quotes[0].percentChange1h.toString().length > 5) {
-                                        loser.quotes[0].percentChange1h.toString()
-                                            .substring(0, 5) + " %"
-                                    } else {
-                                        loser.quotes[0].percentChange1h.toString() + " %"
-                                    }
-                                }
-                            }
-                            val loserPriceList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    "$ " + gainer.quotes[0].price.toString().substring(0, 5)
-                                }
-                            }
-                            val loserLogoList = remember(topLosers) {
-                                topLosers.map { loser ->
-                                    "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png"
-
-                                }
-                            }
-                            val loserGraphList = remember(topLosers) {
-                                topLosers.map { loser ->
-                                    "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
-                                }
-                            }
-                            Tabs(
-                                gainers = topGainers,
-                                losers = topLosers,
-                                gainersPercentage = gainerPercentageList,
-                                losersPercentage = loserPercentageList,
-                                onItemClick = { item, isGainer ->
-
-                                    ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
-                                    val price =
-                                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                            .substring(0, 10) else item.quotes[0].price.toString()
-                                    val percentage = item.quotes[0].percentChange1h.toString()
-
-                                    val isSaved = false
-                                    val coinData = item.toCryptoCoin()
-                                    val gson = Gson() // Or use kotlinx.serialization
-                                    val coinDataJson = gson.toJson(coinData)
-                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
-                                },
-                                animatedVisibilityScope,
-                                "home",
-                                tabTitles,
-                                gainersPrice = gainerPriceList,
-                                losersPrice = loserPriceList,
-                                gainersLogo = gainerLogoList,
-                                losersLogo = loserLogoList,
-                                gainersGraph = gainerGraphList,
-                                losersGraph = loserGraphList
-                            )
                         }
+
+
+                        // Scrollable content
+                        // Custom Navbar
+
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                        ) {
+                            AnimatedVisibility(
+                                visible = !(state.error.isNotBlank() || state.isLoading) || bottomBarVisibility,
+                                enter = fadeIn(
+                                    animationSpec = tween(
+                                        durationMillis = 600,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ),
+                                exit = fadeOut(
+                                    animationSpec = tween(
+                                        durationMillis = 600,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                )
+                            ) {
+                                BottomNavAnimation(
+                                    screens = screen,
+                                    isTab = isTab,
+                                    onClick = { tab ->
+                                        selectedTab = tab
+                                    }
+                                )
+                            }
+                        }
+
+                        // Error message or loading animation
+
                     }
+
                 }
-
-                // Scrollable content
-                // Custom Navbar
-
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                ) {
-                    AnimatedVisibility(
-                        visible = !(state.error.isNotBlank() || state.isLoading),
-                        enter = fadeIn(
-                            animationSpec = tween(
-                                durationMillis = 600,
-                                easing = FastOutSlowInEasing
-                            )
-                        ),
-                        exit = fadeOut(
-                            animationSpec = tween(
-                                durationMillis = 600,
-                                easing = FastOutSlowInEasing
-                            )
-                        )
-                    ) {
-                        BottomNavAnimation(
-                            screens = screen,
-                            isTab = isTab
-                        )
-                    }
-                }
-
-                // Error message or loading animation
                 if (state.error.isNotBlank()) {
                     Text(
                         text = state.error,
@@ -345,10 +391,11 @@ fun SharedTransitionScope.HomeScreen(
                 }
             }
 
-        }
-        else {
-            Box(modifier = Modifier.fillMaxSize()
-                ) {
+        } else {
+
+            Box(
+                modifier = Modifier.fillMaxSize()
+            ) {
                 AnimatedVisibility(
                     visible = !(state.error.isNotBlank() || state.isLoading),
                     enter = fadeIn(
@@ -364,7 +411,6 @@ fun SharedTransitionScope.HomeScreen(
                         )
                     )
                 ) {
-                    // Apply scaling animation along with visibility change
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -373,56 +419,161 @@ fun SharedTransitionScope.HomeScreen(
                                 scaleY = scale
                             )
                     ) {
-                        viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
-                        viewModel.getLosers(state.cryptocurrency!!.data.cryptoCurrencyList)
+                        when (selectedTab) {
+                            0 -> {
+                                bottomBarVisibility = true
 
-                        val topGainers by viewModel.topGainers.collectAsState()
-                        val topLosers by viewModel.topLosers.collectAsState()
-                        val list = state.cryptocurrency!!.data.cryptoCurrencyList
-                            .subList(0, 3)
+                                // Apply scaling animation along with visibility change
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState())
-                                .padding(bottom = 56.dp) // Reserve space for navbar
-                        ) {
-                            TypingAnimation(
-                                text = "Let's Dive Into the Market!",
-                                modifier = Modifier
-                                    .padding(top = 45.dp, start = 15.dp, end = 15.dp)
-                            )
+                                viewModel.getGainers(state.cryptocurrency!!.data.cryptoCurrencyList)
+                                viewModel.getLosers(state.cryptocurrency!!.data.cryptoCurrencyList)
 
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.Top,
-                            ) {
-                                Carousel(
+                                val topGainers by viewModel.topGainers.collectAsState()
+                                val topLosers by viewModel.topLosers.collectAsState()
+                                val list = state.cryptocurrency!!.data.cryptoCurrencyList
+                                    .subList(0, 3)
+
+                                Column(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(carouselHeight),
-                                    onClick = { item ->
+                                        .fillMaxSize()
+                                        .verticalScroll(rememberScrollState())
+                                        .padding(bottom = 56.dp) // Reserve space for navbar
+                                ) {
+                                    TypingAnimation(
+                                        text = "Let's Dive Into the Market!",
+                                        modifier = Modifier
+                                            .padding(
+                                                top = 45.dp,
+                                                start = 15.dp,
+                                                end = 15.dp
+                                            )
+                                    )
 
-                                        val coinData = item.toCryptoCoin()
-                                        val gson = Gson() // Or use kotlinx.serialization
-                                        val coinDataJson = gson.toJson(coinData)
-                                        val flag = true
-                                        navController.navigate(Screen.ZoomedChart.route + "/${item.symbol}/${coinDataJson}/${flag}")
-                                    },
-                                    dotsPadding = dotsPadding,
-                                    currency = list,
-                                    animatedVisibilityScope = animatedVisibilityScope,
-                                )
-                            }
+                                    Row(
+                                        horizontalArrangement = Arrangement.Center,
+                                        verticalAlignment = Alignment.Top,
+                                    ) {
+                                        Carousel(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(carouselHeight),
+                                            onClick = { item ->
 
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(top = 10.dp)
-                            ) {
-                                state.cryptocurrency?.data?.let {
-                                    LazyRowScaleIn(
-                                        items = it.cryptoCurrencyList,
-                                        onCardClicked = { item ->
+                                                val coinData = item.toCryptoCoin()
+                                                val gson =
+                                                    Gson() // Or use kotlinx.serialization
+                                                val coinDataJson = gson.toJson(coinData)
+                                                val flag = true
+                                                navController.navigate(Screen.ZoomedChart.route + "/${item.symbol}/${coinDataJson}/${flag}")
+                                            },
+                                            dotsPadding = dotsPadding,
+                                            currency = list,
+                                            animatedVisibilityScope = animatedVisibilityScope,
+                                        )
+                                    }
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.Center,
+                                        modifier = Modifier.padding(top = 10.dp)
+                                    ) {
+                                        state.cryptocurrency?.data?.let {
+                                            LazyRowScaleIn(
+                                                items = it.cryptoCurrencyList,
+                                                onCardClicked = { item ->
+
+                                                    ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
+                                                    val price =
+                                                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
+                                                            .substring(
+                                                                0,
+                                                                10
+                                                            ) else item.quotes[0].price.toString()
+                                                    val percentage =
+                                                        item.quotes[0].percentChange1h.toString()
+
+                                                    val isSaved = false
+                                                    val coinData = item.toCryptoCoin()
+                                                    val isGainer =
+                                                        if (item.quotes[0].percentChange1h > 0.0) true else false
+
+                                                    val gson =
+                                                        Gson() // Or use kotlinx.serialization
+                                                    val coinDataJson = gson.toJson(coinData)
+                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
+
+                                                },
+                                                animatedVisibilityScope = animatedVisibilityScope
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    val gainerPercentageList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            if (gainer.quotes[0].percentChange1h.toString().length > 5) {
+                                                "+" + gainer.quotes[0].percentChange1h.toString()
+                                                    .substring(0, 5) + " %"
+                                            } else {
+                                                "+" + gainer.quotes[0].percentChange1h.toString() + " %"
+                                            }
+                                        }
+                                    }
+                                    val gainerPriceList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            if (gainer.quotes[0].price < 1000) {
+                                                "$ " + gainer.quotes[0].price.toString()
+                                                    .substring(0, 5)
+                                            } else {
+                                                "$ " + gainer.quotes[0].price.toString()
+                                                    .substring(0, 3) + ".."
+                                            }
+                                        }
+                                    }
+
+                                    val gainerLogoList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png"
+
+                                        }
+                                    }
+                                    val gainerGraphList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png"
+                                        }
+                                    }
+                                    val loserPercentageList = remember(topLosers) {
+                                        topLosers.map { loser ->
+                                            if (loser.quotes[0].percentChange1h.toString().length > 5) {
+                                                loser.quotes[0].percentChange1h.toString()
+                                                    .substring(0, 5) + " %"
+                                            } else {
+                                                loser.quotes[0].percentChange1h.toString() + " %"
+                                            }
+                                        }
+                                    }
+                                    val loserPriceList = remember(topGainers) {
+                                        topGainers.map { gainer ->
+                                            "$ " + gainer.quotes[0].price.toString()
+                                                .substring(0, 5)
+                                        }
+                                    }
+                                    val loserLogoList = remember(topLosers) {
+                                        topLosers.map { loser ->
+                                            "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png"
+
+                                        }
+                                    }
+                                    val loserGraphList = remember(topLosers) {
+                                        topLosers.map { loser ->
+                                            "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
+                                        }
+                                    }
+                                    Tabs(
+                                        gainers = topGainers,
+                                        losers = topLosers,
+                                        gainersPercentage = gainerPercentageList,
+                                        losersPercentage = loserPercentageList,
+                                        onItemClick = { item, isGainer ->
 
                                             ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
                                             val price =
@@ -436,140 +587,71 @@ fun SharedTransitionScope.HomeScreen(
 
                                             val isSaved = false
                                             val coinData = item.toCryptoCoin()
-                                            val isGainer =
-                                                if (item.quotes[0].percentChange1h > 0.0) true else false
-
-                                            val gson = Gson() // Or use kotlinx.serialization
+                                            val gson =
+                                                Gson() // Or use kotlinx.serialization
                                             val coinDataJson = gson.toJson(coinData)
                                             navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
-
                                         },
-                                        animatedVisibilityScope = animatedVisibilityScope
+                                        animatedVisibilityScope,
+                                        "home",
+                                        tabTitles,
+                                        gainersPrice = gainerPriceList,
+                                        losersPrice = loserPriceList,
+                                        gainersLogo = gainerLogoList,
+                                        losersLogo = loserLogoList,
+                                        gainersGraph = gainerGraphList,
+                                        losersGraph = loserGraphList
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(8.dp))
-                            val gainerPercentageList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    if (gainer.quotes[0].percentChange1h.toString().length > 5) {
-                                        "+" + gainer.quotes[0].percentChange1h.toString()
-                                            .substring(0, 5) + " %"
-                                    } else {
-                                        "+" + gainer.quotes[0].percentChange1h.toString() + " %"
-                                    }
-                                }
-                            }
-                            val gainerPriceList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    if (gainer.quotes[0].price < 1000) {
-                                        "$ " + gainer.quotes[0].price.toString().substring(0, 5)
-                                    } else {
-                                        "$ " + gainer.quotes[0].price.toString()
-                                            .substring(0, 3) + ".."
-                                    }
-                                }
-                            }
+                            1 -> {
+                                bottomBarVisibility = true
 
-                            val gainerLogoList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    "https://s2.coinmarketcap.com/static/img/coins/64x64/${gainer.id}.png"
-
-                                }
+                                MarketScreen(
+                                    navController = navController,
+                                    animatedVisibilityScope = animatedVisibilityScope
+                                )
                             }
-                            val gainerGraphList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${gainer.id}.png"
-                                }
-                            }
-                            val loserPercentageList = remember(topLosers) {
-                                topLosers.map { loser ->
-                                    if (loser.quotes[0].percentChange1h.toString().length > 5) {
-                                        loser.quotes[0].percentChange1h.toString()
-                                            .substring(0, 5) + " %"
-                                    } else {
-                                        loser.quotes[0].percentChange1h.toString() + " %"
-                                    }
-                                }
-                            }
-                            val loserPriceList = remember(topGainers) {
-                                topGainers.map { gainer ->
-                                    "$ " + gainer.quotes[0].price.toString().substring(0, 5)
-                                }
-                            }
-                            val loserLogoList = remember(topLosers) {
-                                topLosers.map { loser ->
-                                    "https://s2.coinmarketcap.com/static/img/coins/64x64/${loser.id}.png"
-
-                                }
-                            }
-                            val loserGraphList = remember(topLosers) {
-                                topLosers.map { loser ->
-                                    "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${loser.id}.png"
-                                }
-                            }
-                            Tabs(
-                                gainers = topGainers,
-                                losers = topLosers,
-                                gainersPercentage = gainerPercentageList,
-                                losersPercentage = loserPercentageList,
-                                onItemClick = { item, isGainer ->
-
-                                    ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
-                                    val price =
-                                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                            .substring(0, 10) else item.quotes[0].price.toString()
-                                    val percentage = item.quotes[0].percentChange1h.toString()
-
-                                    val isSaved = false
-                                    val coinData = item.toCryptoCoin()
-                                    val gson = Gson() // Or use kotlinx.serialization
-                                    val coinDataJson = gson.toJson(coinData)
-                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}")
-                                },
-                                animatedVisibilityScope,
-                                "home",
-                                tabTitles,
-                                gainersPrice = gainerPriceList,
-                                losersPrice = loserPriceList,
-                                gainersLogo = gainerLogoList,
-                                losersLogo = loserLogoList,
-                                gainersGraph = gainerGraphList,
-                                losersGraph = loserGraphList
-                            )
                         }
-                    }
-                }
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                        ) {
+                            AnimatedVisibility(
+                                visible = !(state.error.isNotBlank() || state.isLoading) || bottomBarVisibility,
+                                enter = fadeIn(
+                                    animationSpec = tween(
+                                        durationMillis = 600,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ),
+                                exit = fadeOut(
+                                    animationSpec = tween(
+                                        durationMillis = 600,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                )
+                            ) {
+                                BottomNavAnimation(
+                                    screens = screen,
+                                    isTab = isTab,
+                                    onClick = { tab ->
+                                        selectedTab = tab
+                                    }
+                                )
+                            }
+                        }
 
-                // Scrollable content
-                // Custom Navbar
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                ) {
-                    AnimatedVisibility(
-                        visible = !(state.error.isNotBlank() || state.isLoading),
-                        enter = fadeIn(
-                            animationSpec = tween(
-                                durationMillis = 600,
-                                easing = FastOutSlowInEasing
-                            )
-                        ),
-                        exit = fadeOut(
-                            animationSpec = tween(
-                                durationMillis = 600,
-                                easing = FastOutSlowInEasing
-                            )
-                        )
-                    ) {
-                        BottomNavAnimation(
-                            screens = screen,
-                            isTab = isTab
-                        )
-                    }
-                }
+                        // Scrollable content
 
-                // Error message or loading animation
+                }
+                    // Custom Navbar
+
+
+                    // Error message or loading animation
+
+                }
                 if (state.error.isNotBlank()) {
                     Text(
                         text = state.error,
@@ -583,6 +665,7 @@ fun SharedTransitionScope.HomeScreen(
                 }
 
                 if (state.isLoading) {
+                    bottomBarVisibility = false
                     LottieAnimation(
                         composition = composition,
                         progress = { progress },
@@ -592,6 +675,7 @@ fun SharedTransitionScope.HomeScreen(
                     )
                 }
             }
+
         }
     }
 }

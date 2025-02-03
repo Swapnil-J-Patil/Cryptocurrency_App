@@ -10,8 +10,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,6 +23,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,12 +77,12 @@ fun SharedTransitionScope.MarketScreen(
 
     val listState = rememberLazyGridState()
     val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
-    val adaptiveHeight = screenHeight * 0.5
     val coinsList by viewModel.coins.collectAsState()
 
     // Precompute visible indices
     Box(
         modifier = Modifier.fillMaxSize()
+            .padding(bottom = 56.dp) // Reserve space for navbar
     ) {
         AnimatedVisibility(
             visible = !(state.error.isNotBlank() || state.isLoading),
@@ -138,61 +142,64 @@ fun SharedTransitionScope.MarketScreen(
                             "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png"
                         }
                     }
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(halfScreenWidth.dp),
-                        state = listState,
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(adaptiveHeight.dp)
-                            .padding(top = 8.dp)
+                            .fillMaxSize()
                     ) {
-                        itemsIndexed(state.cryptocurrency.data.cryptoCurrencyList) { index, coin ->
-                            // val color = if (gainer.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(halfScreenWidth.dp),
+                            state = listState,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+                            itemsIndexed(state.cryptocurrency.data.cryptoCurrencyList) { index, coin ->
+                                // val color = if (gainer.quotes[0].percentChange24h > 0.0) darkGreen else darkRed
 
-                            // Check visibility
-                            val isVisible = remember {
-                                derivedStateOf {
-                                    val visibleItems = listState.layoutInfo.visibleItemsInfo
-                                    visibleItems.any { it.index == index }
-                                }
-                            }
-                            val scale = remember { Animatable(0f) }
-                            // val hasAnimated = remember { mutableStateOf(false) }
-
-                            LaunchedEffect(isVisible.value) {
-                                if (isVisible.value) {
-                                    scale.animateTo(
-                                        targetValue = 1f,
-                                        animationSpec = tween(
-                                            durationMillis = 300, // Adjust as needed for smoothness
-                                            easing = FastOutSlowInEasing
-                                        )
-                                    )
-                                } else {
-                                    scale.snapTo(0f) // Reset scale when not visible
-                                }
-                            }
-
-                            CoinCardItem(
-                                currencyName = coin.name,
-                                symbol = coin.symbol,
-                                percentage = coinPercentageList[index],
-                                price = coinPriceList[index],
-                                image = coinGraphList[index],
-                                color = darkGreen,
-                                logo = coinLogoList[index],
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp, horizontal = 15.dp)
-                                    .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
-                                    .clickable {
-                                        //onItemClick(coin, true)
+                                // Check visibility
+                                val isVisible = remember {
+                                    derivedStateOf {
+                                        val visibleItems = listState.layoutInfo.visibleItemsInfo
+                                        visibleItems.any { it.index == index }
                                     }
-                                    .sharedElement(
-                                        state = rememberSharedContentState(key = "coinCard/${coin.id}"),
-                                        animatedVisibilityScope = animatedVisibilityScope
-                                    ),
-                            )
+                                }
+                                val scale = remember { Animatable(0f) }
+                                // val hasAnimated = remember { mutableStateOf(false) }
+
+                                LaunchedEffect(isVisible.value) {
+                                    if (isVisible.value) {
+                                        scale.animateTo(
+                                            targetValue = 1f,
+                                            animationSpec = tween(
+                                                durationMillis = 300, // Adjust as needed for smoothness
+                                                easing = FastOutSlowInEasing
+                                            )
+                                        )
+                                    } else {
+                                        scale.snapTo(0f) // Reset scale when not visible
+                                    }
+                                }
+
+                                CoinCardItem(
+                                    currencyName = coin.name,
+                                    symbol = coin.symbol,
+                                    percentage = coinPercentageList[index],
+                                    price = coinPriceList[index],
+                                    image = coinGraphList[index],
+                                    color = darkGreen,
+                                    logo = coinLogoList[index],
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp, horizontal = 15.dp)
+                                        .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
+                                        .clickable {
+                                            //onItemClick(coin, true)
+                                        }
+                                        .sharedElement(
+                                            state = rememberSharedContentState(key = "coinCard/${coin.id}"),
+                                            animatedVisibilityScope = animatedVisibilityScope
+                                        ),
+                                )
+                            }
                         }
                     }
                 }

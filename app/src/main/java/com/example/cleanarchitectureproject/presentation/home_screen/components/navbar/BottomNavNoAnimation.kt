@@ -31,7 +31,8 @@ import com.example.cleanarchitectureproject.presentation.Navbar
 @Composable
 fun BottomNavAnimation(
     screens: List<Navbar>,
-    isTab:Boolean
+    isTab:Boolean,
+    onClick:(Int)->Unit
 ) {
     var selectedScreen by remember { mutableStateOf(0) }
     if (!isTab)
@@ -64,6 +65,7 @@ fun BottomNavAnimation(
                             indication = null
                         ) {
                             selectedScreen = screens.indexOf(screen)
+                            onClick(selectedScreen)
                         },
                         screen = screen,
                         isSelected = isSelected,
@@ -111,6 +113,7 @@ fun BottomNavAnimation(
                                 indication = null
                             ) {
                                 selectedScreen = screens.indexOf(screen)
+                                onClick(selectedScreen)
                             },
                             screen = screen,
                             isSelected = isSelected,
