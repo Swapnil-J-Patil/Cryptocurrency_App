@@ -13,8 +13,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
-import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.common_components.ZoomedChart
+import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
+import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
+import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,14 +34,18 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.HomeScreen.route
+                        startDestination = Screen.MainScreen.route
                     ) {
                         composable(
                             route = Screen.HomeScreen.route
                         ) {
-                            HomeScreen(navController, animatedVisibilityScope = this)
+                            HomeScreenTab(navController, animatedVisibilityScope = this)
                         }
-
+                        composable(
+                            route = Screen.MainScreen.route
+                        ) {
+                            MainScreen(navController, animatedVisibilityScope = this)
+                        }
                         composable(
                             route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}/{listType}",
                             arguments = listOf(
@@ -69,7 +75,14 @@ class MainActivity : ComponentActivity() {
                             )
                             ZoomedChart(currency = coinData, id = coinSymbol, isHomeScreen = isHome, animatedVisibilityScope = this,listType)
                         }
-
+                        composable(
+                            route = Screen.MarketScreen.route
+                        ){
+                            MarketScreen(
+                                navController = navController,
+                                animatedVisibilityScope = this
+                            )
+                        }
                         composable(
                             route = Screen.CoinLivePriceScreen.route + "/{coinId}/{coinSymbol}/{price}/{coinPercentage}/{isGainer}/{isSaved}/{coinData}/{listType}",
                             arguments = listOf(

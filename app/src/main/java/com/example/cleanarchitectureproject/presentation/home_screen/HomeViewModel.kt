@@ -3,10 +3,8 @@ package com.example.cleanarchitectureproject.presentation.home_screen
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cleanarchitectureproject.common.Constants
 import com.example.cleanarchitectureproject.common.Resource
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
@@ -16,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.util.Collections
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,10 +54,15 @@ class HomeViewModel @Inject constructor(
     private val _loserGraphList = MutableStateFlow<List<String>>(emptyList())
     val loserGraphList: StateFlow<List<String>> = _loserGraphList
 
+    private val _isMarketScreen = MutableStateFlow(false)
+    val isMarketScreen: StateFlow<Boolean> = _isMarketScreen
+
     init {
         getCoinStats()
     }
-
+    fun toggleTab() {
+        _isMarketScreen.value = !_isMarketScreen.value
+    }
     private fun getCoinStats() {
         getCurrencyStatsUseCase().onEach { result ->
             when (result) {
@@ -89,7 +91,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _gainerPercentageList.value = topGainers.map { gainer ->
                 val percentage = gainer.quotes[0].percentChange1h.toString()
-                "+" + if (percentage.length > 5) percentage.substring(0, 5) else percentage + " %"
+                "+" + if (percentage.length > 5) percentage.substring(0, 5)  + " %" else percentage + " %"
             }
 
             _gainerPriceList.value = topGainers.map { gainer ->
@@ -107,7 +109,7 @@ class HomeViewModel @Inject constructor(
 
             _loserPercentageList.value = topLosers.map { loser ->
                 val percentage = loser.quotes[0].percentChange1h.toString()
-                if (percentage.length > 5) percentage.substring(0, 5) else percentage + " %"
+                if (percentage.length > 5) percentage.substring(0, 6)  + " %" else percentage + " %"
             }
 
             _loserPriceList.value = topLosers.map { loser ->
@@ -123,6 +125,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
     fun getGainers(cryptoCurrencyList: List<CryptoCurrencyCM>) {
         viewModelScope.launch {
             val sortedCryptocurrencies = cryptoCurrencyList?.sortedWith { o1, o2 ->
