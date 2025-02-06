@@ -1,8 +1,14 @@
 package com.example.cleanarchitectureproject.presentation.home_screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -59,14 +66,19 @@ fun SharedTransitionScope.HomeScreen(
     val progress by animateLottieCompositionAsState(
         composition, iterations = LottieConstants.IterateForever, isPlaying = isPlaying // Infinite repeat mode
     )
-
+    val scale by animateFloatAsState(
+        targetValue = if (!(state.error.isNotBlank() || state.isLoading)) 1f else 0f,
+        animationSpec = tween(
+            durationMillis = 500, // Adjust duration for smoothness
+            easing = FastOutSlowInEasing
+        )
+    )
     val configuration = LocalConfiguration.current
     val isTab = configuration.screenWidthDp.dp > 600.dp
     val carouselHeight = if (isTab) 350.dp else 320.dp
     val dotsPadding = if (isTab) 8.dp else 4.dp
     val tabTitles = listOf("Top Gainers", "Top Losers")
 
-    var bottomBarVisibility by remember { mutableStateOf(true) }
     val gainerPercentageList by viewModel.gainerPercentageList.collectAsState()
     val gainerPriceList by viewModel.gainerPriceList.collectAsState()
     val gainerLogoList by viewModel.gainerLogoList.collectAsState()
@@ -79,132 +91,155 @@ fun SharedTransitionScope.HomeScreen(
     val topGainers by viewModel.topGainers.collectAsState()
     val topLosers by viewModel.topLosers.collectAsState()
 
-    bottomBarVisibility = true
-
-    val list = state.cryptocurrency!!.data.cryptoCurrencyList
-        .subList(0, 3)
-
     Box(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 56.dp) // Reserve space for navbar
-        ) {
-            TypingAnimation(
-                text = "Let's Dive Into the Market!",
-                modifier = Modifier
-                    .padding(
-                        top = 45.dp,
-                        start = 15.dp,
-                        end = 15.dp
-                    )
-            )
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.Top,
-            ) {
-                Carousel(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(carouselHeight),
-                    onClick = { item ->
-
-                        val coinData = item.toCryptoCoin()
-                        val gson =
-                            Gson() // Or use kotlinx.serialization
-                        val coinDataJson = gson.toJson(coinData)
-                        val flag = true
-                        val listType = "carousel"
-                        navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}")
-                    },
-                    dotsPadding = dotsPadding,
-                    currency = list,
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    listType = "carousel"
+        AnimatedVisibility(
+            visible = !(state.error.isNotBlank() || state.isLoading),
+            enter = fadeIn(
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = FastOutSlowInEasing
                 )
-            }
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(top = 10.dp)
+            ),
+            exit = fadeOut(
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = FastOutSlowInEasing
+                )
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale
+                    )
             ) {
                 state.cryptocurrency?.data?.let {
-                    isPlaying = false
+                    val list = state.cryptocurrency!!.data.cryptoCurrencyList
+                        .subList(0, 3)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(bottom = 56.dp) // Reserve space for navbar
+                    ) {
+                        TypingAnimation(
+                            text = "Let's Dive Into the Market!",
+                            modifier = Modifier
+                                .padding(
+                                    top = 45.dp,
+                                    start = 15.dp,
+                                    end = 15.dp
+                                )
+                        )
 
-                    LazyRowScaleIn(
-                        items = it.cryptoCurrencyList,
-                        onCardClicked = { item ->
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.Top,
+                        ) {
+                            Carousel(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(carouselHeight),
+                                onClick = { item ->
 
-                            ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
-                            val price =
-                                "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                    .substring(
-                                        0,
-                                        10
-                                    ) else item.quotes[0].price.toString()
-                            val percentage =
-                                item.quotes[0].percentChange1h.toString()
+                                    val coinData = item.toCryptoCoin()
+                                    val gson =
+                                        Gson() // Or use kotlinx.serialization
+                                    val coinDataJson = gson.toJson(coinData)
+                                    val flag = true
+                                    val listType = "carousel"
+                                    navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}")
+                                },
+                                dotsPadding = dotsPadding,
+                                currency = list,
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                listType = "carousel"
+                            )
+                        }
 
-                            val isSaved = false
-                            val coinData = item.toCryptoCoin()
-                            val isGainer =
-                                if (item.quotes[0].percentChange1h > 0.0) true else false
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.padding(top = 10.dp)
+                        ) {
+                            isPlaying = false
 
-                            val gson =
-                                Gson() // Or use kotlinx.serialization
-                            val coinDataJson = gson.toJson(coinData)
-                            val listType = "lazyRow"
-                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+                            LazyRowScaleIn(
+                                items = it.cryptoCurrencyList,
+                                onCardClicked = { item ->
 
-                        },
-                        animatedVisibilityScope = animatedVisibilityScope
-                    )
+                                    ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
+                                    val price =
+                                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
+                                            .substring(
+                                                0,
+                                                10
+                                            ) else item.quotes[0].price.toString()
+                                    val percentage =
+                                        item.quotes[0].percentChange1h.toString()
+
+                                    val isSaved = false
+                                    val coinData = item.toCryptoCoin()
+                                    val isGainer =
+                                        if (item.quotes[0].percentChange1h > 0.0) true else false
+
+                                    val gson =
+                                        Gson() // Or use kotlinx.serialization
+                                    val coinDataJson = gson.toJson(coinData)
+                                    val listType = "lazyRow"
+                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+
+                                },
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                        }
+
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Tabs(
+                            gainers = topGainers,
+                            losers = topLosers,
+                            gainersPercentage = gainerPercentageList,
+                            losersPercentage = loserPercentageList,
+                            onItemClick = { item, isGainer ->
+
+                                ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
+                                val price =
+                                    "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
+                                        .substring(
+                                            0,
+                                            10
+                                        ) else item.quotes[0].price.toString()
+                                val percentage =
+                                    item.quotes[0].percentChange1h.toString()
+
+                                val isSaved = false
+                                val coinData = item.toCryptoCoin()
+                                val gson =
+                                    Gson() // Or use kotlinx.serialization
+                                val coinDataJson = gson.toJson(coinData)
+                                val listType = "gainersAndLosers"
+                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+                            },
+                            animatedVisibilityScope,
+                            "home",
+                            tabTitles,
+                            gainersPrice = gainerPriceList,
+                            losersPrice = loserPriceList,
+                            gainersLogo = gainerLogoList,
+                            losersLogo = loserLogoList,
+                            gainersGraph = gainerGraphList,
+                            losersGraph = loserGraphList,
+                            listType = "gainersAndLosers"
+                        )
+                    }
                 }
+
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Tabs(
-                gainers = topGainers,
-                losers = topLosers,
-                gainersPercentage = gainerPercentageList,
-                losersPercentage = loserPercentageList,
-                onItemClick = { item, isGainer ->
-
-                    ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
-                    val price =
-                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                            .substring(
-                                0,
-                                10
-                            ) else item.quotes[0].price.toString()
-                    val percentage =
-                        item.quotes[0].percentChange1h.toString()
-
-                    val isSaved = false
-                    val coinData = item.toCryptoCoin()
-                    val gson =
-                        Gson() // Or use kotlinx.serialization
-                    val coinDataJson = gson.toJson(coinData)
-                    val listType = "gainersAndLosers"
-                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
-                },
-                animatedVisibilityScope,
-                "home",
-                tabTitles,
-                gainersPrice = gainerPriceList,
-                losersPrice = loserPriceList,
-                gainersLogo = gainerLogoList,
-                losersLogo = loserLogoList,
-                gainersGraph = gainerGraphList,
-                losersGraph = loserGraphList,
-                listType = "gainersAndLosers"
-            )
         }
         if (state.error.isNotBlank()) {
             Text(

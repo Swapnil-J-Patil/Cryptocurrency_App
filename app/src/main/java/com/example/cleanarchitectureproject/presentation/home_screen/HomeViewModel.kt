@@ -54,15 +54,10 @@ class HomeViewModel @Inject constructor(
     private val _loserGraphList = MutableStateFlow<List<String>>(emptyList())
     val loserGraphList: StateFlow<List<String>> = _loserGraphList
 
-    private val _isMarketScreen = MutableStateFlow(false)
-    val isMarketScreen: StateFlow<Boolean> = _isMarketScreen
-
     init {
         getCoinStats()
     }
-    fun toggleTab() {
-        _isMarketScreen.value = !_isMarketScreen.value
-    }
+
     private fun getCoinStats() {
         getCurrencyStatsUseCase().onEach { result ->
             when (result) {

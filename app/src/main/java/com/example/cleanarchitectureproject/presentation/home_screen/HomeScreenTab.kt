@@ -94,82 +94,122 @@ fun SharedTransitionScope.HomeScreenTab(
     val topGainers by viewModel.topGainers.collectAsState()
     val topLosers by viewModel.topLosers.collectAsState()
 
-    val list = state.cryptocurrency!!.data.cryptoCurrencyList
-        .subList(0, 3)
-    AnimatedVisibility(
-        visible = !(state.error.isNotBlank() || state.isLoading),
-        enter = fadeIn(
-            animationSpec = tween(
-                durationMillis = 600,
-                easing = FastOutSlowInEasing
-            )
-        ),
-        exit = fadeOut(
-            animationSpec = tween(
-                durationMillis = 600,
-                easing = FastOutSlowInEasing
-            )
-        )
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale
+        AnimatedVisibility(
+            visible = !(state.error.isNotBlank() || state.isLoading),
+            enter = fadeIn(
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = FastOutSlowInEasing
                 )
+            ),
+            exit = fadeOut(
+                animationSpec = tween(
+                    durationMillis = 600,
+                    easing = FastOutSlowInEasing
+                )
+            )
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 140.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    TypingAnimation(
-                        text = "Let's Dive Into the Market!",
-                        modifier = Modifier
-                            .padding(top = 45.dp, start = 15.dp, end = 15.dp)
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale
                     )
-
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.Top,
+            ) {
+                state.cryptocurrency?.data?.let {
+                    val list = state.cryptocurrency!!.data.cryptoCurrencyList
+                        .subList(0, 3)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) {
-                        Carousel(
+
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(carouselHeight),
-                            onClick = { item ->
+                                .fillMaxSize()
+                                .padding(start = 140.dp)
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            TypingAnimation(
+                                text = "Let's Dive Into the Market!",
+                                modifier = Modifier
+                                    .padding(top = 45.dp, start = 15.dp, end = 15.dp)
+                            )
 
-                                val coinData = item.toCryptoCoin()
-                                val gson = Gson()
-                                val coinDataJson = gson.toJson(coinData)
-                                val flag = true
-                                val listType = "carousel"
-                                navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}")
-                            },
-                            dotsPadding = dotsPadding,
-                            currency = list,
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            listType = "carousel"
-                        )
-                    }
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.Top,
+                            ) {
+                                Carousel(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(carouselHeight),
+                                    onClick = { item ->
 
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.padding(top = 10.dp)
-                    ) {
-                        state.cryptocurrency?.data?.let {
-                            isPlaying = false
+                                        val coinData = item.toCryptoCoin()
+                                        val gson = Gson()
+                                        val coinDataJson = gson.toJson(coinData)
+                                        val flag = true
+                                        val listType = "carousel"
+                                        navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}")
+                                    },
+                                    dotsPadding = dotsPadding,
+                                    currency = list,
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                    listType = "carousel"
+                                )
+                            }
 
-                            LazyRowScaleIn(
+                            Row(
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.padding(top = 10.dp)
+                            ) {
+                                state.cryptocurrency?.data?.let {
+                                    isPlaying = false
 
-                                items = it.cryptoCurrencyList,
-                                onCardClicked = { item ->
+                                    LazyRowScaleIn(
+
+                                        items = it.cryptoCurrencyList,
+                                        onCardClicked = { item ->
+
+                                            val price =
+                                                "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
+                                                    .substring(
+                                                        0,
+                                                        10
+                                                    ) else item.quotes[0].price.toString()
+                                            val percentage =
+                                                item.quotes[0].percentChange1h.toString()
+
+                                            val isSaved = false
+                                            val coinData = item.toCryptoCoin()
+                                            val isGainer =
+                                                if (item.quotes[0].percentChange1h > 0.0) true else false
+
+                                            val gson =
+                                                Gson() // Or use kotlinx.serialization
+                                            val coinDataJson = gson.toJson(coinData)
+                                            val listType = "lazyRow"
+                                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+
+                                        },
+                                        animatedVisibilityScope = animatedVisibilityScope
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Tabs(
+                                gainers = topGainers,
+                                losers = topLosers,
+                                gainersPercentage = gainerPercentageList,
+                                losersPercentage = loserPercentageList,
+                                onItemClick = { item, isGainer ->
 
                                     val price =
                                         "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
@@ -182,82 +222,49 @@ fun SharedTransitionScope.HomeScreenTab(
 
                                     val isSaved = false
                                     val coinData = item.toCryptoCoin()
-                                    val isGainer =
-                                        if (item.quotes[0].percentChange1h > 0.0) true else false
-
-                                    val gson =
-                                        Gson() // Or use kotlinx.serialization
+                                    val gson = Gson() // Or use kotlinx.serialization
                                     val coinDataJson = gson.toJson(coinData)
-                                    val listType = "lazyRow"
-                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+                                    val listType = "gainersAndLosers"
 
+                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
                                 },
-                                animatedVisibilityScope = animatedVisibilityScope
+                                animatedVisibilityScope,
+                                "home",
+                                tabTitles,
+                                gainersPrice = gainerPriceList,
+                                losersPrice = loserPriceList,
+                                gainersLogo = gainerLogoList,
+                                losersLogo = loserLogoList,
+                                gainersGraph = gainerGraphList,
+                                losersGraph = loserGraphList,
+                                listType = "gainersAndLosers"
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Tabs(
-                        gainers = topGainers,
-                        losers = topLosers,
-                        gainersPercentage = gainerPercentageList,
-                        losersPercentage = loserPercentageList,
-                        onItemClick = { item, isGainer ->
-
-                            val price =
-                                "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                    .substring(
-                                        0,
-                                        10
-                                    ) else item.quotes[0].price.toString()
-                            val percentage =
-                                item.quotes[0].percentChange1h.toString()
-
-                            val isSaved = false
-                            val coinData = item.toCryptoCoin()
-                            val gson = Gson() // Or use kotlinx.serialization
-                            val coinDataJson = gson.toJson(coinData)
-                            val listType = "gainersAndLosers"
-
-                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
-                        },
-                        animatedVisibilityScope,
-                        "home",
-                        tabTitles,
-                        gainersPrice = gainerPriceList,
-                        losersPrice = loserPriceList,
-                        gainersLogo = gainerLogoList,
-                        losersLogo = loserLogoList,
-                        gainersGraph = gainerGraphList,
-                        losersGraph = loserGraphList,
-                        listType = "gainersAndLosers"
-                    )
-
-                }
-                if (state.error.isNotBlank()) {
-                    Text(
-                        text = state.error,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                            .align(Alignment.Center)
-                    )
-                }
-
-                if (state.isLoading) {
-                    LottieAnimation(
-                        composition = composition,
-                        progress = { progress },
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(250.dp)
-                    )
                 }
             }
+        }
+        if (state.error.isNotBlank()) {
+            Text(
+                text = state.error,
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .align(Alignment.Center)
+            )
+        }
+
+        if (state.isLoading) {
+            LottieAnimation(
+                composition = composition,
+                progress = { progress },
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(250.dp)
+            )
         }
     }
 }

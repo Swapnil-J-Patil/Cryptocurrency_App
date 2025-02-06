@@ -28,7 +28,7 @@ sealed class Navbar(
     val inactiveIcon: ImageVector
 ) {
     object Home: Navbar("Home", Icons.Filled.Home, Icons.Outlined.Home)
-    object Create: Navbar("Market", Icons.Filled.InsertChart, Icons.Outlined.InsertChart)
-    object Profile: Navbar("Saved", Icons.Filled.Bookmark, Icons.Outlined.Bookmark)
+    object Market: Navbar("Market", Icons.Filled.InsertChart, Icons.Outlined.InsertChart)
+    object Saved: Navbar("Saved", Icons.Filled.Bookmark, Icons.Outlined.Bookmark)
     object Settings: Navbar("Settings", Icons.Filled.Settings, Icons.Outlined.Settings)
 }

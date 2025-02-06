@@ -19,13 +19,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
-    private val getCurrencyStatsUseCase: GetCurrencyStatsUseCase,
 ) : ViewModel() {
 
-    private val _isMarketScreen = MutableStateFlow(false)
-    val isMarketScreen: StateFlow<Boolean> = _isMarketScreen
+    private val _isMarketScreen = MutableStateFlow("home")
+    val isMarketScreen: StateFlow<String> = _isMarketScreen
 
-    fun toggleTab() {
-        _isMarketScreen.value = !_isMarketScreen.value
+    fun toggleTab(tab: String) {
+        _isMarketScreen.value = tab
     }
 }

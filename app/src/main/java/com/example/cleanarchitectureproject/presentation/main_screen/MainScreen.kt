@@ -38,7 +38,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.Navbar
-import com.example.cleanarchitectureproject.presentation.home_screen.components.navbar.BottomNavAnimation
+import com.example.cleanarchitectureproject.presentation.main_screen.components.navbar.BottomNavAnimation
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
@@ -48,34 +48,19 @@ import com.example.cleanarchitectureproject.presentation.market_screen.MarketScr
 @Composable
 fun SharedTransitionScope.MainScreen(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: MainScreenViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val state = viewModel.statsState.value
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
-    var isPlaying by remember { mutableStateOf(true) } // Control animation state
-
-    val progress by animateLottieCompositionAsState(
-        composition, iterations = LottieConstants.IterateForever, isPlaying = isPlaying // Infinite repeat mode
-    )
-
     val screen = listOf(
         Navbar.Home,
-        Navbar.Create,
-        Navbar.Profile,
+        Navbar.Market,
+        Navbar.Saved,
         Navbar.Settings
     )
 
     val configuration = LocalConfiguration.current
     val isTab = configuration.screenWidthDp.dp > 600.dp
 
-    val scale by animateFloatAsState(
-        targetValue = if (!(state.error.isNotBlank() || state.isLoading)) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = 500, // Adjust duration for smoothness
-            easing = FastOutSlowInEasing
-        )
-    )
     var selectedTab by remember { mutableStateOf(0) }
     var bottomBarVisibility by remember { mutableStateOf(true) }
     val isMarketScreen by viewModel.isMarketScreen.collectAsState()
@@ -84,13 +69,29 @@ fun SharedTransitionScope.MainScreen(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (isTab) {
-            Box(
-                modifier = Modifier.fillMaxSize()
-            ) {
+        if (isTab)
+        {
 
+            if (isMarketScreen=="market") {
+                bottomBarVisibility = true
+                MarketScreen(
+                    navController = navController,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            } else {
+                bottomBarVisibility = true
+                HomeScreenTab(
+                    navController = navController,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.CenterStart
+            ) {
                 AnimatedVisibility(
-                    visible = !(state.error.isNotBlank() || state.isLoading),
+                    visible = bottomBarVisibility,
                     enter = fadeIn(
                         animationSpec = tween(
                             durationMillis = 600,
@@ -104,92 +105,53 @@ fun SharedTransitionScope.MainScreen(
                         )
                     )
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer(
-                                scaleX = scale,
-                                scaleY = scale
-                            )
-                    ) {
-                        if(isMarketScreen)
-                        {
-                            bottomBarVisibility = true
-                            MarketScreen(
-                                navController = navController,
-                                animatedVisibilityScope = animatedVisibilityScope
-                            )
-                        }
-                        else{
-                            bottomBarVisibility = true
-                            HomeScreenTab(navController = navController, animatedVisibilityScope = animatedVisibilityScope)
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.CenterStart)
-                        ) {
-                            AnimatedVisibility(
-                                visible = !(state.error.isNotBlank() || state.isLoading) || bottomBarVisibility,
-                                enter = fadeIn(
-                                    animationSpec = tween(
-                                        durationMillis = 600,
-                                        easing = FastOutSlowInEasing
-                                    )
-                                ),
-                                exit = fadeOut(
-                                    animationSpec = tween(
-                                        durationMillis = 600,
-                                        easing = FastOutSlowInEasing
-                                    )
-                                )
-                            ) {
-                                BottomNavAnimation(
-                                    screens = screen,
-                                    isTab = isTab,
-                                    onClick = { tab ->
-                                        selectedTab = tab
-                                        if(selectedTab==1)
-                                        {
-                                            viewModel.toggleTab()
-                                        }
-                                    }
-                                )
+                    BottomNavAnimation(
+                        screens = screen,
+                        isTab = isTab,
+                        onClick = { tab ->
+                            selectedTab = tab
+                            when (selectedTab) {
+                                0 -> {
+                                    viewModel.toggleTab("home")
+                                }
+                                1 -> {
+                                    viewModel.toggleTab("market")
+                                }
+                                2 -> {
+                                    viewModel.toggleTab("saved")
+                                }
+                                3 -> {
+                                    viewModel.toggleTab("settings")
+                                }
                             }
                         }
-
-                    }
-                }
-                if (state.error.isNotBlank()) {
-                    Text(
-                        text = state.error,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                            .align(Alignment.Center)
-                    )
-                }
-
-                if (state.isLoading) {
-                    LottieAnimation(
-                        composition = composition,
-                        progress = { progress },
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(250.dp)
                     )
                 }
             }
+
         }
-        else {
+        else
+        {
 
+            if (isMarketScreen=="market") {
+                bottomBarVisibility = true
+                MarketScreen(
+                    navController = navController,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            } else {
+                HomeScreen(
+                    navController = navController,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
+            }
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter
             ) {
                 AnimatedVisibility(
-                    visible = !(state.error.isNotBlank() || state.isLoading),
+                    visible = bottomBarVisibility,
                     enter = fadeIn(
                         animationSpec = tween(
                             durationMillis = 600,
@@ -203,86 +165,29 @@ fun SharedTransitionScope.MainScreen(
                         )
                     )
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer(
-                                scaleX = scale,
-                                scaleY = scale
-                            )
-                    ) {
-                        if(isMarketScreen)
-                        {
-                            bottomBarVisibility = true
-                            MarketScreen(
-                                navController = navController,
-                                animatedVisibilityScope = animatedVisibilityScope
-                            )
-                        }
-                        else
-                        {
-                            HomeScreen(navController = navController, animatedVisibilityScope = animatedVisibilityScope)
-                        }
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                        ) {
-                            AnimatedVisibility(
-                                visible = !(state.error.isNotBlank() || state.isLoading) || bottomBarVisibility,
-                                enter = fadeIn(
-                                    animationSpec = tween(
-                                        durationMillis = 600,
-                                        easing = FastOutSlowInEasing
-                                    )
-                                ),
-                                exit = fadeOut(
-                                    animationSpec = tween(
-                                        durationMillis = 600,
-                                        easing = FastOutSlowInEasing
-                                    )
-                                )
-                            ) {
-                                BottomNavAnimation(
-                                    screens = screen,
-                                    isTab = isTab,
-                                    onClick = { tab ->
-                                        selectedTab = tab
-                                        if(selectedTab==1)
-                                        {
-                                            viewModel.toggleTab()
-                                        }
-                                    }
-                                )
+                    BottomNavAnimation(
+                        screens = screen,
+                        isTab = isTab,
+                        onClick = { tab ->
+                            selectedTab = tab
+                            when (selectedTab) {
+                                0 -> {
+                                    viewModel.toggleTab("home")
+                                }
+                                1 -> {
+                                    viewModel.toggleTab("market")
+                                }
+                                2 -> {
+                                    viewModel.toggleTab("saved")
+                                }
+                                3 -> {
+                                    viewModel.toggleTab("settings")
+                                }
                             }
                         }
-
-                }
-
-                }
-                if (state.error.isNotBlank()) {
-                    Text(
-                        text = state.error,
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                            .align(Alignment.Center)
-                    )
-                }
-
-                if (state.isLoading) {
-                    bottomBarVisibility = false
-                    LottieAnimation(
-                        composition = composition,
-                        progress = { progress },
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .size(250.dp)
                     )
                 }
             }
-
         }
     }
 }

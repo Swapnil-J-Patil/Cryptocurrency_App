@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.presentation.home_screen.components.navbar
+package com.example.cleanarchitectureproject.presentation.main_screen.components.navbar
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background

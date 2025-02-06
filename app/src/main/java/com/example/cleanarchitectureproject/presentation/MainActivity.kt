@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
 import com.example.cleanarchitectureproject.presentation.common_components.ZoomedChart
+import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
@@ -36,16 +37,36 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = Screen.MainScreen.route
                     ) {
-                        composable(
-                            route = Screen.HomeScreen.route
-                        ) {
-                            HomeScreenTab(navController, animatedVisibilityScope = this)
-                        }
+                        //Entrypoint
                         composable(
                             route = Screen.MainScreen.route
                         ) {
                             MainScreen(navController, animatedVisibilityScope = this)
                         }
+
+                        //Home Screen
+                        composable(
+                            route = Screen.HomeScreenTab.route
+                        ) {
+                            HomeScreenTab(navController, animatedVisibilityScope = this)
+                        }
+                        composable(
+                            route = Screen.HomeScreen.route
+                        ) {
+                            HomeScreen(navController, animatedVisibilityScope = this)
+                        }
+
+                        //Market Screen
+                        composable(
+                            route = Screen.MarketScreen.route
+                        ){
+                            MarketScreen(
+                                navController = navController,
+                                animatedVisibilityScope = this
+                            )
+                        }
+
+                        //ZoomedChart Screen
                         composable(
                             route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}/{listType}",
                             arguments = listOf(
@@ -75,14 +96,8 @@ class MainActivity : ComponentActivity() {
                             )
                             ZoomedChart(currency = coinData, id = coinSymbol, isHomeScreen = isHome, animatedVisibilityScope = this,listType)
                         }
-                        composable(
-                            route = Screen.MarketScreen.route
-                        ){
-                            MarketScreen(
-                                navController = navController,
-                                animatedVisibilityScope = this
-                            )
-                        }
+
+                        //Live Price Screen
                         composable(
                             route = Screen.CoinLivePriceScreen.route + "/{coinId}/{coinSymbol}/{price}/{coinPercentage}/{isGainer}/{isSaved}/{coinData}/{listType}",
                             arguments = listOf(
