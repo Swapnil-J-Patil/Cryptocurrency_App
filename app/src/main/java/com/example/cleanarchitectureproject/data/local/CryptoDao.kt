@@ -12,7 +12,7 @@ interface CryptoDao {
     suspend fun insertCrypto(crypto: CryptoCoinEntity)
 
     @Query("SELECT EXISTS(SELECT 1 FROM saved_coins WHERE id = :coinId)")
-    fun isCoinSaved(coinId: String): Flow<Boolean>
+    suspend fun isCoinSaved(coinId: String): Boolean
 
     @Delete
     suspend fun deleteCoin(coin: CryptoCoinEntity)

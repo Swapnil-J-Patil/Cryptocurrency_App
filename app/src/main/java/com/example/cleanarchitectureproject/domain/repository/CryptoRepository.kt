@@ -8,7 +8,7 @@ interface CryptoRepository {
     fun getAllCrypto(): Flow<List<CryptoCoin>>
     suspend fun insertCrypto(crypto: CryptoCoin)
     suspend fun clearCrypto()
-    fun isCoinSaved(coinId: String): Flow<Boolean>
+    suspend fun isCoinSaved(coinId: String): Boolean
     suspend fun deleteCoin(coin: CryptoCoin)
 
 }

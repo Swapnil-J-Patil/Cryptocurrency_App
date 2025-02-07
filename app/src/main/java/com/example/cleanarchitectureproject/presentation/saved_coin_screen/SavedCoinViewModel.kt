@@ -46,8 +46,10 @@ class SavedCoinViewModel @Inject constructor(
             insertCryptoUseCase(crypto)
         }
     }
-    fun isCoinSaved(coinId: String): StateFlow<Boolean> = isCoinSavedUseCase(coinId)
-        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+    suspend fun isCoinSaved(coinId: String): Boolean {
+        return isCoinSavedUseCase(coinId)
+    }
+
 
     fun removeCrypto(coin: CryptoCoin) {
         viewModelScope.launch {

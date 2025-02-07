@@ -88,7 +88,7 @@ class CryptoRepositoryImpl @Inject constructor(
         dao.deleteCoin(entity)
     }
 
-    override fun isCoinSaved(coinId: String): Flow<Boolean> {
+    override suspend fun isCoinSaved(coinId: String): Boolean {
         return dao.isCoinSaved(coinId)
     }
 }

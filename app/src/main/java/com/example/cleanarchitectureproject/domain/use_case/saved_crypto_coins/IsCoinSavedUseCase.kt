@@ -8,5 +8,5 @@ import javax.inject.Inject
 class IsCoinSavedUseCase @Inject constructor(
     private val repository: CryptoRepository
 ) {
-    operator fun invoke(coinId: String):Flow<Boolean> = repository.isCoinSaved(coinId)
+    operator suspend fun invoke(coinId: String):Boolean = repository.isCoinSaved(coinId)
 }

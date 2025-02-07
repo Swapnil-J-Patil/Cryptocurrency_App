@@ -34,7 +34,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,13 +56,16 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinViewModel
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.MarketScreenTab(
     navController: NavController,
     viewModel: MarketViewModel = hiltViewModel(),
+    savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val state = viewModel.coinListState.value
@@ -67,6 +73,8 @@ fun SharedTransitionScope.MarketScreenTab(
     val progress by animateLottieCompositionAsState(
         composition, iterations = LottieConstants.IterateForever // Infinite repeat mode
     )
+    val coroutineScope = rememberCoroutineScope()
+    var isSaved by remember { mutableStateOf(false) }
     val scaleBox by animateFloatAsState(
         targetValue = if (!(state.error.isNotBlank() || state.isLoading)) 1f else 0f,
         animationSpec = tween(
@@ -147,7 +155,7 @@ fun SharedTransitionScope.MarketScreenTab(
                                 state = listState,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(top=5.dp)
+                                    .padding(top = 5.dp)
                             ) {
                                 itemsIndexed(
                                     filteredCoins,
@@ -206,12 +214,17 @@ fun SharedTransitionScope.MarketScreenTab(
                                             .clickable {
                                                 //onItemClick(coin, true)
 
-                                                val isSaved = false
-                                                val coinData = coin.toCryptoCoin()
-                                                val gson = Gson() // Or use kotlinx.serialization
-                                                val coinDataJson = gson.toJson(coinData)
-                                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
-                                                    launchSingleTop = true
+                                                coroutineScope.launch {
+                                                    isSaved =
+                                                        savedCoinViewModel.isCoinSaved(coin.id.toString())
+
+                                                    val coinData = coin.toCryptoCoin()
+                                                    val gson =
+                                                        Gson() // Or use kotlinx.serialization
+                                                    val coinDataJson = gson.toJson(coinData)
+                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
+                                                        launchSingleTop = true
+                                                    }
                                                 }
                                             },
                                     )

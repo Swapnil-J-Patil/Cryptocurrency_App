@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,15 +60,18 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.MarketScreen(
     navController: NavController,
     viewModel: MarketViewModel = hiltViewModel(),
+    savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val state = viewModel.coinListState.value
@@ -75,6 +79,8 @@ fun SharedTransitionScope.MarketScreen(
     val progress by animateLottieCompositionAsState(
         composition, iterations = LottieConstants.IterateForever // Infinite repeat mode
     )
+    val coroutineScope = rememberCoroutineScope()
+    var isSaved by remember { mutableStateOf(false) }
     val scaleBox by animateFloatAsState(
         targetValue = if (!(state.error.isNotBlank() || state.isLoading)) 1f else 0f,
         animationSpec = tween(
@@ -214,12 +220,15 @@ fun SharedTransitionScope.MarketScreen(
                                             .clickable {
                                                 //onItemClick(coin, true)
 
-                                                val isSaved = false
+                                                coroutineScope.launch {
+                                                    isSaved = savedCoinViewModel.isCoinSaved(coin.id.toString())
+
                                                 val coinData = coin.toCryptoCoin()
                                                 val gson = Gson() // Or use kotlinx.serialization
                                                 val coinDataJson = gson.toJson(coinData)
                                                 navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
                                                     launchSingleTop = true
+                                                }
                                                 }
                                             },
                                     )

@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,19 +51,23 @@ import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.home_screen.components.TypingAnimation
 import com.example.cleanarchitectureproject.presentation.home_screen.components.carousel.Carousel
 import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.LazyRowScaleIn
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinViewModel
 import com.google.gson.Gson
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.HomeScreenTab(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
+    savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val state = viewModel.statsState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
     var isPlaying by remember { mutableStateOf(true) } // Control animation state
-
+    val coroutineScope = rememberCoroutineScope()
+    var isSaved by remember { mutableStateOf(false) }
     val progress by animateLottieCompositionAsState(
         composition,
         iterations = LottieConstants.IterateForever,
@@ -185,17 +190,20 @@ fun SharedTransitionScope.HomeScreenTab(
                                             val percentage =
                                                 item.quotes[0].percentChange1h.toString()
 
-                                            val isSaved = false
-                                            val coinData = item.toCryptoCoin()
-                                            val isGainer =
-                                                if (item.quotes[0].percentChange1h > 0.0) true else false
+                                            coroutineScope.launch {
+                                                isSaved =
+                                                    savedCoinViewModel.isCoinSaved(item.id.toString())
 
-                                            val gson =
-                                                Gson() // Or use kotlinx.serialization
-                                            val coinDataJson = gson.toJson(coinData)
-                                            val listType = "lazyRow"
-                                            navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+                                                val coinData = item.toCryptoCoin()
+                                                val isGainer =
+                                                    if (item.quotes[0].percentChange1h > 0.0) true else false
 
+                                                val gson =
+                                                    Gson() // Or use kotlinx.serialization
+                                                val coinDataJson = gson.toJson(coinData)
+                                                val listType = "lazyRow"
+                                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+                                            }
                                         },
                                         animatedVisibilityScope = animatedVisibilityScope
                                     )
@@ -220,13 +228,15 @@ fun SharedTransitionScope.HomeScreenTab(
                                     val percentage =
                                         item.quotes[0].percentChange1h.toString()
 
-                                    val isSaved = false
-                                    val coinData = item.toCryptoCoin()
-                                    val gson = Gson() // Or use kotlinx.serialization
-                                    val coinDataJson = gson.toJson(coinData)
-                                    val listType = "gainersAndLosers"
+                                    coroutineScope.launch {
+                                        isSaved = savedCoinViewModel.isCoinSaved(item.id.toString())
+                                        val coinData = item.toCryptoCoin()
+                                        val gson = Gson() // Or use kotlinx.serialization
+                                        val coinDataJson = gson.toJson(coinData)
+                                        val listType = "gainersAndLosers"
 
-                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+                                        navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+                                    }
                                 },
                                 animatedVisibilityScope,
                                 "home",
