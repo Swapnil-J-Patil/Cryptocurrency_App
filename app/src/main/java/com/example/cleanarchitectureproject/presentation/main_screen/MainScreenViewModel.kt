@@ -18,13 +18,19 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(
-) : ViewModel() {
+class MainScreenViewModel @Inject constructor() : ViewModel() {
 
     private val _isMarketScreen = MutableStateFlow("home")
     val isMarketScreen: StateFlow<String> = _isMarketScreen
 
+    private val _selectedTab = MutableStateFlow(0)
+    val selectedTab: StateFlow<Int> = _selectedTab
+
     fun toggleTab(tab: String) {
         _isMarketScreen.value = tab
+    }
+
+    fun setSelectedTab(tab: Int) {
+        _selectedTab.value = tab
     }
 }

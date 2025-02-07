@@ -7,5 +7,6 @@ sealed class Screen(val route: String) {
     object CoinLivePriceScreen: Screen("coin_live_price_screen")
     object ZoomedChart: Screen("zoomed_chart")
     object MarketScreen: Screen("coin_market_screen")
+    object MarketScreenTab: Screen("coin_market_screen_tab")
 
 }

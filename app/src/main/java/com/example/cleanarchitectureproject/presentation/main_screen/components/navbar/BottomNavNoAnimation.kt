@@ -29,80 +29,31 @@ import com.example.cleanarchitectureproject.presentation.Navbar
 @Composable
 fun BottomNavAnimation(
     screens: List<Navbar>,
-    isTab:Boolean,
-    onClick:(Int)->Unit
+    isTab: Boolean,
+    selectedTab: Int,  // Accept selectedTab as a parameter
+    onClick: (Int) -> Unit
 ) {
-    var selectedScreen by remember { mutableStateOf(0) }
-    if (!isTab)
-    {
-    Box(
-        Modifier
-            .shadow(5.dp)
-            .background(color = MaterialTheme.colorScheme.surface)
-            .height(64.dp)
-            .fillMaxWidth()
-           // .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
-    ) {
-        Row(
-            Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            for (screen in screens) {
-                val isSelected = screen == screens[selectedScreen]
-                val animatedWeight by animateFloatAsState(
-                    targetValue = if (isSelected) 1.5f else 1f
-                )
-                Box(
-                    modifier = Modifier.weight(animatedWeight),
-                    contentAlignment = Alignment.TopCenter,
-                ) {
-                    val interactionSource = remember { MutableInteractionSource() }
-                    BottomNavItem(
-                        modifier = Modifier.clickable(
-                            interactionSource = interactionSource,
-                            indication = null
-                        ) {
-                            selectedScreen = screens.indexOf(screen)
-                            onClick(selectedScreen)
-                        },
-                        screen = screen,
-                        isSelected = isSelected,
-                        isTab = isTab
-                    )
-                }
-            }
-        }
-    }
-    }
-    else
-    {
+    // Use selectedTab directly instead of maintaining local state
+    if (!isTab) {
         Box(
             Modifier
                 .shadow(5.dp)
                 .background(color = MaterialTheme.colorScheme.surface)
-                .fillMaxHeight() // Ensure the Box takes full height
-                .width(140.dp) // Adjust width for vertical layout
+                .height(64.dp)
+                .fillMaxWidth()
         ) {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.tertiary),
-                 // Fill available space
-                verticalArrangement = Arrangement.Top, // Align items at the top
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
                 for (screen in screens) {
-                    val isSelected = screen == screens[selectedScreen]
+                    val isSelected = screen == screens[selectedTab]
                     val animatedWeight by animateFloatAsState(
                         targetValue = if (isSelected) 1.5f else 1f
                     )
-
                     Box(
-                        modifier = Modifier
-                            .weight(animatedWeight, fill = false) // Allow flexible spacing
-                            .fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+                        modifier = Modifier.weight(animatedWeight),
+                        contentAlignment = Alignment.TopCenter,
                     ) {
                         val interactionSource = remember { MutableInteractionSource() }
                         BottomNavItem(
@@ -110,8 +61,7 @@ fun BottomNavAnimation(
                                 interactionSource = interactionSource,
                                 indication = null
                             ) {
-                                selectedScreen = screens.indexOf(screen)
-                                onClick(selectedScreen)
+                                onClick(screens.indexOf(screen))
                             },
                             screen = screen,
                             isSelected = isSelected,
@@ -121,6 +71,50 @@ fun BottomNavAnimation(
                 }
             }
         }
+    } else {
+        Box(
+            Modifier
+                .shadow(5.dp)
+                .background(color = MaterialTheme.colorScheme.surface)
+                .fillMaxHeight()
+                .width(140.dp)
+        ) {
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.tertiary),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(20.dp))
+                for (screen in screens) {
+                    val isSelected = screen == screens[selectedTab]
+                    val animatedWeight by animateFloatAsState(
+                        targetValue = if (isSelected) 1.5f else 1f
+                    )
 
+                    Box(
+                        modifier = Modifier
+                            .weight(animatedWeight, fill = false)
+                            .fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val interactionSource = remember { MutableInteractionSource() }
+                        BottomNavItem(
+                            modifier = Modifier.clickable(
+                                interactionSource = interactionSource,
+                                indication = null
+                            ) {
+                                onClick(screens.indexOf(screen))
+                            },
+                            screen = screen,
+                            isSelected = isSelected,
+                            isTab = isTab
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+

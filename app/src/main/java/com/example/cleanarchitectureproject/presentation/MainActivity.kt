@@ -18,6 +18,7 @@ import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
+import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -61,6 +62,14 @@ class MainActivity : ComponentActivity() {
                             route = Screen.MarketScreen.route
                         ){
                             MarketScreen(
+                                navController = navController,
+                                animatedVisibilityScope = this
+                            )
+                        }
+                        composable(
+                            route = Screen.MarketScreenTab.route
+                        ){
+                            MarketScreenTab(
                                 navController = navController,
                                 animatedVisibilityScope = this
                             )

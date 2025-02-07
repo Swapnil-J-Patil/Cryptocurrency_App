@@ -22,6 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
+import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -61,7 +64,10 @@ fun SharedTransitionScope.MainScreen(
     val configuration = LocalConfiguration.current
     val isTab = configuration.screenWidthDp.dp > 600.dp
 
-    var selectedTab by remember { mutableStateOf(0) }
+    var selectedTab by rememberSaveable(stateSaver = Saver(
+        save = { it },
+        restore = { it }
+    )) { mutableStateOf(0) }
     var bottomBarVisibility by remember { mutableStateOf(true) }
     val isMarketScreen by viewModel.isMarketScreen.collectAsState()
 
@@ -71,10 +77,9 @@ fun SharedTransitionScope.MainScreen(
     ) {
         if (isTab)
         {
-
             if (isMarketScreen=="market") {
                 bottomBarVisibility = true
-                MarketScreen(
+                MarketScreenTab(
                     navController = navController,
                     animatedVisibilityScope = animatedVisibilityScope
                 )
@@ -108,21 +113,14 @@ fun SharedTransitionScope.MainScreen(
                     BottomNavAnimation(
                         screens = screen,
                         isTab = isTab,
+                        selectedTab = selectedTab,  // Pass selectedTab
                         onClick = { tab ->
                             selectedTab = tab
-                            when (selectedTab) {
-                                0 -> {
-                                    viewModel.toggleTab("home")
-                                }
-                                1 -> {
-                                    viewModel.toggleTab("market")
-                                }
-                                2 -> {
-                                    viewModel.toggleTab("saved")
-                                }
-                                3 -> {
-                                    viewModel.toggleTab("settings")
-                                }
+                            when (tab) {
+                                0 -> viewModel.toggleTab("home")
+                                1 -> viewModel.toggleTab("market")
+                                2 -> viewModel.toggleTab("saved")
+                                3 -> viewModel.toggleTab("settings")
                             }
                         }
                     )
@@ -168,21 +166,14 @@ fun SharedTransitionScope.MainScreen(
                     BottomNavAnimation(
                         screens = screen,
                         isTab = isTab,
+                        selectedTab = selectedTab,  // Pass selectedTab
                         onClick = { tab ->
                             selectedTab = tab
-                            when (selectedTab) {
-                                0 -> {
-                                    viewModel.toggleTab("home")
-                                }
-                                1 -> {
-                                    viewModel.toggleTab("market")
-                                }
-                                2 -> {
-                                    viewModel.toggleTab("saved")
-                                }
-                                3 -> {
-                                    viewModel.toggleTab("settings")
-                                }
+                            when (tab) {
+                                0 -> viewModel.toggleTab("home")
+                                1 -> viewModel.toggleTab("market")
+                                2 -> viewModel.toggleTab("saved")
+                                3 -> viewModel.toggleTab("settings")
                             }
                         }
                     )

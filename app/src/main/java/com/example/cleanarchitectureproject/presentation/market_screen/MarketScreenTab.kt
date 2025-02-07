@@ -10,22 +10,18 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -38,9 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,13 +53,11 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 import com.google.gson.Gson
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.MarketScreen(
+fun SharedTransitionScope.MarketScreenTab(
     navController: NavController,
     viewModel: MarketViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
@@ -97,10 +89,9 @@ fun SharedTransitionScope.MarketScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = 45.dp,
+                top = 30.dp,
                 start = 15.dp,
                 end = 15.dp,
-                bottom = 56.dp
             ) // Reserve space for navbar
     ) {
         AnimatedVisibility(
@@ -132,6 +123,7 @@ fun SharedTransitionScope.MarketScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .padding(start = 140.dp)
                     ) {
                         OutlinedTextField(
                             value = searchQuery,
@@ -156,7 +148,6 @@ fun SharedTransitionScope.MarketScreen(
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(top=5.dp)
-
                             ) {
                                 itemsIndexed(
                                     filteredCoins,
