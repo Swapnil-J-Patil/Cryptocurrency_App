@@ -98,8 +98,6 @@ fun SharedTransitionScope.MarketScreen(
             .fillMaxSize()
             .padding(
                 top = 45.dp,
-                start = 15.dp,
-                end = 15.dp,
                 bottom = 56.dp
             ) // Reserve space for navbar
     ) {
@@ -138,6 +136,7 @@ fun SharedTransitionScope.MarketScreen(
                             onValueChange = { viewModel.updateSearchQuery(it) },
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .padding(horizontal = 10.dp)
                                 .clip(RoundedCornerShape(8.dp)), // Apply rounded corners
                             shape = RoundedCornerShape(8.dp),
                             placeholder = { Text("Search by Name, Symbol or ID") },
@@ -187,7 +186,12 @@ fun SharedTransitionScope.MarketScreen(
                                         }
                                     }
                                     val listType = "marketScreen_new"
-
+                                    val price =
+                                        "$ " + if (coin.quotes[0].price.toString().length > 10) coin.quotes[0].price.toString()
+                                            .substring(
+                                                0,
+                                                10
+                                            ) else coin.quotes[0].price.toString()
                                     CoinCardItem(
                                         currencyName = coin.name,
                                         symbol = coin.symbol,
@@ -198,7 +202,7 @@ fun SharedTransitionScope.MarketScreen(
                                         logo = coin.logo,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 8.dp)
+                                            .padding(vertical = 8.dp, horizontal = 15.dp)
                                             .graphicsLayer(
                                                 scaleX = scale.value,
                                                 scaleY = scale.value
@@ -214,7 +218,7 @@ fun SharedTransitionScope.MarketScreen(
                                                 val coinData = coin.toCryptoCoin()
                                                 val gson = Gson() // Or use kotlinx.serialization
                                                 val coinDataJson = gson.toJson(coinData)
-                                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${coin.price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
+                                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
                                                     launchSingleTop = true
                                                 }
                                             },

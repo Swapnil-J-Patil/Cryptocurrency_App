@@ -39,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +64,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.R
@@ -72,6 +74,8 @@ import com.example.cleanarchitectureproject.presentation.coin_live_price.compone
 import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
+import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 import com.google.gson.Gson
@@ -89,25 +93,28 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     coinData: CryptoCoin,
     navController: NavController,
-    listType: String
-) {
+    listType: String,
+    viewModel: SavedCoinViewModel = hiltViewModel(),
+
+    ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
     val color = if (isGainer) darkGreen else darkRed
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
     val configuration = LocalConfiguration.current
+    val isSavedState = remember { mutableStateOf(isSaved) }
 
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
-    val adaptiveHeight = if (screenWidth > 600.dp) 150.dp else 120.dp
-    val adaptiveWeightLogo = if (screenWidth > 600.dp) 0.1f else 0.2f
+    val adaptiveHeight = if (screenWidth > 600.dp) 150.dp else 125.dp
+    val adaptiveWeightLogo = if (screenWidth > 600.dp) 0.08f else 0.2f
     val adaptiveWeightDetails = if (screenWidth > 600.dp) 0.7f else 0.53f
     val adaptiveWeightGraph = if (screenWidth > 600.dp) 0.2f else 0.27f
     val lazyColumnPadding=if (screenWidth > 600.dp) 45.dp else 35.dp
 
     val circularPercentage = if (coinData.totalSupply != null) {
-        (coinData.circulatingSupply / coinData.totalSupply) * 100
+        (coinData.circulatingSupply?.div(coinData.totalSupply))?.times(100)
     } else {
         0f
     }
@@ -181,12 +188,20 @@ fun SharedTransitionScope.CoinLivePriceScreen(
             )
 
             Icon(
-                imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
-                contentDescription = if (isSaved) "Bookmarked" else "Bookmark",
+                imageVector = if (isSavedState.value) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                contentDescription = if (isSavedState.value) "Bookmarked" else "Bookmark",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .size(iconSize)
+                    .clickable {
+                        if (!isSavedState.value) {
+                            viewModel.addCrypto(coinData) // Save the coin
+                        } else {
+                            viewModel.removeCrypto(coinData) // Remove the coin
+                        }
+                        isSavedState.value = !isSavedState.value // Toggle state
+                    }
                     .padding(end = 8.dp, bottom = 5.dp)
             )
 
@@ -322,13 +337,19 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
             }
             item {
-                SupplyInfoCard(
-                    circulatingSupply = coinData.circulatingSupply,
-                    maxSupply = coinData.maxSupply,
-                    totalSupply = coinData.totalSupply,
-                    symbol = coinSymbol,
-                    circulatingPercentage = circularPercentage.toFloat()
-                )
+                coinData.circulatingSupply?.let {
+                    coinData.totalSupply?.let { it1 ->
+                        circularPercentage?.let { it2 ->
+                            SupplyInfoCard(
+                                circulatingSupply = it,
+                                maxSupply = coinData.maxSupply,
+                                totalSupply = it1,
+                                symbol = coinSymbol,
+                                circulatingPercentage = it2.toFloat()
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
@@ -350,7 +371,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                         .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 ) {
                     PriceLineChart(
-                        currencyCM = coinData.quotes[0],
+                        currencyCM = coinData.quotes?.get(0),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(300.dp)

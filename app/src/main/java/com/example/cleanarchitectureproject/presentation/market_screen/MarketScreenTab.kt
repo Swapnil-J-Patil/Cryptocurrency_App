@@ -178,7 +178,12 @@ fun SharedTransitionScope.MarketScreenTab(
                                         }
                                     }
                                     val listType = "marketScreen_new"
-
+                                    val price =
+                                        "$ " + if (coin.quotes[0].price.toString().length > 10) coin.quotes[0].price.toString()
+                                            .substring(
+                                                0,
+                                                10
+                                            ) else coin.quotes[0].price.toString()
                                     CoinCardItem(
                                         currencyName = coin.name,
                                         symbol = coin.symbol,
@@ -189,7 +194,7 @@ fun SharedTransitionScope.MarketScreenTab(
                                         logo = coin.logo,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 8.dp)
+                                            .padding(vertical = 8.dp, horizontal = 15.dp)
                                             .graphicsLayer(
                                                 scaleX = scale.value,
                                                 scaleY = scale.value
@@ -205,7 +210,7 @@ fun SharedTransitionScope.MarketScreenTab(
                                                 val coinData = coin.toCryptoCoin()
                                                 val gson = Gson() // Or use kotlinx.serialization
                                                 val coinDataJson = gson.toJson(coinData)
-                                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${coin.price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
+                                                navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
                                                     launchSingleTop = true
                                                 }
                                             },

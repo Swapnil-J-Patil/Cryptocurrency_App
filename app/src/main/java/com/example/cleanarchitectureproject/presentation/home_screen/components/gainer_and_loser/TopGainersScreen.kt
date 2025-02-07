@@ -78,7 +78,7 @@ fun SharedTransitionScope.TopGainersScreen(
             }
 
             CoinCardItem(
-                currencyName = gainer.name,
+                currencyName = if(gainer.name.length > 10) gainer.name.substring(0,8) +".." else gainer.name,
                 symbol = gainer.symbol,
                 percentage = gainersPercentage?.getOrNull(index) ?: "",
                 price = gainersPrice?.getOrNull(index) ?: "",

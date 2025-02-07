@@ -4,6 +4,8 @@ plugins {
     kotlin("kapt")
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -49,6 +51,9 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    room {
+        schemaDirectory("$projectDir/schemas")
     }
 }
 
@@ -104,7 +109,12 @@ dependencies {
     implementation ("androidx.compose.material:material-icons-extended:1.7.6")
 
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
-    
+
+    implementation(libs.ksp.devtools)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx) // Make sure it matches your room_version
+
 }
 kapt{
     correctErrorTypes = true

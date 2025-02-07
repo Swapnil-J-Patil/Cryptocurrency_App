@@ -1,9 +1,14 @@
 package com.example.cleanarchitectureproject.di
 
+import android.app.Application
+import androidx.room.Room
 import com.example.cleanarchitectureproject.common.Constants
+import com.example.cleanarchitectureproject.data.local.CryptoDatabase
 import com.example.cleanarchitectureproject.data.remote.CoinMarketApi
 import com.example.cleanarchitectureproject.data.repository.CoinMarketRepositoryImpl
+import com.example.cleanarchitectureproject.data.repository.CryptoRepositoryImpl
 import com.example.cleanarchitectureproject.domain.repository.CoinMarketRepository
+import com.example.cleanarchitectureproject.domain.repository.CryptoRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,5 +37,22 @@ object AppModule {
     @Singleton
     fun provideCoinMarketRepository(api: CoinMarketApi): CoinMarketRepository {
         return CoinMarketRepositoryImpl(api)
+    }
+
+    //For Room Database
+    @Provides
+    @Singleton
+    fun provideDatabase(app: Application): CryptoDatabase {
+        return Room.databaseBuilder(
+            app,
+            CryptoDatabase::class.java,
+            "crypto_db"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideCryptoRepository(db: CryptoDatabase): CryptoRepository {
+        return CryptoRepositoryImpl(db.cryptoDao)
     }
 }

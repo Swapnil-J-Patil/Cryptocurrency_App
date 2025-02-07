@@ -63,7 +63,7 @@ fun SharedTransitionScope.ZoomedChart(
                 shape = RoundedCornerShape(8.dp) // Rounded corners
             ) {
                 PriceLineChart(
-                    currencyCM = currency.quotes[0],
+                    currencyCM = currency.quotes?.get(0),
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
