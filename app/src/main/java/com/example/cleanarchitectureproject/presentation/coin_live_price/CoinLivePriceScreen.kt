@@ -39,7 +39,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -74,8 +73,7 @@ import com.example.cleanarchitectureproject.presentation.coin_live_price.compone
 import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
-import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
-import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinViewModel
+import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
 import com.google.gson.Gson

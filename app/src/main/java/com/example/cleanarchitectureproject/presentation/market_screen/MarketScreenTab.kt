@@ -56,7 +56,7 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
-import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinViewModel
+import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 

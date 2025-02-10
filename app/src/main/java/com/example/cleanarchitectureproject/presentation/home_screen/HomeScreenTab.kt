@@ -45,13 +45,12 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
-import com.example.cleanarchitectureproject.presentation.Navbar
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.home_screen.components.TypingAnimation
 import com.example.cleanarchitectureproject.presentation.home_screen.components.carousel.Carousel
 import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.LazyRowScaleIn
-import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinViewModel
+import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
