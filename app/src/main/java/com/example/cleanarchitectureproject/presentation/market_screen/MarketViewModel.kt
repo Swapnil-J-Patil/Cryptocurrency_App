@@ -10,8 +10,8 @@ import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCur
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -101,7 +101,7 @@ class MarketViewModel @Inject constructor(
 
                 val price = firstQuote.price
                 val formattedPrice = "$ " + if (price < 1000) price.toString().take(5) else price.toString().take(3) + ".."
-                val color = if (coin.quotes[0].percentChange1h > 0.0) darkGreen else darkRed
+                val color = if (coin.quotes[0].percentChange1h > 0.0) green else lightRed
 
                 CryptocurrencyCoin(
                     id = coin.id,

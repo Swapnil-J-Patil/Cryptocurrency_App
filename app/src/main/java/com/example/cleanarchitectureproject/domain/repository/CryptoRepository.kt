@@ -10,5 +10,4 @@ interface CryptoRepository {
     suspend fun clearCrypto()
     suspend fun isCoinSaved(coinId: String): Boolean
     suspend fun deleteCoin(coin: CryptoCoin)
-
 }

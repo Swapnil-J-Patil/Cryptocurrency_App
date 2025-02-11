@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -83,7 +83,7 @@ fun SharedTransitionScope.TopGainersScreen(
                 percentage = gainersPercentage?.getOrNull(index) ?: "",
                 price = gainersPrice?.getOrNull(index) ?: "",
                 image = gainersGraph?.getOrNull(index) ?: "",
-                color = darkGreen,
+                color = green,
                 logo = gainersLogo?.getOrNull(index) ?: "",
                 modifier = Modifier
                     .fillMaxWidth()

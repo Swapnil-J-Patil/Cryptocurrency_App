@@ -27,7 +27,8 @@ fun SupplyInfoCard(
     maxSupply: Double?,
     totalSupply: Double,
     symbol: String,
-    circulatingPercentage: Float
+    circulatingPercentage: Float,
+    color: Color
 ) {
    /* val supply= "%,.0f".format(circulatingSupply)
     val supplyText= if(supply.length>17)*/
@@ -61,13 +62,13 @@ fun SupplyInfoCard(
                 text = "${circulatingPercentage.toInt()}%",
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.End,
-                color = green,
+                color = color,
                 modifier = Modifier.weight(0.2f)
             )
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        AnimatedProgressBar(progress = circulatingPercentage / 100)
+        AnimatedProgressBar(progress = circulatingPercentage / 100,color=color)
 
         Spacer(modifier = Modifier.height(20.dp))
 

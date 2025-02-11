@@ -74,8 +74,10 @@ import com.example.cleanarchitectureproject.presentation.common_components.Price
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightGreen
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 
@@ -97,7 +99,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
-    val color = if (isGainer) darkGreen else darkRed
+    val color = if (isGainer) green else lightRed
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
     val configuration = LocalConfiguration.current
     val isSavedState = remember { mutableStateOf(isSaved) }
@@ -343,7 +345,8 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                                 maxSupply = coinData.maxSupply,
                                 totalSupply = it1,
                                 symbol = coinSymbol,
-                                circulatingPercentage = it2.toFloat()
+                                circulatingPercentage = it2.toFloat(),
+                                color=color
                             )
                         }
                     }
@@ -364,7 +367,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             val gson = Gson() // Or use kotlinx.serialization
                             val coinDataJson = gson.toJson(coinData)
                             val flag=false
-                            navController.navigate(Screen.ZoomedChart.route + "/${coinId}/${coinDataJson}/${flag}/${listTypeNew}")
+                            navController.navigate(Screen.ZoomedChart.route + "/${coinId}/${coinDataJson}/${flag}/${listTypeNew}/${isGainer}")
                         }
                         .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 ) {
@@ -374,7 +377,9 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             .fillMaxWidth()
                             .height(300.dp)
                             .padding(16.dp),
-                        labelName = coinSymbol
+                        labelName = coinSymbol,
+                        color1 = if(isGainer) green else red,
+                        color2 = if(isGainer) lightGreen else lightRed
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))

@@ -19,6 +19,8 @@ import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenT
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -75,9 +77,27 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        //Saved Coins Screen
+                        composable(
+                            route = Screen.MarketScreen.route
+                        ){
+                            SavedCoinsScreen(
+                                navController = navController,
+                                animatedVisibilityScope = this
+                            )
+                        }
+                        composable(
+                            route = Screen.SavedCoinsScreenTab.route
+                        ){
+                            SavedCoinsScreenTab(
+                                navController = navController,
+                                animatedVisibilityScope = this
+                            )
+                        }
+
                         //ZoomedChart Screen
                         composable(
-                            route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}/{listType}",
+                            route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}/{listType}/{isGainer}",
                             arguments = listOf(
                                 navArgument("coinSymbol") {
                                     type = NavType.StringType
@@ -91,19 +111,23 @@ class MainActivity : ComponentActivity() {
                                 navArgument("listType") {
                                     type = NavType.StringType
                                 },
+                                navArgument("isGainer") {
+                                    type = NavType.BoolType
+                                },
                             )
                         ){
                             val gson = Gson() // Or use kotlinx.serialization
                             val coinSymbol = it.arguments?.getString("coinSymbol") ?: ""
                             val listType = it.arguments?.getString("listType") ?: ""
                             val isHome = it.arguments?.getBoolean("isHome") ?: false
+                            val isGainer = it.arguments?.getBoolean("isGainer") ?: false
                             val coinDataJson = it.arguments?.getString("coinData") ?: ""
 
                             val coinData = gson.fromJson(
                                 coinDataJson,
                                 CryptoCoin::class.java
                             )
-                            ZoomedChart(currency = coinData, id = coinSymbol, isHomeScreen = isHome, animatedVisibilityScope = this,listType)
+                            ZoomedChart(currency = coinData, id = coinSymbol, isHomeScreen = isHome, animatedVisibilityScope = this,listType, isGainer = isGainer)
                         }
 
                         //Live Price Screen

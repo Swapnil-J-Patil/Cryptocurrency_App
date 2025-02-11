@@ -10,13 +10,14 @@ import javax.inject.Inject
 class GetAllCryptoUseCase @Inject constructor(
     private val repository: CryptoRepository
 ) {
-    operator fun invoke(): Flow<Resource<Flow<List<CryptoCoin>>>> = flow {
+    operator fun invoke(): Flow<Resource<List<CryptoCoin>>> = flow {
         try {
-            emit(Resource.Loading<Flow<List<CryptoCoin>>>())  // Emit loading state
-            val cryptoList = repository.getAllCrypto() // Fetch from DB
-            emit(Resource.Success<Flow<List<CryptoCoin>>>(cryptoList)) // Emit success state
+            emit(Resource.Loading())  // Emit loading state
+            repository.getAllCrypto().collect { cryptoList ->
+                emit(Resource.Success(cryptoList)) // Emit success state with actual data
+            }
         } catch (e: Exception) {
-            emit(Resource.Error<Flow<List<CryptoCoin>>>("Failed to load crypto: ${e.message}"))
+            emit(Resource.Error("Failed to load crypto: ${e.message}"))
         }
     }
 }

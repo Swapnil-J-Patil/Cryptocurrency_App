@@ -46,6 +46,8 @@ import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenT
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -77,18 +79,27 @@ fun SharedTransitionScope.MainScreen(
     ) {
         if (isTab)
         {
-            if (isMarketScreen=="market") {
-                bottomBarVisibility = true
-                MarketScreenTab(
-                    navController = navController,
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
-            } else {
-                bottomBarVisibility = true
-                HomeScreenTab(
-                    navController = navController,
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
+            when (isMarketScreen) {
+                "market" -> {
+                    bottomBarVisibility = true
+                    MarketScreenTab(
+                        navController = navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+                "saved" -> {
+                    SavedCoinsScreenTab(
+                        navController = navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+                else -> {
+                    bottomBarVisibility = true
+                    HomeScreenTab(
+                        navController = navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
             }
             Box(
                 modifier = Modifier
@@ -131,17 +142,26 @@ fun SharedTransitionScope.MainScreen(
         else
         {
 
-            if (isMarketScreen=="market") {
-                bottomBarVisibility = true
-                MarketScreen(
-                    navController = navController,
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
-            } else {
-                HomeScreen(
-                    navController = navController,
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
+            when (isMarketScreen) {
+                "market" -> {
+                    bottomBarVisibility = true
+                    MarketScreen(
+                        navController = navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+                "saved" -> {
+                    SavedCoinsScreen(
+                        navController = navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+                else -> {
+                    HomeScreen(
+                        navController = navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
             }
             Box(
                 modifier = Modifier

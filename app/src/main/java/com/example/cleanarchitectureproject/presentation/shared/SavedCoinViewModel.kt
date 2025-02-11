@@ -10,12 +10,23 @@ import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.G
 import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.InsertCryptoUseCase
 import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.IsCoinSavedUseCase
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
+import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @HiltViewModel
 class SavedCoinViewModel @Inject constructor(
     private val getAllCryptoUseCase: GetAllCryptoUseCase,
@@ -25,13 +36,34 @@ class SavedCoinViewModel @Inject constructor(
 
     ) : ViewModel() {
 
-    private val _coinListState = MutableStateFlow(SavedCoinsState())
-    val coinListState = _coinListState.asStateFlow()
+    private val _coinListState = mutableStateOf(SavedCoinsState())
+    val coinListState: State<SavedCoinsState> = _coinListState
 
+    private val _currencyList = MutableStateFlow<List<CryptocurrencyCoin>>(emptyList())
+    private val currencyList: StateFlow<List<CryptocurrencyCoin>> = _currencyList
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery
+
+    val filteredCoins = searchQuery
+        .combine(currencyList) { query, allCoins ->
+            if (query.isBlank()) allCoins
+            else allCoins.filter { coin ->
+                coin.name.contains(query, ignoreCase = true) ||
+                        coin.symbol.contains(query, ignoreCase = true) ||
+                        coin.id.toString().contains(query)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+        Log.d("FilteredCoins", "Size: ${filteredCoins.value.size}, List: $filteredCoins")
+
+    }
     init {
         loadCrypto()
     }
-
     private fun loadCrypto() {
         viewModelScope.launch {
             getAllCryptoUseCase().collect { result ->
@@ -43,7 +75,8 @@ class SavedCoinViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         _coinListState.value = SavedCoinsState(cryptocurrency = result.data)
-                        Log.d("SavedCoinViewModel", "Successfully loaded: ${result.data.toString()}")
+                        result.data?.let { processCoins(it) }
+                        Log.d("SavedCoinViewModel", "Successfully loaded: ${result.data}")
                     }
 
                     is Resource.Error -> {
@@ -54,6 +87,7 @@ class SavedCoinViewModel @Inject constructor(
             }
         }
     }
+
 
     fun addCrypto(crypto: CryptoCoin) {
         viewModelScope.launch {
@@ -67,11 +101,9 @@ class SavedCoinViewModel @Inject constructor(
         }
     }
 
-
     suspend fun isCoinSaved(coinId: String): Boolean {
         return isCoinSavedUseCase(coinId)
     }
-
 
     fun removeCrypto(coin: CryptoCoin) {
         viewModelScope.launch {
@@ -82,6 +114,54 @@ class SavedCoinViewModel @Inject constructor(
                     is Resource.Error -> Log.e("SavedCoinViewModel", "Error deleting crypto: ${result.message}")
                 }
             }
+        }
+    }
+
+    private fun processCoins(coins: List<CryptoCoin>) {
+        viewModelScope.launch {
+            val cryptocurrencyCoins = coins.map { coin ->
+                val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
+
+                val percentage = firstQuote?.percentChange1h.toString()
+                val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
+                    if (percentage.length > 5) percentage.substring(0, 5)   else "$percentage"
+                } else {
+                    if (percentage.length > 5) percentage.substring(0, 6) else "$percentage"
+                }
+
+                val price = firstQuote.price
+                val formattedPrice = "$ " + if (price < 1000) price.toString().take(5) else price.toString().take(3) + ".."
+                val color = if (coin.quotes[0].percentChange1h > 0.0) green else lightRed
+
+                CryptocurrencyCoin(
+                    id = coin.id,
+                    name = coin.name,
+                    symbol = coin.symbol.toString(),
+                    slug = coin.slug.toString(),
+                    tags = coin.tags?: emptyList(),
+                    cmcRank = coin.cmcRank?:0,
+                    marketPairCount = coin.marketPairCount?:0,
+                    circulatingSupply = coin.circulatingSupply?:0.0,
+                    selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply?:0.0,
+                    totalSupply = coin.totalSupply?:0.0,
+                    maxSupply = coin.maxSupply,
+                    isActive = coin.isActive?:0,
+                    lastUpdated = coin.lastUpdated.toString(),
+                    dateAdded = coin.dateAdded.toString(),
+                    quotes = coin.quotes,
+                    isAudited = coin.isAudited?:false,
+                    auditInfoList = emptyList(),
+                    badges = coin.badges?: emptyList(),
+                    percentage = formattedPercentage,
+                    price = formattedPrice,
+                    logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
+                    graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
+                    color = color,
+                    isGainer = firstQuote.percentChange1h > 0
+                )
+            }
+
+            _currencyList.value = cryptocurrencyCoins
         }
     }
 

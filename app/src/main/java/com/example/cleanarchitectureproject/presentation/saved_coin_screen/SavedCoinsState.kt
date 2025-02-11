@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 data class SavedCoinsState (
     val isLoading: Boolean =false,
-    val cryptocurrency: Flow<List<CryptoCoin>>?= null,
+    val cryptocurrency: List<CryptoCoin>?= null,
     val error: String = ""
 )

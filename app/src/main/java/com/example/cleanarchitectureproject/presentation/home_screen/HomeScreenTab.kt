@@ -158,9 +158,9 @@ fun SharedTransitionScope.HomeScreenTab(
                                         val gson = Gson()
                                         val coinDataJson = gson.toJson(coinData)
                                         val flag = true
+                                        val isGainer = if (item.quotes[0].percentChange1h > 0.0) true else false
                                         val listType = "carousel"
-                                        navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}")
-                                    },
+                                        navController.navigate(Screen.ZoomedChart.route + "/${item.id}/${coinDataJson}/${flag}/${listType}/${isGainer}")                                    },
                                     dotsPadding = dotsPadding,
                                     currency = list,
                                     animatedVisibilityScope = animatedVisibilityScope,

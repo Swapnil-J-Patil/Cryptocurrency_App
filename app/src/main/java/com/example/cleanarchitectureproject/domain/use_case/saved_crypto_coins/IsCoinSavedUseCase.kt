@@ -8,5 +8,11 @@ import javax.inject.Inject
 class IsCoinSavedUseCase @Inject constructor(
     private val repository: CryptoRepository
 ) {
-    operator suspend fun invoke(coinId: String):Boolean = repository.isCoinSaved(coinId)
+    suspend operator fun invoke(coinId: String): Boolean {
+        return try {
+            repository.isCoinSaved(coinId) // Returns true/false
+        } catch (e: Exception) {
+            false // Return false if any error occurs
+        }
+    }
 }

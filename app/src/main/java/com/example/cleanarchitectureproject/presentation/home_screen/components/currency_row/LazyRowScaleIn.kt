@@ -20,8 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkGreen
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -49,7 +49,7 @@ fun SharedTransitionScope.LazyRowScaleIn(
 
             val scale = remember { Animatable(0f) }
             val prefix = if (item.quotes[0].percentChange1h > 0.0) "+" else ""
-            val color = if (item.quotes[0].percentChange1h > 0.0) darkGreen else darkRed
+            val color = if (item.quotes[0].percentChange1h > 0.0) green else lightRed
 
             // Trigger animation when the item becomes visible
             LaunchedEffect(isVisible.value) {

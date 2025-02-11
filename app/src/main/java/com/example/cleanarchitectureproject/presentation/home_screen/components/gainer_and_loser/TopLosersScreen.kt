@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -86,7 +86,7 @@ fun SharedTransitionScope.TopLosersScreen(
                 percentage = losersPercentage?.get(index) ?: "",
                 price = losersPrice?.get(index) ?: "",
                 image = losersGraph?.get(index) ?: "",
-                color = darkRed,
+                color = lightRed,
                 logo = losersLogo?.get(index) ?: "",
                 modifier = Modifier
                     .fillMaxWidth()

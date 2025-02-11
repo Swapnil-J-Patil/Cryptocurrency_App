@@ -21,6 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightGreen
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -29,7 +33,8 @@ fun SharedTransitionScope.ZoomedChart(
     id:String,
     isHomeScreen: Boolean,
     animatedVisibilityScope:AnimatedVisibilityScope,
-    listType:String
+    listType:String,
+    isGainer:Boolean
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -71,7 +76,9 @@ fun SharedTransitionScope.ZoomedChart(
                         .clickable {
                             //onClick(page)
                         },
-                    labelName = currency.symbol
+                    labelName = currency.symbol,
+                    color1 = if(isGainer) green else red,
+                    color2 = if(isGainer) lightGreen else lightRed
                 )
             }
         }

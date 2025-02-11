@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 @Composable
-fun AnimatedProgressBar(progress: Float) {
+fun AnimatedProgressBar(progress: Float,color: Color) {
     val animatedProgress = remember { Animatable(0f) }
 
     LaunchedEffect(progress) {
@@ -41,7 +41,7 @@ fun AnimatedProgressBar(progress: Float) {
                 .fillMaxWidth(animatedProgress.value)
                 .height(8.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(green) // Green for progress
+                .background(color) // Green for progress
         )
     }
 }

@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightGreen
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -127,13 +131,16 @@ fun SharedTransitionScope.Carousel(
                     elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
                     shape = RoundedCornerShape(8.dp) // Rounded corners
                 ) {
+                    val isGainer = if (currency.get(page).quotes[0].percentChange1h > 0.0) true else false
                     PriceLineChart(
                         currencyCM = currency.get(page).quotes[0],
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight()
                             .padding(horizontal = 10.dp, vertical = 16.dp),
-                        labelName = currency.get(page).symbol
+                        labelName = currency.get(page).symbol,
+                        color1 = if(isGainer) green else red,
+                        color2 = if(isGainer) lightGreen else lightRed
                     )
                 }
             }
