@@ -122,12 +122,8 @@ class SavedCoinViewModel @Inject constructor(
             val cryptocurrencyCoins = coins.map { coin ->
                 val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
 
-                val percentage = firstQuote?.percentChange1h.toString()
-                val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
-                    if (percentage.length > 5) percentage.substring(0, 5)   else "$percentage"
-                } else {
-                    if (percentage.length > 5) percentage.substring(0, 6) else "$percentage"
-                }
+                val percentage = firstQuote!!.percentChange1h.toString()
+
 
                 val price = firstQuote.price
                 val formattedPrice = "$ " + if (price < 1000) price.toString().take(5) else price.toString().take(3) + ".."
@@ -152,7 +148,7 @@ class SavedCoinViewModel @Inject constructor(
                     isAudited = coin.isAudited?:false,
                     auditInfoList = emptyList(),
                     badges = coin.badges?: emptyList(),
-                    percentage = formattedPercentage,
+                    percentage = percentage,
                     price = formattedPrice,
                     logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
                     graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",

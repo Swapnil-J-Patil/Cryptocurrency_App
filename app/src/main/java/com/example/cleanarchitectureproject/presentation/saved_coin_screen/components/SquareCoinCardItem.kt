@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -27,6 +28,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +53,7 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
+import kotlinx.coroutines.delay
 
 @Composable
 fun SquareCoinCardItem(
@@ -63,22 +66,30 @@ fun SquareCoinCardItem(
     logo: String,
     quotes: QuoteCM,
     isGainer:Boolean,
+    isTab: Boolean
 ) {
     val degree= if(isGainer) 270f else 90f
     val rotationMax= 360f
     val rotationMin= 0f
+
+    val lineChartWidth = if(isTab) 190.dp else 160.dp
+    val adaptiveWeightLogo = if (isTab) 0.08f else 0.2f
 
     val isSelected= remember {
         mutableStateOf(false)
     }
     val animatedAlpha by animateFloatAsState(targetValue = if (isSelected.value) 1f else .5f)
     val animatedIconSize by animateDpAsState(
-        targetValue = if (isSelected.value) 26.dp else 20.dp,
+        targetValue = if (isSelected.value) 22.dp else 20.dp,
         animationSpec = spring(
             stiffness = Spring.StiffnessLow,
             dampingRatio = Spring.DampingRatioMediumBouncy
         )
     )
+    LaunchedEffect(Unit) {
+        delay(1000L) // Delay for 1 second (1000 milliseconds)
+        isSelected.value = true
+    }
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
@@ -88,6 +99,7 @@ fun SquareCoinCardItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(40.dp)
                 .background(Color.Transparent)
                 .padding(horizontal = 8.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -104,7 +116,7 @@ fun SquareCoinCardItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .fillMaxHeight()
-                    .weight(0.2f)
+                    .weight(adaptiveWeightLogo)
                     .aspectRatio(1f)
                     .clip(CircleShape)
             )
@@ -131,6 +143,7 @@ fun SquareCoinCardItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(40.dp)
                 .background(Color.Transparent)
                 .padding(horizontal = 8.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -170,14 +183,29 @@ fun SquareCoinCardItem(
                 )
             }
         }
-        LineChartItem(
-            currencyCM = quotes,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .padding(10.dp),
-            color1 = if(isGainer) green else red,
-            color2 = if(isGainer) lightGreen else lightRed
-        )
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .width(lineChartWidth)
+                    .height(120.dp)
+                    .padding(start = 10.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
+            )
+            {
+                LineChartItem(
+                    currencyCM = quotes,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    color1 = if (isGainer) green else red,
+                    color2 = if (isGainer) lightGreen else lightRed
+                )
+            }
+        }
+
     }
 }

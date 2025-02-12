@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -154,7 +155,7 @@ fun SharedTransitionScope.SavedCoinsScreen(
                                 state = listState,
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .padding(top=5.dp, start = 5.dp,end=5.dp)
+                                    .padding(top=5.dp, start = 8.dp,end=8.dp)
                             ) {
                                 itemsIndexed(
                                     filteredCoins,
@@ -191,10 +192,16 @@ fun SharedTransitionScope.SavedCoinsScreen(
                                                 0,
                                                 10
                                             ) else coin.quotes[0].price.toString()
+                                    val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
+                                    val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
+                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
+                                    } else {
+                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 6) else coin.percentage
+                                    }
                                     SquareCoinCardItem(
-                                        currencyName = coin.name,
+                                        currencyName = if(coin.name.length > 10) coin.name.substring(0,10) +".." else coin.name,
                                         symbol = coin.symbol,
-                                        percentage = if (coin.isGainer) "+" + coin.percentage + "%" else coin.percentage + "%",
+                                        percentage = if (coin.isGainer) "+" + formattedPercentage + "%" else formattedPercentage + "%",
                                         isGainer = coin.isGainer,
                                         price = coin.price,
                                         color = coin.color,
@@ -202,6 +209,7 @@ fun SharedTransitionScope.SavedCoinsScreen(
                                         quotes = coin.quotes[0],
                                         modifier = Modifier
                                             .fillMaxWidth()
+                                            .height(160.dp)
                                             .padding(vertical = 8.dp, horizontal = 8.dp)
                                             .graphicsLayer(
                                                 scaleX = scale.value,
@@ -225,6 +233,7 @@ fun SharedTransitionScope.SavedCoinsScreen(
                                                     }
                                                 }
                                             },
+                                        isTab = false
                                     )
                                 }
                             }

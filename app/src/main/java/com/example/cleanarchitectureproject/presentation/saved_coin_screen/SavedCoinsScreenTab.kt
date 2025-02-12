@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -57,6 +58,7 @@ import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketViewModel
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.components.SquareCoinCardItem
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -151,7 +153,7 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                         )
                         key(searchQuery) {
                             LazyVerticalGrid(
-                                columns = GridCells.Adaptive(halfScreenWidth.dp),
+                                columns = GridCells.Fixed(4),
                                 state = listState,
                                 modifier = Modifier
                                     .fillMaxSize()
@@ -192,17 +194,25 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                                 0,
                                                 10
                                             ) else coin.quotes[0].price.toString()
-                                    CoinCardItem(
-                                        currencyName = coin.name,
+                                    val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
+                                    val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
+                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
+                                    } else {
+                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 6) else coin.percentage
+                                    }
+                                    SquareCoinCardItem(
+                                        currencyName = if(coin.name.length > 10) coin.name.substring(0,10) +".." else coin.name,
                                         symbol = coin.symbol,
-                                        percentage = if (coin.isGainer) "+" + coin.percentage + "%" else coin.percentage + "%",
+                                        percentage = if (coin.isGainer) "+" + formattedPercentage + "%" else formattedPercentage + "%",
+                                        isGainer = coin.isGainer,
                                         price = coin.price,
-                                        image = coin.graph,
                                         color = coin.color,
                                         logo = coin.logo,
+                                        quotes = coin.quotes[0],
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(vertical = 8.dp, horizontal = 15.dp)
+                                            .height(200.dp)
+                                            .padding(vertical = 8.dp, horizontal = 8.dp)
                                             .graphicsLayer(
                                                 scaleX = scale.value,
                                                 scaleY = scale.value
@@ -218,14 +228,14 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                                     isSaved = viewModel.isCoinSaved(coin.id.toString())
 
                                                     val coinData = coin.toCryptoCoin()
-                                                    val gson =
-                                                        Gson() // Or use kotlinx.serialization
+                                                    val gson = Gson() // Or use kotlinx.serialization
                                                     val coinDataJson = gson.toJson(coinData)
                                                     navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
                                                         launchSingleTop = true
                                                     }
                                                 }
                                             },
+                                        isTab = true
                                     )
                                 }
                             }

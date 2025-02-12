@@ -192,10 +192,16 @@ fun SharedTransitionScope.MarketScreenTab(
                                                 0,
                                                 10
                                             ) else coin.quotes[0].price.toString()
+                                    val firstQuote = coin.quotes.firstOrNull() // Handle missing quotes
+                                    val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
+                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
+                                    } else {
+                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 6) else coin.percentage
+                                    }
                                     CoinCardItem(
                                         currencyName = coin.name,
                                         symbol = coin.symbol,
-                                        percentage = if (coin.isGainer) "+" + coin.percentage + "%" else coin.percentage + "%",
+                                        percentage = if (coin.isGainer) "+" + formattedPercentage + "%" else formattedPercentage+ "%",
                                         price = coin.price,
                                         image = coin.graph,
                                         color = coin.color,
