@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +22,7 @@ import com.example.cleanarchitectureproject.presentation.market_screen.MarketScr
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
+import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,7 +81,7 @@ class MainActivity : ComponentActivity() {
 
                         //Saved Coins Screen
                         composable(
-                            route = Screen.MarketScreen.route
+                            route = Screen.SavedCoinsScreen.route
                         ){
                             SavedCoinsScreen(
                                 navController = navController,
@@ -95,6 +97,23 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        //Transaction Screen
+                        composable(
+                            route = Screen.TransactionScreen.route+ "/{transaction}/{coinSymbol}",
+                            arguments = listOf(
+                                navArgument("coinSymbol") {
+                                    type = NavType.StringType
+                                },
+                                navArgument("transaction") {
+                                    type = NavType.StringType
+                                }
+                            )
+                        ){
+                            val coinSymbol = it.arguments?.getString("coinSymbol") ?: ""
+                            val transaction = it.arguments?.getString("transaction") ?: ""
+                            val url= "https://coindcx.com/insta/$transaction/$coinSymbol"
+                            TransactionScreen(url=url, animatedVisibilityScope = this, transaction = transaction, symbol = coinSymbol)
+                        }
                         //ZoomedChart Screen
                         composable(
                             route = Screen.ZoomedChart.route+ "/{coinSymbol}/{coinData}/{isHome}/{listType}/{isGainer}",

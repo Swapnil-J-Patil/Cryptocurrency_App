@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -48,6 +49,7 @@ import com.example.cleanarchitectureproject.presentation.market_screen.MarketScr
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
+import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -155,6 +157,10 @@ fun SharedTransitionScope.MainScreen(
                         navController = navController,
                         animatedVisibilityScope = animatedVisibilityScope
                     )
+                }
+                "settings" -> {
+                    /*val url="https://coindcx.com/insta/buy/btc"
+                    TransactionScreen(url = url)*/
                 }
                 else -> {
                     HomeScreen(

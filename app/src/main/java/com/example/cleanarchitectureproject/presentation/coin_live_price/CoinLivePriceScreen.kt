@@ -384,6 +384,66 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp) // Ensures proper spacing
+                ) {
+                    val symbol=coinSymbol.lowercase()
+                    Box(
+                        modifier = Modifier
+                            .weight(1f) // Ensures both buttons take equal width
+                            .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
+                            .border(1.dp, green, RoundedCornerShape(8.dp))
+                            .padding(16.dp)
+                            .sharedElement(
+                                state = rememberSharedContentState(key = "transaction/${"buy"}_${symbol}"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                            .clickable {
+                                navController.navigate(Screen.TransactionScreen.route + "/${"buy"}/${symbol}") {
+                                    launchSingleTop = true
+                                }
+                            }
+                        ,
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Buy",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f) // Ensures both buttons take equal width
+                            .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
+                            .border(1.dp, lightRed, RoundedCornerShape(8.dp))
+                            .padding(16.dp)
+                            .sharedElement(
+                                state = rememberSharedContentState(key = "transaction/${"sell"}_${symbol}"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                            .clickable {
+                                navController.navigate(Screen.TransactionScreen.route + "/${"sell"}/${symbol}")
+                            }
+                        ,
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "Sell",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+
+            }
         }
     }
 
