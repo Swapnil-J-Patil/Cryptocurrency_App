@@ -23,9 +23,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.components.WebViewItem
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopGainersScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopLosersScreen
+import com.example.cleanarchitectureproject.presentation.transaction_screen.components.TransactionCard
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -46,9 +50,12 @@ fun SharedTransitionScope.Tabs(
     gainersGraph: List<String>? = emptyList(),
     losersGraph: List<String>? = emptyList(),
     symbol: String? = null,
-    listType: String?=null
+    listType: String?=null,
+    coin: CryptoCoin?=null,
+    transaction: String?=null
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
+    val pagerStateForTransaction=rememberPagerState(initialPage = if(transaction=="buy") 0 else 1, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
     val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
@@ -72,121 +79,191 @@ fun SharedTransitionScope.Tabs(
 
     // var time by remember { mutableStateOf("15") }
     Column(modifier = Modifier.fillMaxSize()) {
-        if (screen == "home") {
-            TabRow(
-                selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier.fillMaxWidth(),
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                    )
-                }
-            ) {
-                tabTitles.forEachIndexed { index, title ->
-                    Tab(
-                        modifier = Modifier.weight(1f),
-                        selected = pagerState.currentPage == index,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = {
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (pagerState.currentPage == index)
-                                        MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                ),
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    )
-                }
-            }
-
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxSize()
-            ) { page ->
-                when (page) {
-                    0 -> gainers?.let {
-                        TopGainersScreen(
-                            it,
-                            onItemClick = { item, isGainer -> onItemClick(item, isGainer) },
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            gainersPercentage = gainersPercentage,
-                            gainersPrice = gainersPrice,
-                            gainersLogo = gainersLogo,
-                            gainersGraph = gainersGraph,
-                            listType = listType!!
+        when (screen) {
+            "home" -> {
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    modifier = Modifier.fillMaxWidth(),
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
                         )
                     }
-                    1 -> losers?.let {
-                        TopLosersScreen(
-                            it,
-                            onItemClick = { item, isGainer -> onItemClick(item, isGainer) },
-                            animatedVisibilityScope,
-                            losersPercentage = losersPercentage,
-                            losersPrice = losersPrice,
-                            losersLogo = losersLogo,
-                            losersGraph = losersGraph,
-                            listType = listType!!
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            modifier = Modifier.weight(1f),
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                            text = {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (pagerState.currentPage == index)
+                                            MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         )
                     }
                 }
-            }
-        }
-        else {
-            ScrollableTabRow(
-                selectedTabIndex = pagerState.currentPage,
-                modifier = Modifier.width(screenWidth.dp),
-                edgePadding = 0.dp,
-                indicator = { tabPositions ->
-                    TabRowDefaults.Indicator(
-                        Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
-                    )
-                }
-            ) {
-                tabTitles.forEachIndexed { index, title ->
-                    Tab(
-                        selected = pagerState.currentPage == index,
-                        onClick = {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        modifier = Modifier.width(width.dp).background(MaterialTheme.colorScheme.background),
-                        text = {
-                            Text(
-                                text = title,
-                                style = MaterialTheme.typography.bodyLarge.copy(
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (pagerState.currentPage == index)
-                                        MaterialTheme.colorScheme.primary
-                                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                ),
-                                textAlign = TextAlign.Center
+
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) { page ->
+                    when (page) {
+                        0 -> gainers?.let {
+                            TopGainersScreen(
+                                it,
+                                onItemClick = { item, isGainer -> onItemClick(item, isGainer) },
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                gainersPercentage = gainersPercentage,
+                                gainersPrice = gainersPrice,
+                                gainersLogo = gainersLogo,
+                                gainersGraph = gainersGraph,
+                                listType = listType!!
                             )
                         }
-                    )
+                        1 -> losers?.let {
+                            TopLosersScreen(
+                                it,
+                                onItemClick = { item, isGainer -> onItemClick(item, isGainer) },
+                                animatedVisibilityScope,
+                                losersPercentage = losersPercentage,
+                                losersPrice = losersPrice,
+                                losersLogo = losersLogo,
+                                losersGraph = losersGraph,
+                                listType = listType!!
+                            )
+                        }
+                    }
                 }
             }
+            "transaction" -> {
+                TabRow(
+                    selectedTabIndex = pagerStateForTransaction.currentPage,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 16.dp)
+                        .background(MaterialTheme.colorScheme.tertiary)
+                    ,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.tabIndicatorOffset(tabPositions[pagerStateForTransaction.currentPage])
+                        )
+                    }
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            modifier = Modifier.weight(1f)
+                                .background(MaterialTheme.colorScheme.tertiary)
+                            ,
+                            selected = pagerStateForTransaction.currentPage == index,
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerStateForTransaction.animateScrollToPage(index)
+                                }
+                            },
+                            text = {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (pagerStateForTransaction.currentPage == index)
+                                            MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        )
+                    }
+                }
 
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top=24.dp,bottom=10.dp)
-                    .background(MaterialTheme.colorScheme.background),
-                verticalAlignment = Alignment.Top
+                HorizontalPager(
+                    state = pagerStateForTransaction,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) { page ->
+                    when (page) {
+                        0 ->  TransactionCard(
+                            price = coin?.quotes?.get(0)?.price.toString(),
+                            firstText = "Buy For",
+                            secondText = "Quantity",
+                            buttonText = "BUY",
+                            color = green,
+                            firstPrefix = "$",
+                            secondPrefix = coin?.symbol.toString()
+                        )
+                        1 ->TransactionCard(
+                            price = coin?.quotes?.get(0)?.price.toString(),
+                            firstText = "Quantity",
+                            secondText = "Sell For",
+                            buttonText = "SELL",
+                            color = red,
+                            firstPrefix = coin?.symbol.toString(),
+                            secondPrefix = "$"
+                        )
+                    }
+                }
+            }
+            else -> {
+                ScrollableTabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    modifier = Modifier.width(screenWidth.dp),
+                    edgePadding = 0.dp,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                        )
+                    }
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                            modifier = Modifier.width(width.dp).background(MaterialTheme.colorScheme.background),
+                            text = {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (pagerState.currentPage == index)
+                                            MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    ),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        )
+                    }
+                }
 
-            ) { page ->
-                WebViewItem(url = urls[page], Modifier.height(height.dp).background(MaterialTheme.colorScheme.background))
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top=24.dp,bottom=10.dp)
+                        .background(MaterialTheme.colorScheme.background),
+                    verticalAlignment = Alignment.Top
+
+                ) { page ->
+                    WebViewItem(url = urls[page], Modifier.height(height.dp).background(MaterialTheme.colorScheme.background))
+                }
             }
         }
     }

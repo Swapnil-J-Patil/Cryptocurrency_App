@@ -21,14 +21,23 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
@@ -36,92 +45,71 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.domain.model.CryptoCoin
+import com.example.cleanarchitectureproject.presentation.common_components.Tabs
+import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.CurrencyCardItem
+import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CurrencyCard
+import com.example.cleanarchitectureproject.presentation.transaction_screen.components.TransactionCard
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkBackground
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 
 @SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.TransactionScreen(
-    url: String,
     animatedVisibilityScope: AnimatedVisibilityScope,
     transaction: String,
-    symbol: String
-    ) {
-    val isLoading = remember { mutableStateOf(true) } // Track loading state
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
-    val progress by animateLottieCompositionAsState(
-        composition, iterations = LottieConstants.IterateForever // Infinite repeat mode
-    )
+    coin: CryptoCoin
+) {
+
+    val tabTitles = listOf<String>("Buy ${coin.symbol}", "Sell ${coin.symbol}")
+
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .sharedElement(
-                state = rememberSharedContentState(key = "transaction/${transaction}_${symbol}"),
-                animatedVisibilityScope = animatedVisibilityScope
-            )
-        ,
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
 
-        AndroidView(
-            factory = { context ->
-                WebView(context).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                    )
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    settings.databaseEnabled = true
-                    settings.allowFileAccess = true
-                    settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-
-                    settings.userAgentString =
-                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-
-                    settings.useWideViewPort = true
-                    settings.loadWithOverviewMode = true
-                    settings.setSupportZoom(true)
-                    settings.builtInZoomControls = true
-                    settings.displayZoomControls = false
-                    setBackgroundColor(Color.TRANSPARENT) // Ensure the WebView background is transparent
-
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                            super.onPageStarted(view, url, favicon)
-                            isLoading.value = true // Page started loading
-                        }
-
-                        override fun onPageFinished(view: WebView?, url: String?) {
-                            super.onPageFinished(view, url)
-                            isLoading.value = false // Page finished loading
-                        }
-                    }
-                    loadUrl(url)
-                }
-            },
-            modifier = Modifier.fillMaxSize() // Add your other modifiers (like padding, etc.)
-        )
-        if (isLoading.value) {
-            LottieAnimation(
-                composition = composition,
-                progress = { progress },
+        Column {
+            CurrencyCard(
+                currency = coin.name,
+                image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
                 modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(250.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp, vertical = 8.dp),
+                animatedVisibilityScope = animatedVisibilityScope,
+                currencyId = coin.id.toString(),
+                listType = transaction,
+                symbol = coin.symbol.toString(),
+                graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png"
+
             )
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(420.dp)
+                    .padding(horizontal = 15.dp, vertical = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
+                elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
+                shape = RoundedCornerShape(8.dp) // Rounded corners
+            ){
+                Tabs(
+                    screen = "transaction",
+                    tabTitles = tabTitles,
+                    onItemClick = { item, flag ->
+
+                    },
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    coin = coin,
+                    transaction = transaction
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
-        Box(modifier = Modifier.fillMaxWidth()
-            .height(100.dp)
-            .background(darkBackground)
-            .align(Alignment.TopCenter)
-        )
-        Box(modifier = Modifier.fillMaxWidth()
-            .height(100.dp)
-            .background(darkBackground)
-            .align(Alignment.BottomCenter)
-        )
     }
 }
 

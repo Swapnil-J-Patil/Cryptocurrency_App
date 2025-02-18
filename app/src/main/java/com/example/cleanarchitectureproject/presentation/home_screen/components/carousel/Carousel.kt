@@ -137,6 +137,9 @@ fun SharedTransitionScope.Carousel(
                         modifier = Modifier
                             .fillMaxWidth()
                             .fillMaxHeight()
+                            .clickable {
+                                onClick(currency.get(page))
+                            }
                             .padding(horizontal = 10.dp, vertical = 16.dp),
                         labelName = currency.get(page).symbol,
                         color1 = if(isGainer) green else red,

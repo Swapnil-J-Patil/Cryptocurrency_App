@@ -26,6 +26,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -43,6 +45,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -159,6 +162,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
             }
         }
     }
+
     LaunchedEffect(Unit) {
         delay(1000L) // Delay for 1 second (1000 milliseconds)
         isSelected.value = true
@@ -171,7 +175,6 @@ fun SharedTransitionScope.CoinLivePriceScreen(
             .padding(top = 45.dp, start = 8.dp, end = 8.dp),
     ) {
         // Top Row: Coin Symbol and Save Icon
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -313,15 +316,13 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
         }
 
-
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = lazyColumnPadding)
                 .offset {
                     IntOffset(0, cardHeight.roundToPx())
-                }
+                },
         ) {
             item {
                 Tabs(
@@ -392,7 +393,6 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp) // Ensures proper spacing
                 ) {
-                    val symbol=coinSymbol.lowercase()
                     Box(
                         modifier = Modifier
                             .weight(1f) // Ensures both buttons take equal width
@@ -400,11 +400,13 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             .border(1.dp, green, RoundedCornerShape(8.dp))
                             .padding(16.dp)
                             .sharedElement(
-                                state = rememberSharedContentState(key = "transaction/${"buy"}_${symbol}"),
+                                state = rememberSharedContentState(key = "coinCardTransaction/${"buy"}_${coinId}"),
                                 animatedVisibilityScope = animatedVisibilityScope
                             )
                             .clickable {
-                                navController.navigate(Screen.TransactionScreen.route + "/${"buy"}/${symbol}") {
+                                val gson = Gson() // Or use kotlinx.serialization
+                                val coinDataJson = gson.toJson(coinData)
+                                navController.navigate(Screen.TransactionScreen.route + "/${"buy"}/${coinDataJson}") {
                                     launchSingleTop = true
                                 }
                             }
@@ -425,11 +427,15 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             .border(1.dp, lightRed, RoundedCornerShape(8.dp))
                             .padding(16.dp)
                             .sharedElement(
-                                state = rememberSharedContentState(key = "transaction/${"sell"}_${symbol}"),
+                                state = rememberSharedContentState(key = "coinCardTransaction/${"sell"}_${coinId}"),
                                 animatedVisibilityScope = animatedVisibilityScope
                             )
                             .clickable {
-                                navController.navigate(Screen.TransactionScreen.route + "/${"sell"}/${symbol}")
+                                val gson = Gson() // Or use kotlinx.serialization
+                                val coinDataJson = gson.toJson(coinData)
+                                navController.navigate(Screen.TransactionScreen.route + "/${"sell"}/${coinDataJson}"){
+                                    launchSingleTop = true
+                                }
                             }
                         ,
                         contentAlignment = Alignment.Center
@@ -446,7 +452,6 @@ fun SharedTransitionScope.CoinLivePriceScreen(
             }
         }
     }
-
 
 }
 

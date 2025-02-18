@@ -99,9 +99,9 @@ class MainActivity : ComponentActivity() {
 
                         //Transaction Screen
                         composable(
-                            route = Screen.TransactionScreen.route+ "/{transaction}/{coinSymbol}",
+                            route = Screen.TransactionScreen.route+ "/{transaction}/{coinData}",
                             arguments = listOf(
-                                navArgument("coinSymbol") {
+                                navArgument("coinData") {
                                     type = NavType.StringType
                                 },
                                 navArgument("transaction") {
@@ -109,10 +109,14 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         ){
-                            val coinSymbol = it.arguments?.getString("coinSymbol") ?: ""
+                            val gson = Gson() // Or use kotlinx.serialization
+                            val coinDataJson = it.arguments?.getString("coinData") ?: ""
                             val transaction = it.arguments?.getString("transaction") ?: ""
-                            val url= "https://coindcx.com/insta/$transaction/$coinSymbol"
-                            TransactionScreen(url=url, animatedVisibilityScope = this, transaction = transaction, symbol = coinSymbol)
+                            val coinData = gson.fromJson(
+                                coinDataJson,
+                                CryptoCoin::class.java
+                            )
+                            TransactionScreen( animatedVisibilityScope = this, transaction = transaction, coin = coinData)
                         }
                         //ZoomedChart Screen
                         composable(
