@@ -49,6 +49,7 @@ import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.home_screen.components.currency_row.CurrencyCardItem
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CurrencyCard
+import com.example.cleanarchitectureproject.presentation.transaction_screen.components.DraggableCards
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.TransactionCard
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkBackground
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
@@ -72,8 +73,10 @@ fun SharedTransitionScope.TransactionScreen(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-
-        Column {
+        Column(
+            modifier = Modifier
+                .padding(top = 45.dp),
+            ) {
             CurrencyCard(
                 currency = coin.name,
                 image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
@@ -88,28 +91,11 @@ fun SharedTransitionScope.TransactionScreen(
 
             )
 
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(420.dp)
-                    .padding(horizontal = 15.dp, vertical = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
-                elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
-                shape = RoundedCornerShape(8.dp) // Rounded corners
-            ){
-                Tabs(
-                    screen = "transaction",
-                    tabTitles = tabTitles,
-                    onItemClick = { item, flag ->
-
-                    },
-                    animatedVisibilityScope = animatedVisibilityScope,
-                    coin = coin,
-                    transaction = transaction
-                )
-            }
+            DraggableCards()
             Spacer(modifier = Modifier.height(8.dp))
         }
+
+
     }
 }
 
