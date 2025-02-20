@@ -91,7 +91,7 @@ fun SharedTransitionScope.TransactionScreen(
 
             )
 
-            DraggableCards()
+            DraggableCards(coin = coin)
             Spacer(modifier = Modifier.height(8.dp))
         }
 

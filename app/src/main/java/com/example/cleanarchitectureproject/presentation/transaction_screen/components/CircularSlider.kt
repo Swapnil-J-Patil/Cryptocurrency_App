@@ -31,7 +31,9 @@ fun CustomCircularProgressIndicator(
     minValue:Int = 0,
     maxValue:Int = 100,
     circleRadius:Float,
-    onPositionChange:(Int)->Unit
+    onPositionChange:(Int)->Unit,
+    remainingSupply: Double,
+    pricePerCoin: Double,
 ) {
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
@@ -51,6 +53,22 @@ fun CustomCircularProgressIndicator(
 
     var oldPositionValue by remember {
         mutableStateOf(initialValue)
+    }
+
+    val amountOfCoin = (positionValue / 100.0) * remainingSupply  // Use 100.0 to ensure Double division
+    val usdValue = amountOfCoin * pricePerCoin
+
+    var formattedAmount="%,.0f".format(amountOfCoin)
+    var formattedUsdValue = "%,.2f".format(usdValue)    // Format USD value to 2 decimal places
+    LaunchedEffect(initialValue) {
+       /* positionValue = initialValue
+        oldPositionValue = initialValue*/
+
+        val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
+        val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0  // Avoid division by zero
+
+        formattedUsdValue = "%,.2f".format(usdValue)  // Format as currency
+        formattedAmount = "%,.6f".format(amountOfCoin)  // Format coin amount with precision
     }
 
     Box(
@@ -174,22 +192,65 @@ fun CustomCircularProgressIndicator(
 
             }
 
+           /* val totalSupply = 2000
+            val pricePerCoin = 1.0*/
+
+
+
             drawContext.canvas.nativeCanvas.apply {
                 drawIntoCanvas {
+                    val textSpacing = 30.dp.toPx()  // Space between lines
+                    val padding=10.dp.toPx()
+                    // 1. Display percentage
                     drawText(
-                        "$positionValue %",
+                        formattedAmount,
                         circleCenter.x,
-                        circleCenter.y + 45.dp.toPx()/3f,
+                        circleCenter.y - textSpacing,  // Move slightly upward for balance
                         Paint().apply {
-                            textSize = 38.sp.toPx()
+                            textSize = 22.sp.toPx()
                             textAlign = Paint.Align.CENTER
                             color = white.toArgb()
                             isFakeBoldText = true
                         }
                     )
+
+                    // 2. "amount of coin" below percentage
+                    drawText(
+                        "Amount of coin",
+                        circleCenter.x,
+                        circleCenter.y-padding,  // Center position
+                        Paint().apply {
+                            textSize = 12.sp.toPx()
+                            textAlign = Paint.Align.CENTER
+                            color = white.toArgb()
+                        }
+                    )
+
+                    // 3. "$145.00" below "amount of coin"
+                    drawText(
+                        "$$formattedUsdValue",
+                        circleCenter.x,
+                        circleCenter.y + textSpacing,  // Move down
+                        Paint().apply {
+                            textSize = 22.sp.toPx()
+                            textAlign = Paint.Align.CENTER
+                            color = white.toArgb()
+                        }
+                    )
+
+                    // 4. "Amount in USD" below the amount
+                    drawText(
+                        "Amount in USD",
+                        circleCenter.x,
+                        circleCenter.y + (textSpacing * 2)-padding,  // Move further down
+                        Paint().apply {
+                            textSize = 12.sp.toPx()
+                            textAlign = Paint.Align.CENTER
+                            color = white.toArgb()
+                        }
+                    )
                 }
             }
-
         }
     }
 }

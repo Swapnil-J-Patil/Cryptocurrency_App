@@ -15,7 +15,7 @@ private val DarkColorScheme = darkColorScheme(
     primary = green,
     secondary = white,
     tertiary = grey,
-    tertiaryContainer = Color.LightGray
+    tertiaryContainer = lightGrey
 )
 
 private val LightColorScheme = lightColorScheme(

@@ -8,13 +8,14 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -26,23 +27,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.cleanarchitectureproject.presentation.ui.theme.green
-import com.example.cleanarchitectureproject.presentation.ui.theme.grey
-import com.example.cleanarchitectureproject.presentation.ui.theme.lightGreen
-import com.example.cleanarchitectureproject.presentation.ui.theme.white
+import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun DraggableCards() {
+fun DraggableCards(
+    coin: CryptoCoin
+) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
     val screenHeightPx =
@@ -51,6 +49,12 @@ fun DraggableCards() {
 
     val topCardOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
+    val instruction="Tap the amount in USD to enter exact amount, or use slider to adjust the amount."
+    val remainingSupply: Double?=if (coin.totalSupply != null && coin.circulatingSupply != null) {
+        coin.totalSupply - coin.circulatingSupply
+    } else {
+        0.0 // Return null if either value is null
+    }
 
     Box(
         modifier = Modifier
@@ -63,25 +67,24 @@ fun DraggableCards() {
                 .fillMaxHeight()
                 .padding(horizontal = 12.dp, vertical = 14.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
-            border = BorderStroke(2.dp,MaterialTheme.colorScheme.tertiaryContainer),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.tertiaryContainer),
             shape = RoundedCornerShape(24.dp)
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                CustomCircularProgressIndicator(
-                    modifier = Modifier
-                        .size(250.dp),
-                    initialValue = 50,
-                    primaryColor = green,
-                    secondaryColor = grey,
-                    circleRadius = 230f,
-                    onPositionChange = { position ->
-                        //do something with this position value
-                    }
-                )
+                /* CustomCircularProgressIndicator(
+                     modifier = Modifier
+                         .size(250.dp),
+                     initialValue = 50,
+                     primaryColor = green,
+                     secondaryColor = grey,
+                     circleRadius = 230f,
+                     onPositionChange = { position ->
+                         //do something with this position value
+                     }
+                 )*/
 
             }
         }
@@ -113,7 +116,7 @@ fun DraggableCards() {
                     }
                 ),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
-            border = BorderStroke(2.dp,MaterialTheme.colorScheme.tertiaryContainer),
+            border = BorderStroke(2.dp, MaterialTheme.colorScheme.tertiaryContainer),
             elevation = CardDefaults.cardElevation(8.dp),
             shape = RoundedCornerShape(24.dp)
         ) {
@@ -131,23 +134,38 @@ fun DraggableCards() {
                         .height(2.dp)
                         .background(MaterialTheme.colorScheme.secondary),
                 )
-                {
-
-                }
             }
-            Box(contentAlignment = Alignment.Center) {
-                CustomCircularProgressIndicator(
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Text(
+                    text = "Buy ${coin.symbol}",
+                    textAlign = TextAlign.Start,
                     modifier = Modifier
-                        .size(250.dp)
-                        .background(MaterialTheme.colorScheme.tertiary),
-                    initialValue = 50,
-                    primaryColor = green,
-                    secondaryColor = grey,
-                    circleRadius = 230f,
-                    onPositionChange = { position ->
-                        //do something with this position value
-                    }
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 16.dp),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.secondary
                 )
+                Text(
+                    text = instruction,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                coin.quotes?.get(0)?.let {
+
+                    PriceSelector(
+                        remainingSupply = remainingSupply,
+                        pricePerCoin = it.price
+                    )
+                }
+
             }
         }
     }
