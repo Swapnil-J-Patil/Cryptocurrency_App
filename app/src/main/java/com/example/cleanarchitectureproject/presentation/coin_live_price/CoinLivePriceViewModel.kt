@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.common.Resource
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
+import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
 
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,5 +47,6 @@ class CoinLivePriceViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
 
 }

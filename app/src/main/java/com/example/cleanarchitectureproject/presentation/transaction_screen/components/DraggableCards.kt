@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,6 +34,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.grey
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -45,16 +50,12 @@ fun DraggableCards(
     val density = LocalDensity.current
     val screenHeightPx =
         with(density) { configuration.screenHeightDp.dp.toPx() } // Convert screen height to pixels
-    val maxDrag = screenHeightPx * 0.7f // Allow dragging until 10% from bottom
+    val maxDrag = screenHeightPx * 0.73f // Allow dragging until 10% from bottom
 
     val topCardOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
-    val instruction="Tap the amount in USD to enter exact amount, or use slider to adjust the amount."
-    val remainingSupply: Double?=if (coin.totalSupply != null && coin.circulatingSupply != null) {
-        coin.totalSupply - coin.circulatingSupply
-    } else {
-        0.0 // Return null if either value is null
-    }
+    val instructionBuy="Tap the amount in USD to enter exact amount, use slider to adjust the amount or enter custom amount manually."
+    val instructionSell="Use slider to adjust the amount of coin or enter custom amount manually."
 
     Box(
         modifier = Modifier
@@ -74,18 +75,38 @@ fun DraggableCards(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                /* CustomCircularProgressIndicator(
-                     modifier = Modifier
-                         .size(250.dp),
-                     initialValue = 50,
-                     primaryColor = green,
-                     secondaryColor = grey,
-                     circleRadius = 230f,
-                     onPositionChange = { position ->
-                         //do something with this position value
-                     }
-                 )*/
+                Text(
+                    text = "Sell ${coin.symbol}",
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 16.dp),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = instructionSell,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary
+                )
 
+                coin.quotes?.get(0)?.let {
+
+                    PriceSelector(
+                        pricePerCoin = it.price,
+                        firstText = "Quantity",
+                        buttonText = "SELL",
+                        primaryColor = red,
+                        secondaryColor = grey,
+                        leadingIcon = "#",
+                        isBuy = false,
+                        alternateColor = lightRed
+                    )
+                }
             }
         }
 
@@ -149,7 +170,7 @@ fun DraggableCards(
                     color = MaterialTheme.colorScheme.secondary
                 )
                 Text(
-                    text = instruction,
+                    text = instructionBuy,
                     textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -161,11 +182,16 @@ fun DraggableCards(
                 coin.quotes?.get(0)?.let {
 
                     PriceSelector(
-                        remainingSupply = remainingSupply,
-                        pricePerCoin = it.price
+                        pricePerCoin = it.price,
+                        firstText = "Amount",
+                        buttonText = "BUY",
+                        primaryColor = green,
+                        secondaryColor = grey,
+                        leadingIcon = "$",
+                        isBuy = true,
+                        alternateColor = green
                     )
                 }
-
             }
         }
     }

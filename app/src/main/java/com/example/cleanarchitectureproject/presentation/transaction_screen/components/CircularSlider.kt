@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen.components
 
 import android.graphics.Paint
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -20,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cleanarchitectureproject.presentation.ui.theme.white
+import kotlinx.coroutines.delay
 import kotlin.math.*
 
 @Composable
@@ -32,8 +34,8 @@ fun CustomCircularProgressIndicator(
     maxValue:Int = 100,
     circleRadius:Float,
     onPositionChange:(Int)->Unit,
-    remainingSupply: Double,
     pricePerCoin: Double,
+    flag: Boolean,
 ) {
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
@@ -55,13 +57,24 @@ fun CustomCircularProgressIndicator(
         mutableStateOf(initialValue)
     }
 
-    val amountOfCoin = (positionValue / 100.0) * remainingSupply  // Use 100.0 to ensure Double division
-    val usdValue = amountOfCoin * pricePerCoin
+ /*   val amountOfCoin = (positionValue / 100.0) * remainingSupply  // Use 100.0 to ensure Double division
+    val usdValue = amountOfCoin * pricePerCoin*/
 
-    var formattedAmount="%,.0f".format(amountOfCoin)
-    var formattedUsdValue = "%,.2f".format(usdValue)    // Format USD value to 2 decimal places
+    var formattedAmount by remember { mutableStateOf("") }
+    var formattedUsdValue by remember { mutableStateOf("") }
+
+    LaunchedEffect(flag) {
+
+        val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
+        val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0  // Avoid division by zero
+        formattedUsdValue = "%,.2f".format(usdValue)  // Format as currency
+        formattedAmount = "%,.6f".format(amountOfCoin)  // Format coin amount with precision
+
+        positionValue = initialValue
+        oldPositionValue = initialValue
+    }
     LaunchedEffect(initialValue) {
-       /* positionValue = initialValue
+        /*positionValue = initialValue
         oldPositionValue = initialValue*/
 
         val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
@@ -77,9 +90,9 @@ fun CustomCircularProgressIndicator(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(true){
+                .pointerInput(true) {
                     detectDragGestures(
-                        onDragStart = {offset ->
+                        onDragStart = { offset ->
                             dragStartedAngle = -atan2(
                                 x = circleCenter.y - offset.y,
                                 y = circleCenter.x - offset.x
@@ -93,20 +106,34 @@ fun CustomCircularProgressIndicator(
                             ) * (180f / PI).toFloat()
                             touchAngle = (touchAngle + 180f).mod(360f)
 
-                            val currentAngle = oldPositionValue*360f/(maxValue-minValue)
+                            val currentAngle = oldPositionValue * 360f / (maxValue - minValue)
                             changeAngle = touchAngle - currentAngle
 
-                            val lowerThreshold = currentAngle - (360f / (maxValue-minValue) * 5)
-                            val higherThreshold = currentAngle + (360f / (maxValue-minValue) * 5)
+                            val lowerThreshold = currentAngle - (360f / (maxValue - minValue) * 5)
+                            val higherThreshold = currentAngle + (360f / (maxValue - minValue) * 5)
 
-                            if(dragStartedAngle in lowerThreshold .. higherThreshold){
-                                positionValue = (oldPositionValue + (changeAngle/(360f/(maxValue-minValue))).roundToInt())
+                            if (dragStartedAngle in lowerThreshold..higherThreshold) {
+                                positionValue =
+                                    (oldPositionValue + (changeAngle / (360f / (maxValue - minValue))).roundToInt()).coerceIn(
+                                        minValue, maxValue
+                                    )
+
+                                // Update formatted values dynamically
+                                val usdValue = positionValue.toDouble()
+                                val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
+                                formattedUsdValue = "%,.2f".format(usdValue)
+                                formattedAmount = "%,.6f".format(amountOfCoin)
                             }
-
                         },
                         onDragEnd = {
                             oldPositionValue = positionValue
                             onPositionChange(positionValue)
+
+                            // Ensure values are updated one last time
+                            val usdValue = positionValue.toDouble()
+                            val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
+                            formattedUsdValue = "%,.2f".format(usdValue)
+                            formattedAmount = "%,.6f".format(amountOfCoin)
                         }
                     )
                 }

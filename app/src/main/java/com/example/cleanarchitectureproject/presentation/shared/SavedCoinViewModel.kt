@@ -13,6 +13,7 @@ import com.example.cleanarchitectureproject.presentation.saved_coin_screen.Saved
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
@@ -161,4 +162,27 @@ class SavedCoinViewModel @Inject constructor(
         }
     }
 
+    fun getDynamicThreshold(marketCap: Double): Pair<Double, Double> {
+        return when {
+            marketCap > 1_000_000_000 -> 1_000_000.0 to 0.02 // Large cap: $1M+ volume, 2% turnover
+            marketCap > 100_000_000 -> 100_000.0 to 0.015 // Mid cap: $100K+ volume, 1.5% turnover
+            else -> 10_000.0 to 0.01 // Small cap: $10K+ volume, 1% turnover
+        }
+    }
+
+    fun checkLiquidity(crypto: CryptoCoin): Boolean {
+        Log.d("checkLiquidity", "checkLiquidity is called")
+        val quote = crypto.quotes?.firstOrNull() ?: return false // Get the first quote, return false if null
+        val marketCap = quote.marketCap // Market cap of the coin
+
+        if (marketCap <= 0) return false // Ensure valid market cap
+
+        val (volumeThreshold, turnoverThreshold) = getDynamicThreshold(marketCap) // Get thresholds dynamically
+
+        return isLiquidityLow(quote, volumeThreshold, turnoverThreshold) // Check if liquidity is low
+    }
+
+    fun isLiquidityLow(quote: QuoteCM, volumeThreshold: Double, turnoverThreshold: Double): Boolean {
+        return quote.volume24h < volumeThreshold || quote.turnover < turnoverThreshold
+    }
 }

@@ -72,6 +72,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
+import com.example.cleanarchitectureproject.presentation.coin_live_price.components.LiquidityWarning
 import com.example.cleanarchitectureproject.presentation.coin_live_price.components.SupplyInfoCard
 import com.example.cleanarchitectureproject.presentation.common_components.PriceLineChart
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
@@ -106,7 +107,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
     val configuration = LocalConfiguration.current
     val isSavedState = remember { mutableStateOf(isSaved) }
-
+    val isLowLiquidity=viewModel.checkLiquidity(crypto = coinData)
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
@@ -367,7 +368,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                         .clickable {
                             val gson = Gson() // Or use kotlinx.serialization
                             val coinDataJson = gson.toJson(coinData)
-                            val flag=false
+                            val flag = false
                             navController.navigate(Screen.ZoomedChart.route + "/${coinId}/${coinDataJson}/${flag}/${listTypeNew}/${isGainer}")
                         }
                         .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
@@ -386,6 +387,9 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
+               LiquidityWarning(isLowLiquidity)
+            }
+            item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -396,7 +400,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     Box(
                         modifier = Modifier
                             .weight(1f) // Ensures both buttons take equal width
-                            .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
+                            .background(
+                                MaterialTheme.colorScheme.tertiary,
+                                RoundedCornerShape(8.dp)
+                            )
                             .border(1.dp, green, RoundedCornerShape(8.dp))
                             .padding(16.dp)
                             .sharedElement(
@@ -423,7 +430,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     Box(
                         modifier = Modifier
                             .weight(1f) // Ensures both buttons take equal width
-                            .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
+                            .background(
+                                MaterialTheme.colorScheme.tertiary,
+                                RoundedCornerShape(8.dp)
+                            )
                             .border(1.dp, lightRed, RoundedCornerShape(8.dp))
                             .padding(16.dp)
                             .sharedElement(
@@ -433,7 +443,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             .clickable {
                                 val gson = Gson() // Or use kotlinx.serialization
                                 val coinDataJson = gson.toJson(coinData)
-                                navController.navigate(Screen.TransactionScreen.route + "/${"sell"}/${coinDataJson}"){
+                                navController.navigate(Screen.TransactionScreen.route + "/${"sell"}/${coinDataJson}") {
                                     launchSingleTop = true
                                 }
                             }
