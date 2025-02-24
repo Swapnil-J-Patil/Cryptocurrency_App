@@ -91,7 +91,7 @@ fun SharedTransitionScope.TransactionScreen(
 
             )
 
-            DraggableCards(coin = coin)
+            DraggableCards(coin = coin, imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png")
             Spacer(modifier = Modifier.height(8.dp))
         }
 

@@ -7,9 +7,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,7 +46,8 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun DraggableCards(
-    coin: CryptoCoin
+    coin: CryptoCoin,
+    imageUrl: String
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -75,15 +78,23 @@ fun DraggableCards(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Text(
-                    text = "Sell ${coin.symbol}",
-                    textAlign = TextAlign.Start,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 16.dp),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                        .padding(top = 16.dp, start = 16.dp,end=16.dp),
+                ) {
+                    Text(
+                        text = "Sell ${coin.symbol}",
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .weight(0.5f),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    CoinDisplay(amount = 1000, imageUrl = imageUrl, isSell = true)
+                }
                 Text(
                     text = instructionSell,
                     textAlign = TextAlign.Start,
@@ -160,15 +171,23 @@ fun DraggableCards(
                 modifier = Modifier
                     .fillMaxSize()
             ) {
-                Text(
-                    text = "Buy ${coin.symbol}",
-                    textAlign = TextAlign.Start,
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 16.dp),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                        .padding(top = 16.dp, start = 16.dp,end=16.dp),
+                    ) {
+                    Text(
+                        text = "Buy ${coin.symbol}",
+                        textAlign = TextAlign.Start,
+                        modifier = Modifier
+                            .weight(0.5f),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    CoinDisplay(amount = 1000, isSell = false)
+                }
                 Text(
                     text = instructionBuy,
                     textAlign = TextAlign.Start,

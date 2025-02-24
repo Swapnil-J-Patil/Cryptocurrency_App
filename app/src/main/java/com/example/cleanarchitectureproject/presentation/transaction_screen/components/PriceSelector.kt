@@ -109,7 +109,7 @@ fun PriceSelector(
                 )
             }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(3.dp))
         OrDivider()
 
         Row(
