@@ -20,22 +20,24 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cleanarchitectureproject.presentation.ui.theme.white
 import kotlinx.coroutines.delay
 import kotlin.math.*
 
 @Composable
-fun CustomCircularProgressIndicator(
+fun CircularSlider(
     modifier: Modifier = Modifier,
     initialValue:Int,
     primaryColor: Color,
     secondaryColor:Color,
+    textColor: Color,
     minValue:Int = 0,
     maxValue:Int = 100,
     circleRadius:Float,
     onPositionChange:(Int)->Unit,
     pricePerCoin: Double,
     flag: Boolean,
+    isBuy: Boolean,
+    availableCoins: Double?=0.0
 ) {
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
@@ -57,8 +59,6 @@ fun CustomCircularProgressIndicator(
         mutableStateOf(initialValue)
     }
 
- /*   val amountOfCoin = (positionValue / 100.0) * remainingSupply  // Use 100.0 to ensure Double division
-    val usdValue = amountOfCoin * pricePerCoin*/
 
     var formattedAmount by remember { mutableStateOf("") }
     var formattedUsdValue by remember { mutableStateOf("") }
@@ -74,14 +74,18 @@ fun CustomCircularProgressIndicator(
         oldPositionValue = initialValue
     }
     LaunchedEffect(initialValue) {
-        /*positionValue = initialValue
-        oldPositionValue = initialValue*/
 
-        val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
-        val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0  // Avoid division by zero
-
-        formattedUsdValue = "%,.2f".format(usdValue)  // Format as currency
-        formattedAmount = "%,.6f".format(amountOfCoin)  // Format coin amount with precision
+        if (isBuy) {
+            val usdValue = initialValue.toDouble()
+            val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
+            formattedUsdValue = "%,.2f".format(usdValue)
+            formattedAmount = "%,.6f".format(amountOfCoin)
+        } else {
+            val amountOfCoin =  (initialValue / 100.0) * availableCoins!!
+            val usdValue = amountOfCoin * pricePerCoin
+            formattedUsdValue = "%,.2f".format(usdValue)
+            formattedAmount = "%,.6f".format(amountOfCoin)
+        }
     }
 
     Box(
@@ -118,22 +122,38 @@ fun CustomCircularProgressIndicator(
                                         minValue, maxValue
                                     )
 
-                                // Update formatted values dynamically
-                                val usdValue = positionValue.toDouble()
-                                val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
-                                formattedUsdValue = "%,.2f".format(usdValue)
-                                formattedAmount = "%,.6f".format(amountOfCoin)
+                                if (isBuy) {
+                                    // Slider moves USD -> Calculate coin amount
+                                    val usdValue = positionValue.toDouble()
+                                    val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
+                                    formattedUsdValue = "%,.2f".format(usdValue)
+                                    formattedAmount = "%,.6f".format(amountOfCoin)
+                                }
+                                else {
+                                    // Slider moves amount of coin -> Calculate USD
+                                    val amountOfCoin =  (positionValue / 100.0) * availableCoins!!
+                                    val usdValue = amountOfCoin * pricePerCoin
+                                    formattedUsdValue = "%,.2f".format(usdValue)
+                                    formattedAmount = "%,.6f".format(amountOfCoin)
+                                }
                             }
                         },
                         onDragEnd = {
                             oldPositionValue = positionValue
                             onPositionChange(positionValue)
 
-                            // Ensure values are updated one last time
-                            val usdValue = positionValue.toDouble()
-                            val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
-                            formattedUsdValue = "%,.2f".format(usdValue)
-                            formattedAmount = "%,.6f".format(amountOfCoin)
+                            if (isBuy) {
+                                val usdValue = positionValue.toDouble()
+                                val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
+                                formattedUsdValue = "%,.2f".format(usdValue)
+                                formattedAmount = "%,.6f".format(amountOfCoin)
+                            }
+                            else {
+                                val amountOfCoin =  (positionValue / 100.0) * availableCoins!!
+                                val usdValue = amountOfCoin * pricePerCoin
+                                formattedUsdValue = "%,.2f".format(usdValue)
+                                formattedAmount = "%,.6f".format(amountOfCoin)
+                            }
                         }
                     )
                 }
@@ -219,11 +239,6 @@ fun CustomCircularProgressIndicator(
 
             }
 
-           /* val totalSupply = 2000
-            val pricePerCoin = 1.0*/
-
-
-
             drawContext.canvas.nativeCanvas.apply {
                 drawIntoCanvas {
                     val textSpacing = 30.dp.toPx()  // Space between lines
@@ -236,7 +251,7 @@ fun CustomCircularProgressIndicator(
                         Paint().apply {
                             textSize = 22.sp.toPx()
                             textAlign = Paint.Align.CENTER
-                            color = white.toArgb()
+                            color = textColor.toArgb()
                             isFakeBoldText = true
                         }
                     )
@@ -249,7 +264,7 @@ fun CustomCircularProgressIndicator(
                         Paint().apply {
                             textSize = 12.sp.toPx()
                             textAlign = Paint.Align.CENTER
-                            color = white.toArgb()
+                            color = textColor.toArgb()
                         }
                     )
 
@@ -261,7 +276,7 @@ fun CustomCircularProgressIndicator(
                         Paint().apply {
                             textSize = 22.sp.toPx()
                             textAlign = Paint.Align.CENTER
-                            color = white.toArgb()
+                            color = textColor.toArgb()
                         }
                     )
 
@@ -273,7 +288,7 @@ fun CustomCircularProgressIndicator(
                         Paint().apply {
                             textSize = 12.sp.toPx()
                             textAlign = Paint.Align.CENTER
-                            color = white.toArgb()
+                            color = textColor.toArgb()
                         }
                     )
                 }

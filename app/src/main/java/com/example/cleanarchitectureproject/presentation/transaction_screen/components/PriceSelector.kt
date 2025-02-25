@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen.components
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -54,7 +55,8 @@ fun PriceSelector(
     secondaryColor: Color,
     leadingIcon: String,
     isBuy: Boolean,
-    alternateColor: Color
+    alternateColor: Color,
+    availableCoins: Double?=0.0
 ) {
     val prices = listOf(25, 50, 75, 100)
     var selectedPrice by remember { mutableStateOf(25) } // Holds the slider progress
@@ -62,11 +64,11 @@ fun PriceSelector(
     val text1 = remember { mutableStateOf("") }
     var isFocused by remember { mutableStateOf(false) }
 
-    /* val firstText="Enter Amount"
-     val buttonText="BUY"*/
-    Column {
-        if (isBuy)
-        {
+    Column(
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (isBuy) {
             FlowRow(
                 maxItemsInEachRow = 10,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -79,9 +81,9 @@ fun PriceSelector(
                     CoinPrice(
                         price = price,
                         color = green,
-                        onClick = {amount->
+                        onClick = { amount ->
                             selectedPrice = amount // Extract number and update progress
-                            flag=!flag
+                            flag = !flag
                         }
                     )
                 }
@@ -92,10 +94,10 @@ fun PriceSelector(
         Spacer(modifier = Modifier.height(10.dp))
 
         Box(
-            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-                CustomCircularProgressIndicator(
+            if (isBuy) {
+                CircularSlider(
                     modifier = Modifier.size(300.dp),
                     initialValue = selectedPrice,
                     primaryColor = primaryColor,
@@ -106,8 +108,27 @@ fun PriceSelector(
                     },
                     pricePerCoin = pricePerCoin,
                     flag = flag,
+                    isBuy = isBuy,
+                    textColor = MaterialTheme.colorScheme.secondary
+                )
+            } else {
+                CircularSlider(
+                    modifier = Modifier.size(300.dp),
+                    initialValue = selectedPrice,
+                    primaryColor = primaryColor,
+                    secondaryColor = secondaryColor,
+                    circleRadius = 280f,
+                    onPositionChange = { position ->
+                        selectedPrice = position
+                    },
+                    pricePerCoin = pricePerCoin,
+                    flag = flag,
+                    isBuy = isBuy,
+                    availableCoins = availableCoins,
+                    textColor = MaterialTheme.colorScheme.secondary
                 )
             }
+        }
 
         Spacer(modifier = Modifier.height(3.dp))
         OrDivider()
@@ -131,7 +152,7 @@ fun PriceSelector(
                 label = {
                     Text(
                         text = firstText,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.titleMedium,
                         color = if (isFocused) primaryColor else Color.Gray // Change label color on focus
                     )
                 },
@@ -140,7 +161,7 @@ fun PriceSelector(
                     Text(
                         text = leadingIcon,
                         color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(end = 5.dp)
                     )
                 },
@@ -151,7 +172,7 @@ fun PriceSelector(
                     focusedLabelColor = alternateColor, // Change label color when focused
                     unfocusedLabelColor = Color.Gray, // Default label color
                     cursorColor = primaryColor
-                )
+                ),
             )
 
             Box(
@@ -165,14 +186,13 @@ fun PriceSelector(
                     .padding(16.dp)
                     .clickable {
 
-                    }
-                ,
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = buttonText,
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary
+                    color = Color.White
                 )
             }
         }

@@ -111,11 +111,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
-    val adaptiveHeight = if (screenWidth > 600.dp) 150.dp else 125.dp
+    val adaptiveHeight = if (screenWidth > 600.dp) 100.dp else 75.dp
     val adaptiveWeightLogo = if (screenWidth > 600.dp) 0.08f else 0.2f
     val adaptiveWeightDetails = if (screenWidth > 600.dp) 0.7f else 0.53f
     val adaptiveWeightGraph = if (screenWidth > 600.dp) 0.2f else 0.27f
-    val lazyColumnPadding=if (screenWidth > 600.dp) 45.dp else 35.dp
 
     val circularPercentage = if (coinData.totalSupply != null) {
         (coinData.circulatingSupply?.div(coinData.totalSupply))?.times(100)
@@ -138,40 +137,14 @@ fun SharedTransitionScope.CoinLivePriceScreen(
             dampingRatio = Spring.DampingRatioMediumBouncy
         )
     )
-    var cardHeight by remember { mutableStateOf(adaptiveHeight) }
-
-    val maxCardHeight = adaptiveHeight
-    val minCardHeight = 0.dp
-    var imageScale by remember { mutableFloatStateOf(1f) }
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                // Calculate the change in image size based on scroll delta
-                val delta = available.y
-                val newImageSize = cardHeight + delta.dp
-                val previousImageSize = cardHeight
-
-                // Constrain the image size within the allowed bounds
-                cardHeight = newImageSize.coerceIn(minCardHeight, maxCardHeight)
-                val consumed = cardHeight - previousImageSize
-
-                // Calculate the scale for the image
-                imageScale = cardHeight / maxCardHeight
-
-                // Return the consumed scroll amount
-                return Offset(0f, consumed.value)
-            }
-        }
-    }
 
     LaunchedEffect(Unit) {
         delay(1000L) // Delay for 1 second (1000 milliseconds)
         isSelected.value = true
     }
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(nestedScrollConnection)
             .background(MaterialTheme.colorScheme.background)
             .padding(top = 45.dp, start = 8.dp, end = 8.dp),
     ) {
@@ -179,7 +152,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 12.dp),
         ) {
             Text(
                 text = coinSymbol,
@@ -212,119 +185,110 @@ fun SharedTransitionScope.CoinLivePriceScreen(
         }
         // Row: Coin Image, Price, and Percentage
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(adaptiveHeight)
-                .graphicsLayer {
-                    scaleX = imageScale
-                    scaleY = imageScale
-                    // Center the image vertically as it scales
-                    translationY = -(maxCardHeight.toPx() - cardHeight.toPx()) / 2f
-                }
-                .sharedElement(
-                    state = rememberSharedContentState(key = "coinCard/${listType}_${coinId}"),
-                    animatedVisibilityScope = animatedVisibilityScope
-                )
-                .padding(start = 8.dp, end = 8.dp, top = 55.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
-            elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
-            shape = RoundedCornerShape(8.dp) // Rounded corners
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Transparent)
-                    .padding(horizontal = 8.dp, vertical = 5.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                // Currency Logo (10%)
-
-                Image(
-                    painter = rememberAsyncImagePainter(coinImage),
-                    contentDescription = "Currency Logo",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .fillMaxHeight()
-                        .weight(adaptiveWeightLogo)
-                        .aspectRatio(1f)
-                        .clip(CircleShape)
-                )
-
-                Spacer(modifier = Modifier.width(20.dp))
-
-                // Price and Percentage (20%)
-                Column(
-                    modifier = Modifier
-                        .weight(adaptiveWeightDetails)
-                        .padding(top = 2.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        text = coinPrice,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .offset(x = -6.dp)
-                    ) {
-                        FlipIcon(
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .alpha(animatedAlpha)
-                                .rotate(degree)
-                                .size(animatedIconSize),
-                            isActive = isSelected.value,
-                            activeIcon = Icons.Filled.PlayArrow,
-                            inactiveIcon = Icons.Filled.PlayArrow,
-                            contentDescription = "Bottom Navigation Icon",
-                            color = color,
-                            rotationMax = rotationMax,
-                            rotationMin = rotationMin
-                        )
-                        Text(
-                            text = "$prefix$coinPercentage %",
-                            maxLines = 1,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontStyle = FontStyle.Italic,
-                            color = color,
-                        )
-                    }
-                }
-
-                // Graph Image (40%)
-
-                Image(
-                    painter = rememberAsyncImagePainter(
-                        model = graph,
-                        error = painterResource(id = R.drawable.placeholder) // Replace with your drawable resource
-                    ),
-                    contentDescription = "Graph Image",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .weight(adaptiveWeightGraph)
-                        .padding(end = 10.dp),
-                )
-            }
-
-        }
-
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = lazyColumnPadding)
-                .offset {
-                    IntOffset(0, cardHeight.roundToPx())
-                },
+                .fillMaxSize(),
         ) {
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(adaptiveHeight)
+                        .sharedElement(
+                            state = rememberSharedContentState(key = "coinCard/${listType}_${coinId}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        )
+                        .padding(start = 8.dp, end = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary), // Set the background color
+                    elevation = CardDefaults.cardElevation(4.dp), // Add elevation for shadow
+                    shape = RoundedCornerShape(8.dp) // Rounded corners
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.Transparent)
+                            .padding(horizontal = 8.dp, vertical = 5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // Currency Logo (10%)
+
+                        Image(
+                            painter = rememberAsyncImagePainter(coinImage),
+                            contentDescription = "Currency Logo",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .fillMaxHeight()
+                                .weight(adaptiveWeightLogo)
+                                .aspectRatio(1f)
+                                .clip(CircleShape)
+                        )
+
+                        Spacer(modifier = Modifier.width(20.dp))
+
+                        // Price and Percentage (20%)
+                        Column(
+                            modifier = Modifier
+                                .weight(adaptiveWeightDetails)
+                                .padding(top = 2.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = coinPrice,
+                                maxLines = 1,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.secondary,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Row(
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .offset(x = -6.dp)
+                            ) {
+                                FlipIcon(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .alpha(animatedAlpha)
+                                        .rotate(degree)
+                                        .size(animatedIconSize),
+                                    isActive = isSelected.value,
+                                    activeIcon = Icons.Filled.PlayArrow,
+                                    inactiveIcon = Icons.Filled.PlayArrow,
+                                    contentDescription = "Bottom Navigation Icon",
+                                    color = color,
+                                    rotationMax = rotationMax,
+                                    rotationMin = rotationMin
+                                )
+                                Text(
+                                    text = "$prefix$coinPercentage %",
+                                    maxLines = 1,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontStyle = FontStyle.Italic,
+                                    color = color,
+                                )
+                            }
+                        }
+
+                        // Graph Image (40%)
+
+                        Image(
+                            painter = rememberAsyncImagePainter(
+                                model = graph,
+                                error = painterResource(id = R.drawable.placeholder) // Replace with your drawable resource
+                            ),
+                            contentDescription = "Graph Image",
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier
+                                .weight(adaptiveWeightGraph)
+                                .padding(end = 10.dp),
+                        )
+                    }
+
+                }
+            }
             item {
                 Tabs(
                     screen = "livePrice",
@@ -371,7 +335,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             val flag = false
                             navController.navigate(Screen.ZoomedChart.route + "/${coinId}/${coinDataJson}/${flag}/${listTypeNew}/${isGainer}")
                         }
-                        .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+                        .border(2.dp, Color.Gray, RoundedCornerShape(8.dp))
                 ) {
                     PriceLineChart(
                         currencyCM = coinData.quotes?.get(0),
@@ -404,7 +368,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                                 MaterialTheme.colorScheme.tertiary,
                                 RoundedCornerShape(8.dp)
                             )
-                            .border(1.dp, green, RoundedCornerShape(8.dp))
+                            .border(2.dp, green, RoundedCornerShape(8.dp))
                             .padding(16.dp)
                             .sharedElement(
                                 state = rememberSharedContentState(key = "coinCardTransaction/${"buy"}_${coinId}"),
@@ -434,7 +398,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                                 MaterialTheme.colorScheme.tertiary,
                                 RoundedCornerShape(8.dp)
                             )
-                            .border(1.dp, lightRed, RoundedCornerShape(8.dp))
+                            .border(2.dp, lightRed, RoundedCornerShape(8.dp))
                             .padding(16.dp)
                             .sharedElement(
                                 state = rememberSharedContentState(key = "coinCardTransaction/${"sell"}_${coinId}"),

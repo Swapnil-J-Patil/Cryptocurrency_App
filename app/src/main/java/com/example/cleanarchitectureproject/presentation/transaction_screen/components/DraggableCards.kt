@@ -51,10 +51,13 @@ fun DraggableCards(
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
-    val screenHeightPx =
-        with(density) { configuration.screenHeightDp.dp.toPx() } // Convert screen height to pixels
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() } // Convert screen height to pixels
     val maxDrag = screenHeightPx * 0.73f // Allow dragging until 10% from bottom
+    val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.dp
+    val isTab = screenWidth> 600.dp
 
+    val cardHeight= if(isTab) 800.dp else screenHeight
     val topCardOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
     val instructionBuy="Tap the amount in USD to enter exact amount, use slider to adjust the amount or enter custom amount manually."
@@ -62,7 +65,9 @@ fun DraggableCards(
 
     Box(
         modifier = Modifier
-            .fillMaxSize(), contentAlignment = Alignment.TopCenter
+            .fillMaxWidth()
+            .height(cardHeight),
+        contentAlignment = Alignment.TopCenter
     ) {
         // Bottom Card (Revealed as top card is dragged)
         Card(
@@ -93,7 +98,7 @@ fun DraggableCards(
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    CoinDisplay(amount = 1000, imageUrl = imageUrl, isSell = true)
+                    CoinDisplay(amount = 50.12345, imageUrl = imageUrl, isSell = true)
                 }
                 Text(
                     text = instructionSell,
@@ -112,10 +117,11 @@ fun DraggableCards(
                         firstText = "Quantity",
                         buttonText = "SELL",
                         primaryColor = red,
-                        secondaryColor = grey,
+                        secondaryColor = MaterialTheme.colorScheme.primaryContainer,
                         leadingIcon = "#",
                         isBuy = false,
-                        alternateColor = lightRed
+                        alternateColor = lightRed,
+                        availableCoins = 50.12345
                     )
                 }
             }
@@ -186,7 +192,7 @@ fun DraggableCards(
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    CoinDisplay(amount = 1000, isSell = false)
+                    CoinDisplay(amount = 1000.0000, isSell = false)
                 }
                 Text(
                     text = instructionBuy,
@@ -205,7 +211,7 @@ fun DraggableCards(
                         firstText = "Amount",
                         buttonText = "BUY",
                         primaryColor = green,
-                        secondaryColor = grey,
+                        secondaryColor = MaterialTheme.colorScheme.primaryContainer,
                         leadingIcon = "$",
                         isBuy = true,
                         alternateColor = green

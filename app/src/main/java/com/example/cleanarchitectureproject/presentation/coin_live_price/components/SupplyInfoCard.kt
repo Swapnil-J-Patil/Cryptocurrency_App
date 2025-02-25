@@ -36,7 +36,7 @@ fun SupplyInfoCard(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(8.dp))
-            .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
+            .border(2.dp, Color.Gray, RoundedCornerShape(8.dp))
             .padding(16.dp)
     ) {
         Text(
