@@ -61,7 +61,7 @@ fun DraggableCards(
     val topCardOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
     val instructionBuy="Tap the amount in USD to enter exact amount, use slider to adjust the amount or enter custom amount manually."
-    val instructionSell="Use slider to adjust the amount of coin or enter custom amount manually."
+    val instructionSell="Use slider to adjust the quantity of coin or enter custom quantity manually."
 
     Box(
         modifier = Modifier
