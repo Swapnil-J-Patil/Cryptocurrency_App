@@ -22,6 +22,7 @@ import com.example.cleanarchitectureproject.presentation.market_screen.MarketScr
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
+import com.example.cleanarchitectureproject.presentation.splash_screen.SplashScreen
 import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.gson.Gson
@@ -40,9 +41,14 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.MainScreen.route
+                        startDestination = Screen.SplashScreen.route
                     ) {
                         //Entrypoint
+                        composable(
+                            route = Screen.SplashScreen.route
+                        ) {
+                            SplashScreen(navController)
+                        }
                         composable(
                             route = Screen.MainScreen.route
                         ) {

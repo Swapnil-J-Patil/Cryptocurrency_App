@@ -15,7 +15,7 @@ val white= Color(0xFFFFFFFF)
 val red = Color(0xFFE93030) // A softer red that stands out but is not overly harsh.
 val lightRed = Color(0xFFE57373) // A softer red that stands out but is not overly harsh.
 val gold = Color(0xFFFFD700)
-val darkBackground = Color(0xFF0C1116) // Dark blue-gray shade
-val lightBackground = Color(0x40FFFFFF) // Pure white
+val darkBackground = Color(0xFF20262D) // Dark blue-gray shade
+val lightBackground = Color(0xFFECEAEA) // Pure white
 val lightGrey = Color(0x40888686) // Pure white
 
