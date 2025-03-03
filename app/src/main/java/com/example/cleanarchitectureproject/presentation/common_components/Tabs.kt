@@ -55,7 +55,6 @@ fun SharedTransitionScope.Tabs(
     transaction: String?=null
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
-    val pagerStateForTransaction=rememberPagerState(initialPage = if(transaction=="buy") 0 else 1, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
     val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
@@ -149,16 +148,16 @@ fun SharedTransitionScope.Tabs(
                     }
                 }
             }
-            "transaction" -> {
+            "login" -> {
                 TabRow(
-                    selectedTabIndex = pagerStateForTransaction.currentPage,
+                    selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier.fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 16.dp)
                         .background(MaterialTheme.colorScheme.tertiary)
                     ,
                     indicator = { tabPositions ->
                         TabRowDefaults.Indicator(
-                            Modifier.tabIndicatorOffset(tabPositions[pagerStateForTransaction.currentPage])
+                            Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
                         )
                     }
                 ) {
@@ -167,10 +166,10 @@ fun SharedTransitionScope.Tabs(
                             modifier = Modifier.weight(1f)
                                 .background(MaterialTheme.colorScheme.tertiary)
                             ,
-                            selected = pagerStateForTransaction.currentPage == index,
+                            selected = pagerState.currentPage == index,
                             onClick = {
                                 coroutineScope.launch {
-                                    pagerStateForTransaction.animateScrollToPage(index)
+                                    pagerState.animateScrollToPage(index)
                                 }
                             },
                             text = {
@@ -178,7 +177,7 @@ fun SharedTransitionScope.Tabs(
                                     text = title,
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         fontWeight = FontWeight.Bold,
-                                        color = if (pagerStateForTransaction.currentPage == index)
+                                        color = if (pagerState.currentPage == index)
                                             MaterialTheme.colorScheme.primary
                                         else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                     ),
@@ -191,28 +190,22 @@ fun SharedTransitionScope.Tabs(
                 }
 
                 HorizontalPager(
-                    state = pagerStateForTransaction,
+                    state = pagerState,
                     modifier = Modifier
                         .fillMaxSize()
                 ) { page ->
                     when (page) {
                         0 ->  TransactionCard(
-                            price = coin?.quotes?.get(0)?.price.toString(),
-                            firstText = "Buy For",
-                            secondText = "Quantity",
-                            buttonText = "BUY",
+                            firstText = "Email Address",
+                            secondText = "Password",
+                            buttonText = "Sign In",
                             color = green,
-                            firstPrefix = "$",
-                            secondPrefix = coin?.symbol.toString()
                         )
                         1 ->TransactionCard(
-                            price = coin?.quotes?.get(0)?.price.toString(),
-                            firstText = "Quantity",
-                            secondText = "Sell For",
-                            buttonText = "SELL",
-                            color = red,
-                            firstPrefix = coin?.symbol.toString(),
-                            secondPrefix = "$"
+                            firstText = "Email Address",
+                            secondText = "Password",
+                            buttonText = "Sign Up",
+                            color = green,
                         )
                     }
                 }

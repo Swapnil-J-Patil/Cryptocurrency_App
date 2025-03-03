@@ -53,7 +53,7 @@ fun SplashScreen(navController: NavController) {
         showText = true
 
         delay(1500L) // Wait for another 2 seconds before navigation
-        navController.navigate("main_screen") {
+        navController.navigate("login_screen") {
             popUpTo("splash_screen") { inclusive = true }
         }
     }

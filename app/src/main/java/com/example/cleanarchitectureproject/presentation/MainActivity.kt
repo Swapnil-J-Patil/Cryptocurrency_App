@@ -17,6 +17,7 @@ import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLiv
 import com.example.cleanarchitectureproject.presentation.common_components.ZoomedChart
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
+import com.example.cleanarchitectureproject.presentation.login_screen.LoginScreen
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
@@ -48,6 +49,11 @@ class MainActivity : ComponentActivity() {
                             route = Screen.SplashScreen.route
                         ) {
                             SplashScreen(navController)
+                        }
+                        composable(
+                            route = Screen.LoginScreen.route
+                        ) {
+                            LoginScreen(navController, animatedVisibilityScope = this)
                         }
                         composable(
                             route = Screen.MainScreen.route
