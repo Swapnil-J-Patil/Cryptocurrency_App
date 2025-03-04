@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.SplashScreen.route
+                        startDestination = Screen.LoginScreen.route
                     ) {
                         //Entrypoint
                         composable(

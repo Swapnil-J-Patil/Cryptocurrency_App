@@ -1,9 +1,8 @@
-package com.example.cleanarchitectureproject.presentation.transaction_screen.components
+package com.example.cleanarchitectureproject.presentation.login_screen.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,13 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Password
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,19 +37,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.example.cleanarchitectureproject.presentation.Screen
+import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
-import com.example.cleanarchitectureproject.presentation.ui.theme.gold
-import com.example.cleanarchitectureproject.presentation.ui.theme.green
-import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
-import com.google.gson.Gson
 
 @Composable
-fun TransactionCard(
+fun LoginCard(
     firstText: String,
     secondText: String,
     buttonText: String,
@@ -56,13 +56,13 @@ fun TransactionCard(
 ) {
     val text1 = remember { mutableStateOf("") }
     val text2 = remember { mutableStateOf("") }
-
+    var passwordVisible by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
     ) {
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         OutlinedTextField(
             value = text1.value,
             onValueChange = { text1.value = it },
@@ -75,8 +75,8 @@ fun TransactionCard(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
-                    contentDescription ="login icon",
-                    modifier = Modifier.padding(end=10.dp)
+                    contentDescription = "login icon",
+                    modifier = Modifier.padding(end = 10.dp)
                 )
             }, // Set leading text instead of icon
 
@@ -97,11 +97,20 @@ fun TransactionCard(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
-                    contentDescription ="login icon",
-                    modifier = Modifier.padding(end=10.dp)
+                    contentDescription = "login icon",
+                    modifier = Modifier.padding(end = 10.dp)
                 )
-            }, // Set leading text instead of icon
-            singleLine = true
+            },
+            trailingIcon = {
+                val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                val description = if (passwordVisible) "Hide password" else "Show password"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = icon, contentDescription = description)
+                }
+            },
+            singleLine = true,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -114,7 +123,7 @@ fun TransactionCard(
                 .border(1.dp, color, RoundedCornerShape(8.dp)),
             onClick = {},
             contentPadding = PaddingValues(vertical = 10.dp),
-            ) {
+        ) {
             Text(
                 text = buttonText,
                 style = MaterialTheme.typography.titleMedium,
@@ -131,62 +140,65 @@ fun TransactionCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 10.dp)
+                .padding(start = 10.dp, end = 10.dp, top = 10.dp)
         ) {
-            val fingerprint = "https://img.freepik.com/premium-vector/blue-light-fingerprint-icon-circle-hud-digital-screen-dark-background-illustration-cyber-security-technology-concept_115968-43.jpg"
-            val google="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
-            val faceId="https://cdn-icons-png.flaticon.com/512/6356/6356241.png"
+
             Box(
                 modifier = Modifier
-                    .size(67.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF23af92)),
+                    .size(70.dp)
+                    .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
+                    .clip(CircleShape), // Clip after border
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    rememberAsyncImagePainter(model = google),
+                    painter = painterResource(id = R.drawable.googlelogo),
                     contentDescription = "google",
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(40.dp) // Ensure image is smaller than the border container
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.tertiary),
+                        .background(Color.Transparent),
+                    contentScale = ContentScale.Inside
                 )
             }
+
             Box(
                 modifier = Modifier
-                    .size(67.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF23af92)),
+                    .size(70.dp)
+                    .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
+                    .clip(CircleShape), // Clip after border
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    rememberAsyncImagePainter(model = fingerprint),
+                    painter = painterResource(id = R.drawable.fingerprint),
                     contentDescription = "fingerprint",
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(50.dp) // Ensure image is smaller than the border container
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.tertiary),
+                        .background(Color.Transparent),
+                    contentScale = ContentScale.Inside
                 )
             }
+
             Box(
                 modifier = Modifier
-                    .size(67.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF23af92)),
+                    .size(70.dp)
+                    .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
+                    .clip(CircleShape), // Clip after border
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    rememberAsyncImagePainter(model = faceId),
+                    painter = painterResource(id = R.drawable.faceid),
                     contentDescription = "faceId",
                     modifier = Modifier
-                        .size(60.dp)
+                        .size(50.dp) // Ensure image is smaller than the border container
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.tertiary),
+                        .background(Color.Transparent),
+                    contentScale = ContentScale.Inside
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(35.dp))
 
     }
 }

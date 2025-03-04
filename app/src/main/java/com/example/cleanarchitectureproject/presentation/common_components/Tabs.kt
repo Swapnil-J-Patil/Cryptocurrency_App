@@ -27,9 +27,8 @@ import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.components.WebViewItem
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopGainersScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopLosersScreen
-import com.example.cleanarchitectureproject.presentation.transaction_screen.components.TransactionCard
+import com.example.cleanarchitectureproject.presentation.login_screen.components.LoginCard
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
-import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -195,13 +194,13 @@ fun SharedTransitionScope.Tabs(
                         .fillMaxSize()
                 ) { page ->
                     when (page) {
-                        0 ->  TransactionCard(
+                        0 ->  LoginCard(
                             firstText = "Email Address",
                             secondText = "Password",
                             buttonText = "Sign In",
                             color = green,
                         )
-                        1 ->TransactionCard(
+                        1 -> LoginCard(
                             firstText = "Email Address",
                             secondText = "Password",
                             buttonText = "Sign Up",
