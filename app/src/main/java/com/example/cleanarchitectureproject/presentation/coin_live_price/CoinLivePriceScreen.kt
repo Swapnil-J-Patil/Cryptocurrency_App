@@ -297,7 +297,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     onItemClick = { item, flag ->
 
                     },
-                    symbol = coinSymbol
+                    symbol = coinSymbol,
+                    onAuthClick = {type,method,email,password->
+
+                    }
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 

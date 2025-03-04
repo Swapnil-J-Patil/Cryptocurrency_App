@@ -246,7 +246,10 @@ fun SharedTransitionScope.HomeScreen(
                             losersLogo = loserLogoList,
                             gainersGraph = gainerGraphList,
                             losersGraph = loserGraphList,
-                            listType = "gainersAndLosers"
+                            listType = "gainersAndLosers",
+                            onAuthClick = {type,method,email,password->
+
+                            }
                         )
                     }
                 }

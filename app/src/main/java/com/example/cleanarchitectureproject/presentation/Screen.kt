@@ -6,7 +6,7 @@ sealed class Screen(val route: String) {
     object ZoomedChart: Screen("zoomed_chart")
     object TransactionScreen: Screen("transaction_screen")
     object SplashScreen: Screen("splash_screen")
-    object LoginScreen: Screen("login_screen")
+    object AuthScreen: Screen("auth_screen")
 
     object HomeScreenTab: Screen("home_screen_tab")
     object HomeScreen: Screen("home_screen")

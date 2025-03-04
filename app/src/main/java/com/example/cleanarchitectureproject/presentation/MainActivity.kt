@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +16,7 @@ import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLiv
 import com.example.cleanarchitectureproject.presentation.common_components.ZoomedChart
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
-import com.example.cleanarchitectureproject.presentation.login_screen.LoginScreen
+import com.example.cleanarchitectureproject.presentation.auth_screen.AuthScreen
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
@@ -26,15 +25,20 @@ import com.example.cleanarchitectureproject.presentation.saved_coin_screen.Saved
 import com.example.cleanarchitectureproject.presentation.splash_screen.SplashScreen
 import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
+import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+
     @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        FirebaseApp.initializeApp(this)
         setContent {
             CleanArchitectureProjectTheme {
                 val navController = rememberNavController()
@@ -42,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.LoginScreen.route
+                        startDestination = Screen.AuthScreen.route
                     ) {
                         //Entrypoint
                         composable(
@@ -51,9 +55,9 @@ class MainActivity : ComponentActivity() {
                             SplashScreen(navController)
                         }
                         composable(
-                            route = Screen.LoginScreen.route
+                            route = Screen.AuthScreen.route
                         ) {
-                            LoginScreen(navController, animatedVisibilityScope = this)
+                            AuthScreen(navController, animatedVisibilityScope = this)
                         }
                         composable(
                             route = Screen.MainScreen.route

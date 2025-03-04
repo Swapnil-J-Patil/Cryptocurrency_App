@@ -14,6 +14,12 @@ devtoolsKsp = "1.9.0-1.0.13"
 ksp = "1.9.0-1.0.13"
 room_version = "2.6.1"
 roomKtx = "2.6.1"
+googleGmsGoogleServices = "4.4.2"
+firebaseAuth = "22.0.0"
+credentials = "1.3.0"
+credentialsPlayServicesAuth = "1.3.0"
+googleid = "1.1.1"
+playServicesAuth = "21.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,12 +40,18 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-room-runtime = { group= "androidx.room", name="room-runtime",version.ref="room_version"}
 androidx-room-compiler = { group= "androidx.room", name="room-compiler",version.ref="room_version"}
-ksp-devtools = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "devtoolsKsp" } # Nome corrigido
+ksp-devtools = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "devtoolsKsp" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
+play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" } # Nome corrigido
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = {id="com.google.devtools.ksp", version.ref = "ksp" }
 room = {id="androidx.room", version.ref = "room_version" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 
 

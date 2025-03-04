@@ -1,8 +1,9 @@
-package com.example.cleanarchitectureproject.presentation.login_screen.components
+package com.example.cleanarchitectureproject.presentation.auth_screen.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Lock
@@ -39,23 +39,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
 
 @Composable
-fun LoginCard(
+fun AuthCard(
     firstText: String,
     secondText: String,
     buttonText: String,
     color: Color,
+    isSignIn: Boolean? = false,
+    onAuthClick: (String, String,String,String) -> Unit
 ) {
-    val text1 = remember { mutableStateOf("") }
-    val text2 = remember { mutableStateOf("") }
+    val email = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -64,8 +64,8 @@ fun LoginCard(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = text1.value,
-            onValueChange = { text1.value = it },
+            value = email.value,
+            onValueChange = { email.value = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)
@@ -86,8 +86,8 @@ fun LoginCard(
         Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
-            value = text2.value,
-            onValueChange = { text2.value = it },
+            value = password.value,
+            onValueChange = { password.value = it },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)
@@ -102,7 +102,8 @@ fun LoginCard(
                 )
             },
             trailingIcon = {
-                val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                val icon =
+                    if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 val description = if (passwordVisible) "Hide password" else "Show password"
 
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -121,7 +122,13 @@ fun LoginCard(
                 .padding(15.dp)
                 .background(color = color, RoundedCornerShape(8.dp))
                 .border(1.dp, color, RoundedCornerShape(8.dp)),
-            onClick = {},
+            onClick = {
+                if (isSignIn == true) {
+                    onAuthClick("signIn", "email",email.value,password.value)
+                } else {
+                    onAuthClick("signUp", "email",email.value,password.value)
+                }
+            },
             contentPadding = PaddingValues(vertical = 10.dp),
         ) {
             Text(
@@ -143,29 +150,45 @@ fun LoginCard(
                 .padding(start = 10.dp, end = 10.dp, top = 10.dp)
         ) {
 
-            Box(
-                modifier = Modifier
-                    .size(70.dp)
-                    .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
-                    .clip(CircleShape), // Clip after border
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.googlelogo),
-                    contentDescription = "google",
+            if (isSignIn == true) {
+                Box(
                     modifier = Modifier
-                        .size(40.dp) // Ensure image is smaller than the border container
+                        .size(70.dp)
+                        .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
                         .clip(CircleShape)
-                        .background(Color.Transparent),
-                    contentScale = ContentScale.Inside
-                )
+                        .clickable {
+                            onAuthClick("signIn", "gmail","","")
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.googlelogo),
+                        contentDescription = "google",
+                        modifier = Modifier
+                            .size(40.dp) // Ensure image is smaller than the border container
+                            .clip(CircleShape)
+                            .background(Color.Transparent),
+                        contentScale = ContentScale.Inside
+                    )
+                }
             }
 
             Box(
                 modifier = Modifier
                     .size(70.dp)
                     .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
-                    .clip(CircleShape), // Clip after border
+                    .clip(CircleShape)
+                    .clickable {
+                        if(isSignIn==true)
+                        {
+                            onAuthClick("signIn","fingerprint","","")
+                        }
+                        else
+                        {
+                            onAuthClick("signUp","fingerprint","","")
+                        }
+                    }
+                , // Clip after border
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -183,7 +206,18 @@ fun LoginCard(
                 modifier = Modifier
                     .size(70.dp)
                     .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
-                    .clip(CircleShape), // Clip after border
+                    .clip(CircleShape)
+                    .clickable {
+                        if(isSignIn==true)
+                        {
+                            onAuthClick("signIn","faceId","","")
+                        }
+                        else
+                        {
+                            onAuthClick("signUp","faceId","","")
+                        }
+                    }
+                , // Clip after border
                 contentAlignment = Alignment.Center
             ) {
                 Image(

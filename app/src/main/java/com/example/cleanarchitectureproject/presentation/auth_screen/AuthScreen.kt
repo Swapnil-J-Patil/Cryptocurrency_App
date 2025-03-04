@@ -1,30 +1,26 @@
-package com.example.cleanarchitectureproject.presentation.login_screen
+package com.example.cleanarchitectureproject.presentation.auth_screen
 
-import android.widget.Space
-import androidx.compose.animation.AnimatedVisibility
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -37,46 +33,52 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.R
-import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.LoginScreen(
+fun SharedTransitionScope.AuthScreen(
     navController: NavController,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    viewModel: AuthViewModel = hiltViewModel()
 ) {
 
     val tabTitles = listOf("Sign In", "Sign Up")
     val brushColors = listOf(Color(0xFF23af92), Color(0xFF0E5C4C))
+   // val authState by viewModel.authState.collectAsState()
+
+    val authState by viewModel.authState.collectAsState()
+    val context = LocalContext.current
+
+    val signInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult() // ✅ FIXED: Correct contract
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.handleSignInResult(result.data)
+        }
+    }
 
     // Animation state
     val infiniteTransition = rememberInfiniteTransition(label = "background")
@@ -93,7 +95,10 @@ fun SharedTransitionScope.LoginScreen(
         label = "offset"
     )
     val scrollState = rememberScrollState()
-
+  /*  authState?.let {
+        it.onSuccess { Log.d("Auth", "Success!") }
+        it.onFailure { Log.e("Auth", it.message ?: "Error") }
+    }*/
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -170,6 +175,27 @@ fun SharedTransitionScope.LoginScreen(
 
                 },
                 animatedVisibilityScope = animatedVisibilityScope,
+                onAuthClick = {type,method,email,password->
+                    when(type)
+                    {
+                        "signIn"->{
+                            if(method=="email")
+                            {
+                                viewModel.signIn(email,password)
+                            }
+                            if(method=="gmail")
+                            {
+                                viewModel.signInWithGoogleOneTap(context, signInLauncher)
+                            }
+                        }
+                        "signUp"->{
+                            if(method=="email")
+                            {
+                                viewModel.signUp(email,password)
+                            }
+                        }
+                    }
+                }
             )
 
         }

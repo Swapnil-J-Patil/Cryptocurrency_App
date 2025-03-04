@@ -27,7 +27,7 @@ import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.components.WebViewItem
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopGainersScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopLosersScreen
-import com.example.cleanarchitectureproject.presentation.login_screen.components.LoginCard
+import com.example.cleanarchitectureproject.presentation.auth_screen.components.AuthCard
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import kotlinx.coroutines.launch
 
@@ -51,8 +51,10 @@ fun SharedTransitionScope.Tabs(
     symbol: String? = null,
     listType: String?=null,
     coin: CryptoCoin?=null,
-    transaction: String?=null
-) {
+    transaction: String?=null,
+    onAuthClick: (String,String,String,String) -> Unit,
+
+    ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
     val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
@@ -194,17 +196,24 @@ fun SharedTransitionScope.Tabs(
                         .fillMaxSize()
                 ) { page ->
                     when (page) {
-                        0 ->  LoginCard(
+                        0 ->  AuthCard(
                             firstText = "Email Address",
                             secondText = "Password",
                             buttonText = "Sign In",
                             color = green,
+                            isSignIn = true,
+                            onAuthClick = {type,method,email,password->
+                                onAuthClick(type,method,email,password)
+                            }
                         )
-                        1 -> LoginCard(
+                        1 -> AuthCard(
                             firstText = "Email Address",
                             secondText = "Password",
                             buttonText = "Sign Up",
                             color = green,
+                            onAuthClick = {type,method,email,password->
+                                onAuthClick(type,method,email,password)
+                            }
                         )
                     }
                 }

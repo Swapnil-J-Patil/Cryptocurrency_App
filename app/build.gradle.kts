@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -6,12 +8,18 @@ plugins {
     id("com.google.dagger.hilt.android")
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.google.gms.google.services)
 }
 
+val localProperties = Properties()
+localProperties.load(rootProject.file("local.properties").inputStream())
 android {
     namespace = "com.example.cleanarchitectureproject"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         applicationId = "com.example.cleanarchitectureproject"
         minSdk = 24
@@ -23,6 +31,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties["GOOGLE_WEB_CLIENT_ID"]}\"")
     }
 
     buildTypes {
@@ -66,6 +76,12 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.firebase.auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation ("com.google.firebase:firebase-bom:33.10.0")
+    implementation(libs.googleid)
+    implementation(libs.play.services.auth)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
