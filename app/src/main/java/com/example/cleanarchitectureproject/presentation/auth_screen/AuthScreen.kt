@@ -3,15 +3,24 @@ package com.example.cleanarchitectureproject.presentation.auth_screen
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -33,8 +42,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -95,10 +108,12 @@ fun SharedTransitionScope.AuthScreen(
         label = "offset"
     )
     val scrollState = rememberScrollState()
-  /*  authState?.let {
-        it.onSuccess { Log.d("Auth", "Success!") }
-        it.onFailure { Log.e("Auth", it.message ?: "Error") }
-    }*/
+    var visibility by remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(Unit) {
+        visibility=true
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
@@ -123,7 +138,7 @@ fun SharedTransitionScope.AuthScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Transparent)
-                .padding(top=50.dp, start = 16.dp, end = 8.dp),
+                .padding(top = 50.dp, start = 16.dp, end = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -153,51 +168,76 @@ fun SharedTransitionScope.AuthScreen(
             text = "Unleash your inner trader today.",
             color = lightBackground,
             modifier = Modifier.fillMaxWidth()
-                .padding(top=16.dp, start = 16.dp,end=16.dp),
+                .padding(top = 16.dp, start = 16.dp, end = 16.dp),
             textAlign = TextAlign.Start,
             fontFamily = Poppins,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.ExtraLight
         )
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(top=26.dp, start = 8.dp,end=8.dp, bottom = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
-            elevation = CardDefaults.cardElevation(16.dp),
-            shape = RoundedCornerShape(12.dp)
+        AnimatedVisibility(
+            visible = visibility,
+            enter = slideInVertically(
+                initialOffsetY = { it/3 }, // Starts from full height (bottom)
+                animationSpec = tween(
+                    durationMillis = 800, // Slightly increased duration for a smoother feel
+                    easing = LinearOutSlowInEasing // Smoother easing for entering animation
+                )
+            ) + fadeIn(
+                animationSpec = tween(
+                    durationMillis = 800,
+                    easing = LinearOutSlowInEasing
+                )
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { it }, // Moves to full height (bottom)
+                animationSpec = tween(
+                    durationMillis = 800,
+                    easing = FastOutSlowInEasing // Keeps a natural exit motion
+                )
+            ) + fadeOut(
+                animationSpec = tween(
+                    durationMillis = 800,
+                    easing = FastOutSlowInEasing
+                )
+            )
         ) {
-            Tabs(
-                screen = "login",
-                tabTitles = tabTitles,
-                onItemClick = { item, flag ->
+        Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(top = 26.dp, start = 8.dp, end = 8.dp, bottom = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                elevation = CardDefaults.cardElevation(16.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Tabs(
+                    screen = "login",
+                    tabTitles = tabTitles,
+                    onItemClick = { item, flag ->
 
-                },
-                animatedVisibilityScope = animatedVisibilityScope,
-                onAuthClick = {type,method,email,password->
-                    when(type)
-                    {
-                        "signIn"->{
-                            if(method=="email")
-                            {
-                                viewModel.signIn(email,password)
+                    },
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    onAuthClick = { type, method, email, password ->
+                        when (type) {
+                            "signIn" -> {
+                                if (method == "email") {
+                                    viewModel.signIn(email, password)
+                                }
+                                if (method == "gmail") {
+                                    viewModel.signInWithGoogleOneTap(context, signInLauncher)
+                                }
                             }
-                            if(method=="gmail")
-                            {
-                                viewModel.signInWithGoogleOneTap(context, signInLauncher)
-                            }
-                        }
-                        "signUp"->{
-                            if(method=="email")
-                            {
-                                viewModel.signUp(email,password)
+
+                            "signUp" -> {
+                                if (method == "email") {
+                                    viewModel.signUp(email, password)
+                                }
                             }
                         }
                     }
-                }
-            )
+                )
 
+            }
         }
     }
 
