@@ -39,11 +39,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
+import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
 
 @Composable
@@ -53,7 +58,7 @@ fun AuthCard(
     buttonText: String,
     color: Color,
     isSignIn: Boolean? = false,
-    onAuthClick: (String, String,String,String) -> Unit
+    onAuthClick: (String, String, String, String) -> Unit
 ) {
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
@@ -140,19 +145,23 @@ fun AuthCard(
                 .border(1.dp, color, RoundedCornerShape(8.dp)),
             onClick = {
                 when {
-                    email.value.isEmpty() && password.value.isEmpty() ->{
+                    email.value.isEmpty() && password.value.isEmpty() -> {
                         passwordError = "Password cannot be empty"
                         emailError = "Email cannot be empty"
                     }
+
                     email.value.isEmpty() -> {
                         emailError = "Email cannot be empty"
                     }
+
                     !email.value.matches(emailRegex) -> {
                         emailError = "Enter a valid email address"
                     }
+
                     password.value.isEmpty() -> {
                         passwordError = "Password cannot be empty"
                     }
+
                     else -> {
                         if (isSignIn == true) {
                             onAuthClick("signIn", "email", email.value, password.value)
@@ -170,27 +179,26 @@ fun AuthCard(
                 color = Color.White
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        OrDivider()
-        Spacer(modifier = Modifier.height(12.dp))
+        if (isSignIn == true) {
+            Spacer(modifier = Modifier.height(16.dp))
+            OrDivider()
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp)
+            ) {
 
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 10.dp, end = 10.dp, top = 10.dp)
-        ) {
-
-            if (isSignIn == true) {
                 Box(
                     modifier = Modifier
                         .size(70.dp)
                         .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
                         .clip(CircleShape)
                         .clickable {
-                            onAuthClick("signIn", "gmail","","")
+                            onAuthClick("signIn", "gmail", "", "")
                         },
                     contentAlignment = Alignment.Center
                 ) {
@@ -204,67 +212,75 @@ fun AuthCard(
                         contentScale = ContentScale.Inside
                     )
                 }
-            }
 
-            Box(
-                modifier = Modifier
-                    .size(70.dp)
-                    .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
-                    .clip(CircleShape)
-                    .clickable {
-                        if(isSignIn==true)
-                        {
-                            onAuthClick("signIn","fingerprint","","")
-                        }
-                        else
-                        {
-                            onAuthClick("signUp","fingerprint","","")
-                        }
-                    }
-                , // Clip after border
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.fingerprint),
-                    contentDescription = "fingerprint",
+                Box(
                     modifier = Modifier
-                        .size(50.dp) // Ensure image is smaller than the border container
+                        .size(70.dp)
+                        .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
                         .clip(CircleShape)
-                        .background(Color.Transparent),
-                    contentScale = ContentScale.Inside
-                )
-            }
+                        .clickable {
+                            if (isSignIn == true) {
+                                onAuthClick("signIn", "fingerprint", "", "")
+                            } else {
+                                onAuthClick("signUp", "fingerprint", "", "")
+                            }
+                        }, // Clip after border
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.fingerprint),
+                        contentDescription = "fingerprint",
+                        modifier = Modifier
+                            .size(50.dp) // Ensure image is smaller than the border container
+                            .clip(CircleShape)
+                            .background(Color.Transparent),
+                        contentScale = ContentScale.Inside
+                    )
+                }
 
-            Box(
-                modifier = Modifier
-                    .size(70.dp)
-                    .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
-                    .clip(CircleShape)
-                    .clickable {
-                        if(isSignIn==true)
-                        {
-                            onAuthClick("signIn","faceId","","")
-                        }
-                        else
-                        {
-                            onAuthClick("signUp","faceId","","")
-                        }
-                    }
-                , // Clip after border
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.faceid),
-                    contentDescription = "faceId",
+                Box(
                     modifier = Modifier
-                        .size(50.dp) // Ensure image is smaller than the border container
+                        .size(70.dp)
+                        .border(2.dp, Color(0xFF23af92), CircleShape) // Apply border first
                         .clip(CircleShape)
-                        .background(Color.Transparent),
-                    contentScale = ContentScale.Inside
-                )
+                        .clickable {
+                            if (isSignIn == true) {
+                                onAuthClick("signIn", "pin", "", "")
+                            } else {
+                                onAuthClick("signUp", "pin", "", "")
+                            }
+                        }, // Clip after border
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.patternlock),
+                        contentDescription = "pin",
+                        modifier = Modifier
+                            .size(50.dp) // Ensure image is smaller than the border container
+                            .clip(CircleShape)
+                            .padding(6.dp)
+                            .background(Color.Transparent),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
         }
+        else
+        {
+            Spacer(modifier = Modifier.height(16.dp))
 
+            Text(
+                text = "Please note:\n \nWe respect your privacy. Your email will only be used for account access and important notifications.",
+                color = lightBackground,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 16.dp, start = 16.dp, end = 16.dp),
+                textAlign = TextAlign.Start,
+                fontFamily = Poppins,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.ExtraLight
+            )
+
+        }
         Spacer(modifier = Modifier.height(35.dp))
 
     }

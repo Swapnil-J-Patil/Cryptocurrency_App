@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.auth_screen
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -63,6 +64,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.R
@@ -75,14 +77,15 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackgroun
 fun SharedTransitionScope.AuthScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    viewModel: AuthViewModel = hiltViewModel()
-) {
+    viewModel: AuthViewModel = hiltViewModel(),
+    ) {
 
     val tabTitles = listOf("Sign In", "Sign Up")
     val brushColors = listOf(Color(0xFF23af92), Color(0xFF0E5C4C))
    // val authState by viewModel.authState.collectAsState()
 
     val authState by viewModel.authState.collectAsState()
+
     val context = LocalContext.current
 
     val signInLauncher = rememberLauncherForActivityResult(
@@ -220,11 +223,23 @@ fun SharedTransitionScope.AuthScreen(
                     onAuthClick = { type, method, email, password ->
                         when (type) {
                             "signIn" -> {
-                                if (method == "email") {
-                                    viewModel.signIn(email, password)
-                                }
-                                if (method == "gmail") {
-                                    viewModel.signInWithGoogleOneTap(context, signInLauncher)
+                                when(method){
+                                    "email"->
+                                    {
+                                        viewModel.signIn(email, password)
+                                    }
+                                    "gmail"->
+                                    {
+                                        viewModel.signInWithGoogleOneTap(context, signInLauncher)
+                                    }
+                                    "fingerprint"->
+                                    {
+
+                                    }
+                                    "pin"->
+                                    {
+
+                                    }
                                 }
                             }
 
@@ -236,7 +251,6 @@ fun SharedTransitionScope.AuthScreen(
                         }
                     }
                 )
-
             }
         }
     }
