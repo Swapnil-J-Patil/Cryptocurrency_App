@@ -44,6 +44,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 
 @Composable
 fun AuthCard(
@@ -57,6 +58,11 @@ fun AuthCard(
     val email = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var emailError by remember { mutableStateOf<String?>(null) } // For email validation
+    var passwordError by remember { mutableStateOf<String?>(null) }
+
+    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,13 +71,18 @@ fun AuthCard(
 
         OutlinedTextField(
             value = email.value,
-            onValueChange = { email.value = it },
+            onValueChange = {
+                email.value = it
+                emailError = null // Reset error when typing
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)
                 .clip(RoundedCornerShape(8.dp)), // Apply rounded corners
             shape = RoundedCornerShape(8.dp),
             label = { Text(firstText) },
+            isError = emailError != null, // Show error state
+            supportingText = { emailError?.let { Text(it, color = red) } }, // Error message
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
@@ -87,13 +98,18 @@ fun AuthCard(
 
         OutlinedTextField(
             value = password.value,
-            onValueChange = { password.value = it },
+            onValueChange = {
+                password.value = it
+                passwordError = null // Reset error on typing
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)
                 .clip(RoundedCornerShape(8.dp)), // Apply rounded corners
             shape = RoundedCornerShape(8.dp),
             label = { Text(secondText) },
+            isError = passwordError != null, // Show error state if needed
+            supportingText = { passwordError?.let { Text(it, color = red) } }, // Show error text
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Lock,
@@ -123,10 +139,27 @@ fun AuthCard(
                 .background(color = color, RoundedCornerShape(8.dp))
                 .border(1.dp, color, RoundedCornerShape(8.dp)),
             onClick = {
-                if (isSignIn == true) {
-                    onAuthClick("signIn", "email",email.value,password.value)
-                } else {
-                    onAuthClick("signUp", "email",email.value,password.value)
+                when {
+                    email.value.isEmpty() && password.value.isEmpty() ->{
+                        passwordError = "Password cannot be empty"
+                        emailError = "Email cannot be empty"
+                    }
+                    email.value.isEmpty() -> {
+                        emailError = "Email cannot be empty"
+                    }
+                    !email.value.matches(emailRegex) -> {
+                        emailError = "Enter a valid email address"
+                    }
+                    password.value.isEmpty() -> {
+                        passwordError = "Password cannot be empty"
+                    }
+                    else -> {
+                        if (isSignIn == true) {
+                            onAuthClick("signIn", "email", email.value, password.value)
+                        } else {
+                            onAuthClick("signUp", "email", email.value, password.value)
+                        }
+                    }
                 }
             },
             contentPadding = PaddingValues(vertical = 10.dp),
