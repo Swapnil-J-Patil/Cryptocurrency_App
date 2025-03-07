@@ -3,15 +3,15 @@ package com.example.cleanarchitectureproject.presentation.auth_screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.domain.model.BiometricResult
-import com.example.cleanarchitectureproject.domain.use_case.biometric.AuthenticateBiometricUseCase
-import com.example.cleanarchitectureproject.domain.use_case.biometric.AuthenticateWithDeviceCredentialUseCase
+import com.example.cleanarchitectureproject.domain.use_case.biometric_auth.FingerprintAuthUseCase
+import com.example.cleanarchitectureproject.domain.use_case.biometric_auth.DeviceCredentialAuthUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class BiometricViewModel(
-    private val authenticateBiometricUseCase: AuthenticateBiometricUseCase,
-    private val authenticateWithDeviceCredentialUseCase: AuthenticateWithDeviceCredentialUseCase
+    private val authenticateBiometricUseCase: FingerprintAuthUseCase,
+    private val authenticateWithDeviceCredentialUseCase: DeviceCredentialAuthUseCase
 
 ) : ViewModel() {
 

@@ -227,7 +227,7 @@ fun SharedTransitionScope.AuthScreen(
                                     }
                                     "gmail"->
                                     {
-                                        viewModel.signInWithGoogleOneTap(context, signInLauncher)
+                                        viewModel.signInWithGoogle(context, signInLauncher)
                                     }
                                     "fingerprint"->
                                     {

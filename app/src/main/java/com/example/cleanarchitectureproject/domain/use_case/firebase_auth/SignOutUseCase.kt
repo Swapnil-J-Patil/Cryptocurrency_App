@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.domain.use_case.authentication
+package com.example.cleanarchitectureproject.domain.use_case.firebase_auth
 
 import com.example.cleanarchitectureproject.domain.repository.AuthRepository
 import javax.inject.Inject

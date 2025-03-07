@@ -4,18 +4,16 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.cleanarchitectureproject.domain.use_case.authentication.HandleGoogleSignInResultUseCase
-import com.example.cleanarchitectureproject.domain.use_case.authentication.SignInUseCase
-import com.example.cleanarchitectureproject.domain.use_case.authentication.SignInWithGoogleOneTapUseCase
-import com.example.cleanarchitectureproject.domain.use_case.authentication.SignOutUseCase
-import com.example.cleanarchitectureproject.domain.use_case.authentication.SignUpUseCase
+import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.HandleGoogleSignInResultUseCase
+import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.SignInUseCase
+import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.SignInWithGoogleOneTapUseCase
+import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.SignOutUseCase
+import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.SignUpUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -65,7 +63,7 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun signInWithGoogleOneTap(context: Context, launcher: ActivityResultLauncher<IntentSenderRequest>) {
+    fun signInWithGoogle(context: Context, launcher: ActivityResultLauncher<IntentSenderRequest>) {
         signInWithGoogleOneTapUseCase(context, launcher)
     }
 

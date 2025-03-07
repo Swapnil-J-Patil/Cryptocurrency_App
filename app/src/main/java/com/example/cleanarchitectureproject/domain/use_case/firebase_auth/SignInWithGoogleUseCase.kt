@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.domain.use_case.authentication
+package com.example.cleanarchitectureproject.domain.use_case.firebase_auth
 
 import android.content.Context
 import androidx.activity.result.ActivityResultLauncher
