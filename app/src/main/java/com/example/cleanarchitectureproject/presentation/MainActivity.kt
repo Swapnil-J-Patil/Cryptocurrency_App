@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.navigation.NavType
@@ -11,12 +12,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.cleanarchitectureproject.di.AppContainer
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
 import com.example.cleanarchitectureproject.presentation.common_components.ZoomedChart
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
 import com.example.cleanarchitectureproject.presentation.auth_screen.AuthScreen
+import com.example.cleanarchitectureproject.presentation.auth_screen.util.BiometricPromptManager
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
@@ -30,8 +33,10 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
+    private lateinit var appContainer: AppContainer
+    private lateinit var promptManager: BiometricPromptManager
 
     @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +44,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         FirebaseApp.initializeApp(this)
+        appContainer = AppContainer(this)
+        promptManager = appContainer.biometricPromptManager
         setContent {
             CleanArchitectureProjectTheme {
                 val navController = rememberNavController()
@@ -57,7 +64,7 @@ class MainActivity : ComponentActivity() {
                         composable(
                             route = Screen.AuthScreen.route
                         ) {
-                            AuthScreen(navController, animatedVisibilityScope = this)
+                            AuthScreen(navController, animatedVisibilityScope = this, promptManager = promptManager)
                         }
                         composable(
                             route = Screen.MainScreen.route

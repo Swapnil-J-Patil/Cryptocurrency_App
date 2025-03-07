@@ -4,6 +4,7 @@ import android.app.Activity
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.biometric.BiometricPrompt
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -68,6 +69,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.domain.model.BiometricResult
+import com.example.cleanarchitectureproject.presentation.auth_screen.util.BiometricPromptManager
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
@@ -78,6 +81,7 @@ fun SharedTransitionScope.AuthScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
     viewModel: AuthViewModel = hiltViewModel(),
+    promptManager: BiometricPromptManager
     ) {
 
     val tabTitles = listOf("Sign In", "Sign Up")
@@ -85,6 +89,13 @@ fun SharedTransitionScope.AuthScreen(
    // val authState by viewModel.authState.collectAsState()
 
     val authState by viewModel.authState.collectAsState()
+    val biometricResult by promptManager.promptResults.collectAsState(initial = null)
+
+    val promptInfo = BiometricPrompt.PromptInfo.Builder()
+        .setTitle("Biometric Authentication")
+        .setSubtitle("Use your fingerprint to authenticate")
+        .setNegativeButtonText("Cancel")
+        .build()
 
     val context = LocalContext.current
 
@@ -170,7 +181,8 @@ fun SharedTransitionScope.AuthScreen(
         Text(
             text = "Unleash your inner trader today.",
             color = lightBackground,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp),
             textAlign = TextAlign.Start,
             fontFamily = Poppins,
@@ -234,11 +246,19 @@ fun SharedTransitionScope.AuthScreen(
                                     }
                                     "fingerprint"->
                                     {
+                                        promptManager.showBiometricPrompt(
+                                            title = "Biometric Authentication",
+                                            description = "Use your fingerprint to authenticate"
+                                        )
 
+                                        //viewModel.authenticate(promptInfo)
                                     }
                                     "pin"->
                                     {
-
+                                        promptManager.showDeviceCredentialPrompt(
+                                            title = "Biometric Authentication",
+                                            description = "Use your pin or pattern to authenticate"
+                                        )
                                     }
                                 }
                             }
@@ -251,6 +271,9 @@ fun SharedTransitionScope.AuthScreen(
                         }
                     }
                 )
+            /*biometricResult?.let { result ->
+                Log.d("BiometricAuth", "AuthScreen: $result")
+            }*/
             }
         }
     }

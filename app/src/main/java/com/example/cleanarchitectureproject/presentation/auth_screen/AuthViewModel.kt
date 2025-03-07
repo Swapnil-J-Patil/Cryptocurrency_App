@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
+import androidx.biometric.BiometricPrompt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.domain.use_case.authentication.HandleGoogleSignInResultUseCase
@@ -14,6 +15,7 @@ import com.example.cleanarchitectureproject.domain.use_case.authentication.SignU
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,7 +25,8 @@ class AuthViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val signOutUseCase: SignOutUseCase,
     private val signInWithGoogleOneTapUseCase: SignInWithGoogleOneTapUseCase,
-    private val handleGoogleSignInResultUseCase: HandleGoogleSignInResultUseCase
+    private val handleGoogleSignInResultUseCase: HandleGoogleSignInResultUseCase,
+
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.SignedOut)
