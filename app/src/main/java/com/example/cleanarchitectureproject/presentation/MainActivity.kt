@@ -1,7 +1,6 @@
 package com.example.cleanarchitectureproject.presentation
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -19,7 +18,7 @@ import com.example.cleanarchitectureproject.presentation.common_components.Zoome
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
 import com.example.cleanarchitectureproject.presentation.auth_screen.AuthScreen
-import com.example.cleanarchitectureproject.presentation.auth_screen.util.BiometricPromptManager
+import com.example.cleanarchitectureproject.presentation.auth_screen.BiometricViewModel
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
@@ -36,7 +35,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appContainer: AppContainer
-    private lateinit var promptManager: BiometricPromptManager
+    private lateinit var biometricViewModel: BiometricViewModel
 
     @OptIn(ExperimentalSharedTransitionApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         FirebaseApp.initializeApp(this)
         appContainer = AppContainer(this)
-        promptManager = appContainer.biometricPromptManager
+        biometricViewModel = appContainer.biometricViewModel
         setContent {
             CleanArchitectureProjectTheme {
                 val navController = rememberNavController()
@@ -64,7 +63,7 @@ class MainActivity : AppCompatActivity() {
                         composable(
                             route = Screen.AuthScreen.route
                         ) {
-                            AuthScreen(navController, animatedVisibilityScope = this, promptManager = promptManager)
+                            AuthScreen(navController, animatedVisibilityScope = this, biometricViewModel = biometricViewModel)
                         }
                         composable(
                             route = Screen.MainScreen.route

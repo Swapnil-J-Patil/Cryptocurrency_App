@@ -1,10 +1,8 @@
 package com.example.cleanarchitectureproject.presentation.auth_screen
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.biometric.BiometricPrompt
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -19,9 +17,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,12 +61,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.R
-import com.example.cleanarchitectureproject.domain.model.BiometricResult
-import com.example.cleanarchitectureproject.presentation.auth_screen.util.BiometricPromptManager
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
@@ -81,22 +74,14 @@ fun SharedTransitionScope.AuthScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
     viewModel: AuthViewModel = hiltViewModel(),
-    promptManager: BiometricPromptManager
-    ) {
+    biometricViewModel: BiometricViewModel
+) {
 
     val tabTitles = listOf("Sign In", "Sign Up")
     val brushColors = listOf(Color(0xFF23af92), Color(0xFF0E5C4C))
-   // val authState by viewModel.authState.collectAsState()
 
     val authState by viewModel.authState.collectAsState()
-    val biometricResult by promptManager.promptResults.collectAsState(initial = null)
-
-    val promptInfo = BiometricPrompt.PromptInfo.Builder()
-        .setTitle("Biometric Authentication")
-        .setSubtitle("Use your fingerprint to authenticate")
-        .setNegativeButtonText("Cancel")
-        .build()
-
+    val biometricState by biometricViewModel.biometricState.collectAsState()
     val context = LocalContext.current
 
     val signInLauncher = rememberLauncherForActivityResult(
@@ -246,19 +231,11 @@ fun SharedTransitionScope.AuthScreen(
                                     }
                                     "fingerprint"->
                                     {
-                                        promptManager.showBiometricPrompt(
-                                            title = "Biometric Authentication",
-                                            description = "Use your fingerprint to authenticate"
-                                        )
-
-                                        //viewModel.authenticate(promptInfo)
+                                        biometricViewModel.fingerprintAuth("Authentication", "Use your fingerprint to authenticate")
                                     }
                                     "pin"->
                                     {
-                                        promptManager.showDeviceCredentialPrompt(
-                                            title = "Biometric Authentication",
-                                            description = "Use your pin or pattern to authenticate"
-                                        )
+                                        biometricViewModel.deviceCredentialAuth("Authentication", "Use device pin or pattern to authenticate")
                                     }
                                 }
                             }

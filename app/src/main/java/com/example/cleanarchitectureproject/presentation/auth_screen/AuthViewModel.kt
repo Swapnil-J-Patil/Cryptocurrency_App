@@ -26,7 +26,6 @@ class AuthViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     private val signInWithGoogleOneTapUseCase: SignInWithGoogleOneTapUseCase,
     private val handleGoogleSignInResultUseCase: HandleGoogleSignInResultUseCase,
-
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.SignedOut)

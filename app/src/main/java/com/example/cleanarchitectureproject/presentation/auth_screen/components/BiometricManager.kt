@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.presentation.auth_screen.util
+package com.example.cleanarchitectureproject.presentation.auth_screen.components
 
 import android.os.Build
 import androidx.biometric.BiometricManager
