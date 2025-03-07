@@ -8,6 +8,6 @@ class DeviceCredentialAuthUseCase(
     private val biometricRepository: BiometricRepository
 ) {
     operator fun invoke(title: String, description: String): Flow<BiometricResult> {
-        return biometricRepository.authenticateWithDeviceCredential(title, description)
+        return biometricRepository.deviceCredentialAuth(title, description)
     }
 }

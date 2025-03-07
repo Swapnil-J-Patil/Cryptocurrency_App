@@ -8,6 +8,6 @@ class FingerprintAuthUseCase(
     private val biometricRepository: BiometricRepository
 ) {
     operator fun invoke(title: String, description: String): Flow<BiometricResult> {
-        return biometricRepository.authenticateWithBiometrics(title, description)
+        return biometricRepository.fingerprintAuth(title, description)
     }
 }

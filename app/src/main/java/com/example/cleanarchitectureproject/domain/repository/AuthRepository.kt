@@ -12,6 +12,7 @@ interface AuthRepository {
     suspend fun signUp(email: String, password: String): Flow<Result<AuthResult>>
     suspend fun signIn(email: String, password: String): Flow<Result<AuthResult>>
     suspend fun signOut()
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit>
     fun signInWithGoogle(context: Context, launcher: ActivityResultLauncher<IntentSenderRequest>)
     fun handleSignInResult(data: Intent?): Flow<Result<FirebaseUser>>
 }

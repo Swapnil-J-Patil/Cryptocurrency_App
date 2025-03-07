@@ -6,6 +6,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.ForgotPasswordUseCase
 import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.HandleGoogleSignInResultUseCase
 import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.SignInUseCase
 import com.example.cleanarchitectureproject.domain.use_case.firebase_auth.SignInWithGoogleOneTapUseCase
@@ -23,11 +24,15 @@ class AuthViewModel @Inject constructor(
     private val signInUseCase: SignInUseCase,
     private val signOutUseCase: SignOutUseCase,
     private val signInWithGoogleOneTapUseCase: SignInWithGoogleOneTapUseCase,
+    private val forgotPasswordUseCase: ForgotPasswordUseCase,
     private val handleGoogleSignInResultUseCase: HandleGoogleSignInResultUseCase,
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.SignedOut)
     val authState: StateFlow<AuthState> = _authState
+
+    private val _forgotPasswordState = MutableStateFlow<Result<Unit>?>(null)
+    val forgotPasswordState: StateFlow<Result<Unit>?> = _forgotPasswordState
 
     fun signUp(email: String, password: String) {
         viewModelScope.launch {
@@ -77,6 +82,12 @@ class AuthViewModel @Inject constructor(
                     _authState.value = AuthState.Error(exception.localizedMessage ?: "Google Sign-in failed")
                 }
             }
+        }
+    }
+
+    fun resetPassword(email: String) {
+        viewModelScope.launch {
+            _forgotPasswordState.value = forgotPasswordUseCase(email)
         }
     }
 

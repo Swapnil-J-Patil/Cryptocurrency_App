@@ -16,7 +16,7 @@ class BiometricPromptManager(
     private val resultChannel = Channel<BiometricResult>()
     val promptResults = resultChannel.receiveAsFlow()
 
-    fun showBiometricPrompt(title: String, description: String) {
+    fun showFingerprintPrompt(title: String, description: String) {
         val manager = BiometricManager.from(activity)
         val authenticators = if (Build.VERSION.SDK_INT >= 30) {
             BiometricManager.Authenticators.BIOMETRIC_STRONG or
