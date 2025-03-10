@@ -62,7 +62,7 @@ fun SharedTransitionScope.MainScreen(
         Navbar.Home,
         Navbar.Market,
         Navbar.Saved,
-        Navbar.Settings
+        Navbar.Profile
     )
 
     val configuration = LocalConfiguration.current
