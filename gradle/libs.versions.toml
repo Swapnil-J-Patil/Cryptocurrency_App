@@ -1,5 +1,5 @@
 [versions]
-accompanistPager = "0.31.3-beta"
+accompanistPager = "0.24.10-beta"
 agp = "8.5.1"
 composeCharts = "0.1.0"
 kotlin = "1.9.0"
@@ -56,6 +56,8 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" } # Nome corrigido
+google-accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistPager" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

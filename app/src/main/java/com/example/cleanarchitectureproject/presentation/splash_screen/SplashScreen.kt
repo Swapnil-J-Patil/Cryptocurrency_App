@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.splash_screen
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -21,18 +22,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.presentation.Screen
+import com.example.cleanarchitectureproject.presentation.shared.PrefsManager
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController) {
+fun SplashScreen(navController: NavController,context: Context) {
     val scale = remember { Animatable(0f) }
     val circleScale = remember { Animatable(1f) }
     var flag by remember { mutableStateOf(false) }
     var showText by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true) {
+        val prefsManager = PrefsManager(context)
         scale.animateTo(
             targetValue = 1f,
             animationSpec = tween(
@@ -53,9 +57,18 @@ fun SplashScreen(navController: NavController) {
         showText = true
 
         delay(1500L) // Wait for another 2 seconds before navigation
-        navController.navigate("auth_screen") {
-            popUpTo("splash_screen") { inclusive = true }
+        if(prefsManager.isOnboardingCompleted())
+        {
+            navController.navigate(Screen.AuthScreen.route ) {
+                popUpTo(Screen.SplashScreen.route ) { inclusive = true }
+            }
         }
+        else{
+            navController.navigate(Screen.OnboardingScreen.route ) {
+                popUpTo(Screen.SplashScreen.route ) { inclusive = true }
+            }
+        }
+
     }
 
     Box(

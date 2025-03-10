@@ -22,11 +22,14 @@ import com.example.cleanarchitectureproject.presentation.auth_screen.BiometricVi
 import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
+import com.example.cleanarchitectureproject.presentation.onboarding_screen.BubblePagerContent
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
 import com.example.cleanarchitectureproject.presentation.splash_screen.SplashScreen
 import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.rememberPagerState
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appContainer: AppContainer
     private lateinit var biometricViewModel: BiometricViewModel
 
-    @OptIn(ExperimentalSharedTransitionApi::class)
+    @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalPagerApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -48,17 +51,23 @@ class MainActivity : AppCompatActivity() {
         setContent {
             CleanArchitectureProjectTheme {
                 val navController = rememberNavController()
+
                 SharedTransitionLayout {
 
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.AuthScreen.route
+                        startDestination = Screen.SplashScreen.route
                     ) {
                         //Entrypoint
                         composable(
                             route = Screen.SplashScreen.route
                         ) {
-                            SplashScreen(navController)
+                            SplashScreen(navController,this@MainActivity)
+                        }
+                        composable(
+                            route = Screen.OnboardingScreen.route
+                        ) {
+                            BubblePagerContent(navController,this@MainActivity)
                         }
                         composable(
                             route = Screen.AuthScreen.route

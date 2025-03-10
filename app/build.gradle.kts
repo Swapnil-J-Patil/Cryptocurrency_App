@@ -139,6 +139,10 @@ dependencies {
 
     implementation("androidx.biometric:biometric:1.1.0")
 
+    //pager animtion
+    implementation (libs.google.accompanist.pager)
+    implementation (libs.accompanist.systemuicontroller)
+
 }
 kapt{
     correctErrorTypes = true
