@@ -19,3 +19,8 @@ val darkBackground = Color(0xFF20262D) // Dark blue-gray shade
 val lightBackground = Color(0xFFECEAEA) // Pure white
 val lightGrey = Color(0x40888686) // Pure white
 
+val greenBright = Color(0xFF1DB94F)
+val blueBright = Color(0xFF3274F1)
+val orangeBright = Color(0xFFF46411)
+val redBright = Color(0xFFEA383B)
+

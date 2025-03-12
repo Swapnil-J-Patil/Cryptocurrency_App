@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 val localProperties = Properties()
@@ -143,6 +144,9 @@ dependencies {
     implementation (libs.google.accompanist.pager)
     implementation (libs.accompanist.systemuicontroller)
 
+    //datastore
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
 }
 kapt{
     correctErrorTypes = true

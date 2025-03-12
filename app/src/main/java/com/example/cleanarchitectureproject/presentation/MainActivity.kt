@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.navigation.NavType
@@ -75,7 +77,11 @@ class MainActivity : AppCompatActivity() {
                             AuthScreen(navController, animatedVisibilityScope = this, biometricViewModel = biometricViewModel)
                         }
                         composable(
-                            route = Screen.MainScreen.route
+                            route = Screen.MainScreen.route,
+                            enterTransition = { EnterTransition.None },
+                            exitTransition = { ExitTransition.None },
+                            popEnterTransition = { EnterTransition.None },
+                            popExitTransition = { ExitTransition.None }
                         ) {
                             MainScreen(navController, animatedVisibilityScope = this)
                         }

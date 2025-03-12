@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.auth_screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.domain.model.BiometricResult
@@ -21,6 +22,7 @@ class BiometricViewModel(
     fun fingerprintAuth(title: String, description: String) {
         viewModelScope.launch {
             authenticateBiometricUseCase(title, description).collect { result ->
+                Log.d("biometricAuth", "AuthViewmodel: $result")
                 _biometricState.value = result
             }
         }
