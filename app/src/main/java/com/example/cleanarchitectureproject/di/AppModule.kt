@@ -4,15 +4,18 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.example.cleanarchitectureproject.common.Constants
-import com.example.cleanarchitectureproject.data.local.CryptoDatabase
+import com.example.cleanarchitectureproject.data.local.portfolio.PortfolioDatabase
+import com.example.cleanarchitectureproject.data.local.saved_coins.CryptoDatabase
 import com.example.cleanarchitectureproject.data.remote.CoinMarketApi
 import com.example.cleanarchitectureproject.data.repository.AuthRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CoinMarketRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CryptoRepositoryImpl
+import com.example.cleanarchitectureproject.data.repository.PortfolioRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.UserDetailsRepositoryImpl
 import com.example.cleanarchitectureproject.domain.repository.AuthRepository
 import com.example.cleanarchitectureproject.domain.repository.CoinMarketRepository
 import com.example.cleanarchitectureproject.domain.repository.CryptoRepository
+import com.example.cleanarchitectureproject.domain.repository.PortfolioRepository
 import com.example.cleanarchitectureproject.domain.repository.UserDetailsRepository
 import com.example.cleanarchitectureproject.domain.use_case.keystore.ClearTokensUseCase
 import com.example.cleanarchitectureproject.domain.use_case.keystore.GetTokensUseCase
@@ -25,14 +28,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    //For CoinMarket Api
+    //CoinMarket Api
     @Provides
     @Singleton
     fun provideCoinMarketApi(): CoinMarketApi {
@@ -49,7 +51,7 @@ object AppModule {
         return CoinMarketRepositoryImpl(api)
     }
 
-    //For Room Database
+    //Room Database
     @Provides
     @Singleton
     fun provideDatabase(app: Application): CryptoDatabase {
@@ -64,6 +66,22 @@ object AppModule {
     @Singleton
     fun provideCryptoRepository(db: CryptoDatabase): CryptoRepository {
         return CryptoRepositoryImpl(db.cryptoDao)
+    }
+
+    @Provides
+    @Singleton
+    fun providePortfolioDatabase(app: Application): PortfolioDatabase {
+        return Room.databaseBuilder(
+            app,
+            PortfolioDatabase::class.java,
+            "portfolio_db"
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePortfolioRepository(db: PortfolioDatabase): PortfolioRepository {
+        return PortfolioRepositoryImpl(db.portfolioDao)
     }
 
     //Keystore

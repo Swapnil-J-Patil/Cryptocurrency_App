@@ -1,12 +1,9 @@
-package com.example.cleanarchitectureproject.data.local
+package com.example.cleanarchitectureproject.domain.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 
-@Entity(tableName = "saved_coins")  // Ensure the table name is correctly set
-data class CryptoCoinEntity(
-    @PrimaryKey val id: Int,
+data class PortfolioCoin(
+    val id: Int,
     val name: String,
     val symbol: String?,
     val slug: String?,
@@ -22,5 +19,6 @@ data class CryptoCoinEntity(
     val dateAdded: String?,
     val quotes: List<QuoteCM>?,
     val isAudited: Boolean?,
-    val badges: List<Int>?
+    val badges: List<Int>?,
+    val quantity: Double?
 )

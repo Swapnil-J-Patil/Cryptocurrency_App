@@ -1,6 +1,5 @@
 package com.example.cleanarchitectureproject.domain.repository
 
-import com.example.cleanarchitectureproject.data.local.CryptoCoinEntity
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import kotlinx.coroutines.flow.Flow
 

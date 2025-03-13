@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.data.local
+package com.example.cleanarchitectureproject.data.local.saved_coins
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
