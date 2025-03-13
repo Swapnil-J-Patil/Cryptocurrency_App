@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.auth_screen
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -64,14 +65,18 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.data.local.keystore.UserDetailsSerializer
 import com.example.cleanarchitectureproject.domain.model.BiometricResult
 import com.example.cleanarchitectureproject.domain.model.SweetToastProperty
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.CustomSweetToast
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
+import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
+import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 import kotlinx.coroutines.delay
@@ -82,7 +87,9 @@ import kotlinx.coroutines.launch
 fun SharedTransitionScope.AuthScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    context: Context,
     viewModel: AuthViewModel = hiltViewModel(),
+    keyStoreViewModel: KeyStoreViewModel= hiltViewModel(),
     biometricViewModel: BiometricViewModel
 ) {
 
@@ -95,11 +102,51 @@ fun SharedTransitionScope.AuthScreen(
 
     val authState by viewModel.authState.collectAsState()
     val biometricState by biometricViewModel.biometricState.collectAsState()
+    val prefsManager = remember { PrefsManager(context) } // Initialize SharedPreferences
+    val context = LocalContext.current
+
+    val signInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.handleSignInResult(result.data)
+        }
+    }
+
+    // Animation state
+    val infiniteTransition = rememberInfiniteTransition(label = "background")
+    val targetOffset = with(LocalDensity.current) {
+        1000.dp.toPx()
+    }
+    val animatedOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = targetOffset, // Adjust based on desired movement range
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 10000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset"
+    )
+    val scrollState = rememberScrollState()
+    var visibility by remember {
+        mutableStateOf(false)
+    }
+    val userName = when (val state = authState) {
+        is AuthState.SignedIn -> state.user.displayName ?: "No Name"
+        else -> "Not Signed In"
+    }
+    val userEmail = when (val state = authState) {
+        is AuthState.SignedIn -> state.user.email ?: "No Email"
+        else -> "Not Signed In"
+    }
 
     LaunchedEffect(biometricState) {
         biometricState?.let { result ->
             when (result) {
                 is BiometricResult.AuthenticationSuccess -> {
+                    prefsManager.setBiometricAuthCompleted(true)
+                    prefsManager.setFirebaseAuthCompleted(false)
+
                     navController.navigate(Screen.MainScreen.route) {
                         popUpTo(Screen.AuthScreen.route) { inclusive = true }
                     }
@@ -165,6 +212,10 @@ fun SharedTransitionScope.AuthScreen(
         authState?.let { result ->
             when (result) {
                 is AuthState.SignedIn -> {
+                    prefsManager.setFirebaseAuthCompleted(true)
+                    keyStoreViewModel.clearTokens()
+                    keyStoreViewModel.saveToken(userName)
+                    keyStoreViewModel.saveToken(userEmail)
                     navController.navigate(Screen.MainScreen.route) {
                         popUpTo(Screen.AuthScreen.route) { inclusive = true }
                     }
@@ -183,37 +234,10 @@ fun SharedTransitionScope.AuthScreen(
                 is AuthState.SignedOut -> "Signed Out successfully!"
                 is AuthState.Loading -> "Signing in..."
             }
+            Log.d("AuthScreen", "User: $userName and $userEmail")
         }
     }
 
-    val context = LocalContext.current
-
-    val signInLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            viewModel.handleSignInResult(result.data)
-        }
-    }
-
-    // Animation state
-    val infiniteTransition = rememberInfiniteTransition(label = "background")
-    val targetOffset = with(LocalDensity.current) {
-        1000.dp.toPx()
-    }
-    val animatedOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = targetOffset, // Adjust based on desired movement range
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 10000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offset"
-    )
-    val scrollState = rememberScrollState()
-    var visibility by remember {
-        mutableStateOf(false)
-    }
     LaunchedEffect(Unit) {
         visibility = true
     }

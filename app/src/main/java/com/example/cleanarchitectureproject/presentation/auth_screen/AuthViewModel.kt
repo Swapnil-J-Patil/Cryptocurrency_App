@@ -97,6 +97,15 @@ class AuthViewModel @Inject constructor(
             _authState.value = AuthState.SignedOut
         }
     }
+    fun getUserName(): String? {
+        val currentUser = (_authState.value as? AuthState.SignedIn)?.user
+        return currentUser?.displayName
+    }
+    fun getUserEmail(): String? {
+        val currentUser = (_authState.value as? AuthState.SignedIn)?.user
+        return currentUser?.email
+    }
+
 }
 
 

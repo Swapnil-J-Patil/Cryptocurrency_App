@@ -30,5 +30,5 @@ sealed class Navbar(
     object Home: Navbar("Home", Icons.Filled.Home, Icons.Outlined.Home)
     object Market: Navbar("Market", Icons.Filled.InsertChart, Icons.Outlined.InsertChart)
     object Saved: Navbar("Saved", Icons.Filled.Bookmark, Icons.Outlined.Bookmark)
-    object Profile: Navbar("Settings", Icons.Filled.Person, Icons.Outlined.Person)
+    object Profile: Navbar("Profile", Icons.Filled.Person, Icons.Outlined.Person)
 }

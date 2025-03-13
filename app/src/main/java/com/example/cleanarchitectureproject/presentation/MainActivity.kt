@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -8,11 +9,13 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.datastore.dataStore
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.cleanarchitectureproject.data.local.keystore.UserDetailsSerializer
 import com.example.cleanarchitectureproject.di.AppContainer
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
@@ -74,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                         composable(
                             route = Screen.AuthScreen.route
                         ) {
-                            AuthScreen(navController, animatedVisibilityScope = this, biometricViewModel = biometricViewModel)
+                            AuthScreen(navController, context = this@MainActivity, animatedVisibilityScope = this, biometricViewModel = biometricViewModel)
                         }
                         composable(
                             route = Screen.MainScreen.route,

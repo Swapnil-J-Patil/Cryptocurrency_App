@@ -26,7 +26,7 @@ constraintlayout = "2.2.1"
 navigationFragmentKtx = "2.8.8"
 navigationUiKtx = "2.8.8"
 datastorePreferences = "1.1.1"
-kotlinxSerializationJson = "1.7.3"
+kotlinxSerializationJson = "1.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

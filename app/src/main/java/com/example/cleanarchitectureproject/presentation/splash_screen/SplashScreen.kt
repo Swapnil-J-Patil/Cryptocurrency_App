@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.splash_screen
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -23,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.Screen
-import com.example.cleanarchitectureproject.presentation.shared.PrefsManager
+import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 import kotlinx.coroutines.delay
@@ -57,14 +58,20 @@ fun SplashScreen(navController: NavController,context: Context) {
         showText = true
 
         delay(1500L) // Wait for another 2 seconds before navigation
-        if(prefsManager.isOnboardingCompleted())
+        if(prefsManager.isOnboardingCompleted() && !prefsManager.isFirebaseAuthCompleted() && !prefsManager.isBiometricAuthCompleted())
         {
             navController.navigate(Screen.AuthScreen.route ) {
                 popUpTo(Screen.SplashScreen.route ) { inclusive = true }
             }
         }
-        else{
+        else if(!prefsManager.isOnboardingCompleted()){
             navController.navigate(Screen.OnboardingScreen.route ) {
+                popUpTo(Screen.SplashScreen.route ) { inclusive = true }
+            }
+        }
+        else
+        {
+            navController.navigate(Screen.MainScreen.route ) {
                 popUpTo(Screen.SplashScreen.route ) { inclusive = true }
             }
         }
@@ -114,8 +121,9 @@ fun SplashScreen(navController: NavController,context: Context) {
                 Text(
                     text = "DreamTrade",
                     color = Color.White,
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(top=12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
                     textAlign = TextAlign.Center,
                     fontSize = 35.sp,
                     fontFamily = Poppins,

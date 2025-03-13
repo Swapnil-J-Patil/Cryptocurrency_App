@@ -50,10 +50,9 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.onboarding_screen.components.BubblePager
 import com.example.cleanarchitectureproject.presentation.onboarding_screen.components.PagerIndicator
-import com.example.cleanarchitectureproject.presentation.shared.PrefsManager
+import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.launch
 

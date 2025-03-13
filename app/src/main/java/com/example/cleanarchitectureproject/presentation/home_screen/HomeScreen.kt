@@ -73,6 +73,7 @@ fun SharedTransitionScope.HomeScreen(
         iterations = LottieConstants.IterateForever,
         isPlaying = isPlaying // Infinite repeat mode
     )
+
     val scale by animateFloatAsState(
         targetValue = if (!(state.error.isNotBlank() || state.isLoading)) 1f else 0f,
         animationSpec = tween(
