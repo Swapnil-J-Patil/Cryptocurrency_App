@@ -160,6 +160,7 @@ fun BubblePagerContent(
                             ) {
                                 TextButton(onClick = {
                                     prefsManager.setOnboardingCompleted(true)
+                                    prefsManager.setDollarAmount("1000")
                                     navController.navigate(Screen.AuthScreen.route ) {
                                         popUpTo(Screen.OnboardingScreen.route ) { inclusive = true }
                                     }
@@ -214,6 +215,7 @@ fun BubblePagerContent(
                             Button(
                                 onClick = {
                                     prefsManager.setOnboardingCompleted(true)
+                                    prefsManager.setDollarAmount("1000")
                                     navController.navigate(Screen.AuthScreen.route ) {
                                         popUpTo(Screen.OnboardingScreen.route ) { inclusive = true }
                                     }

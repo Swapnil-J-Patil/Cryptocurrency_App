@@ -1,5 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen.components
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import kotlin.math.log
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -48,14 +51,19 @@ fun PriceSelector(
     leadingIcon: String,
     isBuy: Boolean,
     alternateColor: Color,
-    availableCoins: Double?=0.0
+    availableCoins: Double?=0.0,
 ) {
     val prices = listOf(25, 50, 75, 100)
     var selectedPrice by remember { mutableStateOf(25) } // Holds the slider progress
     var flag by remember { mutableStateOf(false) } // Holds the slider progress
     val text1 = remember { mutableStateOf("") }
     var isFocused by remember { mutableStateOf(false) }
-
+    val cryptoQuantity = remember {
+        mutableStateOf("")
+    }
+    val amountOfDollars = remember {
+        mutableStateOf("")
+    }
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -101,7 +109,11 @@ fun PriceSelector(
                     pricePerCoin = pricePerCoin,
                     flag = flag,
                     isBuy = isBuy,
-                    textColor = MaterialTheme.colorScheme.secondary
+                    textColor = MaterialTheme.colorScheme.secondary,
+                    onBuyOrSell = {crypto,usd->
+                        cryptoQuantity.value=crypto
+                        amountOfDollars.value=usd
+                    }
                 )
             } else {
                 CircularSlider(
@@ -117,7 +129,11 @@ fun PriceSelector(
                     flag = flag,
                     isBuy = isBuy,
                     availableCoins = availableCoins,
-                    textColor = MaterialTheme.colorScheme.secondary
+                    textColor = MaterialTheme.colorScheme.secondary,
+                    onBuyOrSell = {crypto,usd->
+                        cryptoQuantity.value=crypto
+                        amountOfDollars.value=usd
+                    }
                 )
             }
         }
@@ -173,7 +189,9 @@ fun PriceSelector(
                 shape = RoundedCornerShape(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = primaryColor),
                 contentPadding = PaddingValues(vertical = 16.dp),
-                onClick = {}
+                onClick = {
+                    //Log.d("buyAndSell","quantity: ${cryptoQuantity.value} and price: ${amountOfDollars.value}")
+                }
             ) {
                 Text(
                     text = buttonText,

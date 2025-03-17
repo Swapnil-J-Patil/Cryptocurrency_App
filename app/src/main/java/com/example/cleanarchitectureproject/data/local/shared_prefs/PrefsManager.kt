@@ -31,4 +31,13 @@ class PrefsManager(context: Context) {
     fun isBiometricAuthCompleted(): Boolean {
         return sharedPreferences.getBoolean("biometric_auth_completed", false)
     }
+
+    //Dollars
+    fun setDollarAmount(value: String) {
+        sharedPreferences.edit().putString("dollars", value).apply()
+    }
+
+    fun getDollarAmount(): String? {
+        return sharedPreferences.getString("dollars", null)
+    }
 }

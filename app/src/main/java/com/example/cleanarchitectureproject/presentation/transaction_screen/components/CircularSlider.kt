@@ -37,7 +37,8 @@ fun CircularSlider(
     pricePerCoin: Double,
     flag: Boolean,
     isBuy: Boolean,
-    availableCoins: Double?=0.0
+    availableCoins: Double?=0.0,
+    onBuyOrSell:(String,String)->Unit
 ) {
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
@@ -80,11 +81,13 @@ fun CircularSlider(
             val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
             formattedUsdValue = "%,.2f".format(usdValue)
             formattedAmount = "%,.6f".format(amountOfCoin)
+            onBuyOrSell(formattedAmount,formattedUsdValue)
         } else {
             val amountOfCoin =  (initialValue / 100.0) * availableCoins!!
             val usdValue = amountOfCoin * pricePerCoin
             formattedUsdValue = "%,.2f".format(usdValue)
             formattedAmount = "%,.6f".format(amountOfCoin)
+            onBuyOrSell(formattedAmount,formattedUsdValue)
         }
     }
 

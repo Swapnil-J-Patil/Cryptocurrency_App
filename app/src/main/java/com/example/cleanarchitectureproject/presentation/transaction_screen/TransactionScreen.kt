@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.animation.AnimatedVisibility
@@ -37,7 +38,9 @@ import com.example.cleanarchitectureproject.presentation.transaction_screen.comp
 fun SharedTransitionScope.TransactionScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     transaction: String,
-    coin: CryptoCoin
+    coin: CryptoCoin,
+    context: Context
+
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -106,7 +109,9 @@ fun SharedTransitionScope.TransactionScreen(
                 ) {
                     DraggableCards(
                         coin = coin,
-                        imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png"
+                        imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
+                        context= context,
+                        transaction=transaction
                     )
                 }
 

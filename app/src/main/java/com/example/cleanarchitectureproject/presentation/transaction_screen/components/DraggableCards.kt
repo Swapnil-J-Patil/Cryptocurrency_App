@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen.components
 
+import android.content.Context
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -26,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -35,6 +37,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.grey
@@ -47,7 +50,9 @@ import kotlin.math.roundToInt
 @Composable
 fun DraggableCards(
     coin: CryptoCoin,
-    imageUrl: String
+    imageUrl: String,
+    context: Context,
+    transaction: String
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -56,13 +61,20 @@ fun DraggableCards(
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val isTab = screenWidth> 600.dp
-
+    val prefsManager = remember { PrefsManager(context) } // Initialize SharedPreferences
+    val dollars=prefsManager.getDollarAmount()
     val cardHeight= if(isTab) 800.dp else screenHeight
     val topCardOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
     val instructionBuy="Tap the amount in USD to enter exact amount, use slider to adjust the amount or enter custom amount manually."
     val instructionSell="Use slider to adjust the quantity of coin or enter custom quantity manually."
 
+    LaunchedEffect(Unit) {
+        if(transaction.lowercase()=="sell")
+        {
+            topCardOffset.snapTo(maxDrag)
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,7 +100,7 @@ fun DraggableCards(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 16.dp,end=16.dp),
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                 ) {
                     Text(
                         text = "Sell ${coin.symbol}",
@@ -182,7 +194,7 @@ fun DraggableCards(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, start = 16.dp,end=16.dp),
+                        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
                     ) {
                     Text(
                         text = "Buy ${coin.symbol}",
@@ -192,7 +204,9 @@ fun DraggableCards(
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    CoinDisplay(amount = 1000.0000, isSell = false)
+                    if (dollars != null) {
+                        CoinDisplay(amount = dollars.toDouble(), isSell = false)
+                    }
                 }
                 Text(
                     text = instructionBuy,
