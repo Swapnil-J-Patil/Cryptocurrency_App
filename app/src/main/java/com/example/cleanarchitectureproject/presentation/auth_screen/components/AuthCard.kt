@@ -86,7 +86,11 @@ fun AuthCard(
 
     val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$".toRegex()
     val forgotPasswordState by viewModel.forgotPasswordState.collectAsState()
+    var isVisible by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        isVisible = true
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -100,12 +104,6 @@ fun AuthCard(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    var isVisible by remember { mutableStateOf(false) }
-
-                    // Launch effect to trigger animation
-                    LaunchedEffect(Unit) {
-                        isVisible = true
-                    }
 
                     AnimatedVisibility(
                         visible = isVisible,

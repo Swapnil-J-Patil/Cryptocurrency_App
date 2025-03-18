@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +28,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +40,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
+import com.example.cleanarchitectureproject.presentation.transaction_screen.helper.DecimalChecker
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlin.math.log
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -52,6 +57,7 @@ fun PriceSelector(
     isBuy: Boolean,
     alternateColor: Color,
     availableCoins: Double?=0.0,
+    isBuyClicked:(Boolean,String,String)-> Unit
 ) {
     val prices = listOf(25, 50, 75, 100)
     var selectedPrice by remember { mutableStateOf(25) } // Holds the slider progress
@@ -149,39 +155,46 @@ fun PriceSelector(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp) // Ensures proper spacing
         ) {
-            OutlinedTextField(
-                value = text1.value,
-                onValueChange = { text1.value = it },
-                modifier = Modifier
-                    .weight(1f)
-                    .offset(y = -4.dp)
-                    .onFocusChanged { isFocused = it.isFocused }, // Track focus state
-                shape = RoundedCornerShape(8.dp),
-                label = {
-                    Text(
-                        text = firstText,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = if (isFocused) primaryColor else Color.Gray // Change label color on focus
-                    )
-                },
-                singleLine = true,
-                leadingIcon = {
-                    Text(
-                        text = leadingIcon,
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(end = 5.dp)
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = primaryColor, // Change outline when focused
-                    unfocusedBorderColor = Color.Gray, // Default outline color
-                    focusedLabelColor = alternateColor, // Change label color when focused
-                    unfocusedLabelColor = Color.Gray, // Default label color
-                    cursorColor = primaryColor
-                ),
+            val customTextSelectionColors = TextSelectionColors(
+                handleColor = primaryColor, // Set the handle (bottom part of cursor) to red
+                backgroundColor = Color.Transparent // Keep selection background transparent or customize
             )
+
+            CompositionLocalProvider(LocalTextSelectionColors provides customTextSelectionColors) {
+                OutlinedTextField(
+                    value = text1.value,
+                    onValueChange = { text1.value = it },
+                    modifier = Modifier
+                        .weight(1f)
+                        .offset(y = -4.dp)
+                        .onFocusChanged { isFocused = it.isFocused }, // Track focus state
+                    shape = RoundedCornerShape(8.dp),
+                    label = {
+                        Text(
+                            text = firstText,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = if (isFocused) primaryColor else Color.Gray // Change label color on focus
+                        )
+                    },
+                    singleLine = true,
+                    leadingIcon = {
+                        Text(
+                            text = leadingIcon,
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(end = 5.dp)
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        focusedBorderColor = primaryColor, // Change outline when focused
+                        unfocusedBorderColor = Color.Gray, // Default outline color
+                        focusedLabelColor = alternateColor, // Change label color when focused
+                        unfocusedLabelColor = Color.Gray, // Default label color
+                        cursorColor = primaryColor,
+                    ),
+                )
+            }
 
             Button(
                 modifier = Modifier
@@ -191,6 +204,35 @@ fun PriceSelector(
                 contentPadding = PaddingValues(vertical = 16.dp),
                 onClick = {
                     //Log.d("buyAndSell","quantity: ${cryptoQuantity.value} and price: ${amountOfDollars.value}")
+                    if(isBuy)
+                    {
+                        if(text1.value=="")
+                        {
+                            val quantity = if(DecimalChecker.hasMoreThanSixDecimals(cryptoQuantity.value.toDouble()))cryptoQuantity.value.toDoubleOrNull()?.let { String.format("%.6f", it).toDouble() } ?: 0.0 else cryptoQuantity.value
+                            val amount = amountOfDollars.value.toDoubleOrNull()?.let { String.format("%.2f", it).toDouble() } ?: 0.0
+
+                            isBuyClicked(true,quantity.toString(),amount.toString())
+                        }
+                        else
+                        {
+                            val quantity = String.format("%.6f", text1.value.toDouble() / pricePerCoin).toDouble()
+                            isBuyClicked(true,quantity.toString(),text1.value)
+                        }
+                    }
+                    else
+                    {
+                        if(text1.value=="")
+                        {
+                            val quantity = cryptoQuantity.value.toDoubleOrNull()?.let { String.format("%.6f", it).toDouble() } ?: 0.0
+                            val amount = amountOfDollars.value.toDoubleOrNull()?.let { String.format("%.2f", it).toDouble() } ?: 0.0
+                            isBuyClicked(false,quantity.toString(),amount.toString())
+                        }
+                        else
+                        {
+                            val amount = String.format("%.2f", text1.value.toDouble() * (pricePerCoin ?: 0.0)).toDouble()
+                            isBuyClicked(false,text1.value,amount.toString())
+                        }
+                    }
                 }
             ) {
                 Text(
@@ -203,3 +245,4 @@ fun PriceSelector(
         Spacer(modifier = Modifier.height(16.dp))
     }
 }
+

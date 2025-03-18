@@ -52,7 +52,8 @@ fun DraggableCards(
     coin: CryptoCoin,
     imageUrl: String,
     context: Context,
-    transaction: String
+    transaction: String,
+    isBuyClicked:(Boolean,String,String)->Unit,
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -133,7 +134,10 @@ fun DraggableCards(
                         leadingIcon = "#",
                         isBuy = false,
                         alternateColor = lightRed,
-                        availableCoins = 50.12345
+                        availableCoins = 50.12345,
+                        isBuyClicked = {flag, quantity, usd->
+                            isBuyClicked(flag,quantity,usd)
+                        }
                     )
                 }
             }
@@ -228,7 +232,10 @@ fun DraggableCards(
                         secondaryColor = MaterialTheme.colorScheme.primaryContainer,
                         leadingIcon = "$",
                         isBuy = true,
-                        alternateColor = green
+                        alternateColor = green,
+                        isBuyClicked = {flag, quantity, usd->
+                            isBuyClicked(flag,quantity,usd)
+                        }
                     )
                 }
             }
