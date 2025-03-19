@@ -51,10 +51,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.domain.model.SweetToastProperty
+import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.auth_screen.Error
 import com.example.cleanarchitectureproject.presentation.common_components.CustomSweetToast
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
@@ -75,7 +77,8 @@ fun SharedTransitionScope.TransactionScreen(
     transaction: String,
     coin: CryptoCoin,
     context: Context,
-    viewModel: PortfolioViewModel = hiltViewModel()
+    viewModel: PortfolioViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
@@ -251,6 +254,8 @@ fun SharedTransitionScope.TransactionScreen(
                                 Log.d("savedQuantity", "TransactionScreen: $quantity")
                                 savedQuantity = quantity  // Update state to trigger recomposition
                             }
+                            isTransaction = false
+                            navController.navigate(Screen.SuccessScreen.route)
                         }
 
                     }
@@ -309,6 +314,8 @@ fun SharedTransitionScope.TransactionScreen(
                                 Log.d("savedQuantity", "TransactionScreen: $quantity")
                                 savedQuantity = quantity  // Update state to trigger recomposition
                             }
+                            isTransaction = false
+                            navController.navigate(Screen.SuccessScreen.route)
                         }
                     }
 

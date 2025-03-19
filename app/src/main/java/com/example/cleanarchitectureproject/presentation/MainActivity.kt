@@ -31,6 +31,7 @@ import com.example.cleanarchitectureproject.presentation.onboarding_screen.Bubbl
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
 import com.example.cleanarchitectureproject.presentation.splash_screen.SplashScreen
+import com.example.cleanarchitectureproject.presentation.success_screen.SuccessScreen
 import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -78,6 +79,11 @@ class MainActivity : AppCompatActivity() {
                             route = Screen.AuthScreen.route
                         ) {
                             AuthScreen(navController, context = this@MainActivity, animatedVisibilityScope = this, biometricViewModel = biometricViewModel)
+                        }
+                        composable(
+                            route = Screen.SuccessScreen.route
+                        ) {
+                            SuccessScreen(navController = navController)
                         }
                         composable(
                             route = Screen.MainScreen.route,
@@ -156,7 +162,7 @@ class MainActivity : AppCompatActivity() {
                                 coinDataJson,
                                 CryptoCoin::class.java
                             )
-                            TransactionScreen( animatedVisibilityScope = this, transaction = transaction, coin = coinData, context = this@MainActivity)
+                            TransactionScreen( animatedVisibilityScope = this, transaction = transaction, coin = coinData, context = this@MainActivity, navController = navController)
                         }
                         //ZoomedChart Screen
                         composable(
