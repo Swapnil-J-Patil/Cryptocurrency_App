@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen.components
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -28,6 +29,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -37,8 +41,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
+import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.grey
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
@@ -54,6 +60,8 @@ fun DraggableCards(
     context: Context,
     transaction: String,
     isBuyClicked:(Boolean,String,String)->Unit,
+    savedQuantity: Double?,
+    dollars: Double
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -62,8 +70,10 @@ fun DraggableCards(
     val screenWidth = configuration.screenWidthDp.dp
     val screenHeight = configuration.screenHeightDp.dp
     val isTab = screenWidth> 600.dp
-    val prefsManager = remember { PrefsManager(context) } // Initialize SharedPreferences
-    val dollars=prefsManager.getDollarAmount()
+    val cryptoQuantity = remember {
+        mutableStateOf(0.0)
+    }
+
     val cardHeight= if(isTab) 800.dp else screenHeight
     val topCardOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
@@ -74,6 +84,11 @@ fun DraggableCards(
         if(transaction.lowercase()=="sell")
         {
             topCardOffset.snapTo(maxDrag)
+        }
+    }
+    LaunchedEffect(savedQuantity) {
+        if (savedQuantity != null) {
+            cryptoQuantity.value=savedQuantity.toDouble()
         }
     }
     Box(
@@ -111,7 +126,7 @@ fun DraggableCards(
                         style = MaterialTheme.typography.headlineSmall,
                         color = MaterialTheme.colorScheme.secondary
                     )
-                    CoinDisplay(amount = 50.12345, imageUrl = imageUrl, isSell = true)
+                    CoinDisplay(amount = cryptoQuantity.value, imageUrl = imageUrl, isSell = true)
                 }
                 Text(
                     text = instructionSell,
@@ -134,7 +149,7 @@ fun DraggableCards(
                         leadingIcon = "#",
                         isBuy = false,
                         alternateColor = lightRed,
-                        availableCoins = 50.12345,
+                        availableCoins = cryptoQuantity.value,
                         isBuyClicked = {flag, quantity, usd->
                             isBuyClicked(flag,quantity,usd)
                         }

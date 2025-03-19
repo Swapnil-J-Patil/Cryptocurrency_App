@@ -28,7 +28,8 @@ import com.example.cleanarchitectureproject.R
 
 @Composable
 fun CoinDisplay(
-    amount: Double, modifier: Modifier = Modifier,
+    amount: Double?,
+    modifier: Modifier = Modifier,
     imageUrl: String?=null,
     isSell: Boolean,
 
@@ -65,7 +66,7 @@ fun CoinDisplay(
             Spacer(modifier = Modifier.width(6.dp)) // Space between icon and text
 
             Text(
-                text = if(isSell)"%,.6f".format(amount) else "%,.2f".format(amount),
+                text = "%,.2f".format(amount),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.secondary

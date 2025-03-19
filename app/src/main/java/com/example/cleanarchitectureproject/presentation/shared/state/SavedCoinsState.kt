@@ -1,8 +1,6 @@
-package com.example.cleanarchitectureproject.presentation.saved_coin_screen
+package com.example.cleanarchitectureproject.presentation.shared.state
 
-import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptocurrencyCMDTO
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
-import kotlinx.coroutines.flow.Flow
 
 data class SavedCoinsState (
     val isLoading: Boolean =false,

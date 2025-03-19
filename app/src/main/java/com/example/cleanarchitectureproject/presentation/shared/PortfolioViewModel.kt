@@ -5,15 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.common.Resource
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.DeleteCryptoUseCase
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.GetAllCryptoUseCase
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.InsertCryptoUseCase
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.IsCoinSavedUseCase
-import com.example.cleanarchitectureproject.presentation.shared.state.SavedCoinsState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
+import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
+import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.DeleteCryptoPortfolioUseCase
+import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.GetAllCryptoPortfolioUseCase
+import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.GetCoinPortfolioUseCase
+import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.InsertCryptoPortfolioUseCase
+import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.IsCoinSavedPortfolioUseCase
+import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioCoinState
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 
@@ -27,19 +29,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SavedCoinViewModel @Inject constructor(
-    private val getAllCryptoUseCase: GetAllCryptoUseCase,
-    private val insertCryptoUseCase: InsertCryptoUseCase,
-    private val deleteCryptoUseCase: DeleteCryptoUseCase,
-    private val isCoinSavedUseCase: IsCoinSavedUseCase,
+class PortfolioViewModel @Inject constructor(
+    private val getAllCryptoUseCase: GetAllCryptoPortfolioUseCase,
+    private val getCoinUseCase: GetCoinPortfolioUseCase,
+    private val insertCryptoUseCase: InsertCryptoPortfolioUseCase,
+    private val deleteCryptoUseCase: DeleteCryptoPortfolioUseCase,
+    private val isCoinSavedUseCase: IsCoinSavedPortfolioUseCase,
 
     ) : ViewModel() {
 
-    private val _coinListState = mutableStateOf(SavedCoinsState())
-    val coinListState: State<SavedCoinsState> = _coinListState
+    private val _coinListState = mutableStateOf(PortfolioCoinState())
+    val coinListState: State<PortfolioCoinState> = _coinListState
 
     private val _currencyList = MutableStateFlow<List<CryptocurrencyCoin>>(emptyList())
     private val currencyList: StateFlow<List<CryptocurrencyCoin>> = _currencyList
+
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
@@ -60,26 +64,27 @@ class SavedCoinViewModel @Inject constructor(
         Log.d("FilteredCoins", "Size: ${filteredCoins.value.size}, List: $filteredCoins")
 
     }
+
     init {
-        loadCrypto()
+        //loadCrypto()
     }
     private fun loadCrypto() {
         viewModelScope.launch {
             getAllCryptoUseCase().collect { result ->
                 when (result) {
                     is Resource.Loading -> {
-                        _coinListState.value = SavedCoinsState(isLoading = true)
+                        _coinListState.value = PortfolioCoinState(isLoading = true)
                         Log.d("SavedCoinViewModel", "Loading data...")
                     }
 
                     is Resource.Success -> {
-                        _coinListState.value = SavedCoinsState(cryptocurrency = result.data)
+                        _coinListState.value = PortfolioCoinState(cryptocurrency = result.data)
                         result.data?.let { processCoins(it) }
                         Log.d("SavedCoinViewModel", "Successfully loaded: ${result.data}")
                     }
 
                     is Resource.Error -> {
-                        _coinListState.value = SavedCoinsState(error = result.message ?: "Unknown error")
+                        _coinListState.value = PortfolioCoinState(error = result.message ?: "Unknown error")
                         Log.e("SavedCoinViewModel", "Error loading data: ${result.message}")
                     }
                 }
@@ -88,7 +93,24 @@ class SavedCoinViewModel @Inject constructor(
     }
 
 
-    fun addCrypto(crypto: CryptoCoin) {
+    fun getSavedCoinQuantity(coinId: String, onResult: (Double?) -> Unit) {
+        viewModelScope.launch {
+            val isSaved = isCoinSaved(coinId)
+            if (isSaved) {
+                getCoinUseCase(coinId).collect { result ->
+                    when (result) {
+                        is Resource.Success -> onResult(result.data?.quantity)
+                        else -> onResult(null)
+                    }
+                }
+            } else {
+                onResult(null)
+            }
+        }
+    }
+
+
+    fun addCrypto(crypto: PortfolioCoin) {
         viewModelScope.launch {
             insertCryptoUseCase(crypto).collect { result ->
                 when (result) {
@@ -104,7 +126,7 @@ class SavedCoinViewModel @Inject constructor(
         return isCoinSavedUseCase(coinId)
     }
 
-    fun removeCrypto(coin: CryptoCoin) {
+    fun removeCrypto(coin: PortfolioCoin) {
         viewModelScope.launch {
             deleteCryptoUseCase(coin).collect { result ->
                 when (result) {
@@ -116,7 +138,7 @@ class SavedCoinViewModel @Inject constructor(
         }
     }
 
-    private fun processCoins(coins: List<CryptoCoin>) {
+    private fun processCoins(coins: List<PortfolioCoin>) {
         viewModelScope.launch {
             val cryptocurrencyCoins = coins.map { coin ->
                 val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
@@ -166,21 +188,5 @@ class SavedCoinViewModel @Inject constructor(
             marketCap > 100_000_000 -> 100_000.0 to 0.015 // Mid cap: $100K+ volume, 1.5% turnover
             else -> 10_000.0 to 0.01 // Small cap: $10K+ volume, 1% turnover
         }
-    }
-
-    fun checkLiquidity(crypto: CryptoCoin): Boolean {
-        Log.d("checkLiquidity", "checkLiquidity is called")
-        val quote = crypto.quotes?.firstOrNull() ?: return false // Get the first quote, return false if null
-        val marketCap = quote.marketCap // Market cap of the coin
-
-        if (marketCap <= 0) return false // Ensure valid market cap
-
-        val (volumeThreshold, turnoverThreshold) = getDynamicThreshold(marketCap) // Get thresholds dynamically
-
-        return isLiquidityLow(quote, volumeThreshold, turnoverThreshold) // Check if liquidity is low
-    }
-
-    fun isLiquidityLow(quote: QuoteCM, volumeThreshold: Double, turnoverThreshold: Double): Boolean {
-        return quote.volume24h < volumeThreshold || quote.turnover < turnoverThreshold
     }
 }

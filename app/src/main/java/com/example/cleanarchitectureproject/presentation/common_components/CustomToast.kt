@@ -116,6 +116,7 @@ fun CustomSweetToast(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = message,
+                            modifier = Modifier.padding(start = 10.dp, end = 15.dp, top = 5.dp),
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.secondary,
                             style = MaterialTheme.typography.bodyLarge

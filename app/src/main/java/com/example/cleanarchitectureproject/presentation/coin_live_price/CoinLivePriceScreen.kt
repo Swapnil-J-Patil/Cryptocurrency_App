@@ -14,6 +14,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -34,6 +35,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -107,7 +110,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
     val configuration = LocalConfiguration.current
     val isSavedState = remember { mutableStateOf(isSaved) }
-    val isLowLiquidity=viewModel.checkLiquidity(crypto = coinData)
+    val isLowLiquidity = viewModel.checkLiquidity(crypto = coinData)
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
 
@@ -122,11 +125,11 @@ fun SharedTransitionScope.CoinLivePriceScreen(
         0f
     }
     val iconSize = if (screenWidth > 600.dp) 50.dp else 40.dp
-    val degree= if(isGainer) 270f else 90f
-    val rotationMax= 360f
-    val rotationMin= 0f
+    val degree = if (isGainer) 270f else 90f
+    val rotationMax = 360f
+    val rotationMin = 0f
 
-    val isSelected= remember {
+    val isSelected = remember {
         mutableStateOf(false)
     }
     val animatedAlpha by animateFloatAsState(targetValue = if (isSelected.value) 1f else .5f)
@@ -298,7 +301,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
                     },
                     symbol = coinSymbol,
-                    onAuthClick = {type,method,email,password->
+                    onAuthClick = { type, method, email, password ->
 
                     }
                 )
@@ -315,7 +318,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                                 totalSupply = it1,
                                 symbol = coinSymbol,
                                 circulatingPercentage = it2.toFloat(),
-                                color=color
+                                color = color
                             )
                         }
                     }
@@ -323,7 +326,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
-                val listTypeNew="lineChart"
+                val listTypeNew = "lineChart"
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -347,14 +350,14 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             .height(300.dp)
                             .padding(16.dp),
                         labelName = coinSymbol,
-                        color1 = if(isGainer) green else red,
-                        color2 = if(isGainer) lightGreen else lightRed
+                        color1 = if (isGainer) green else red,
+                        color2 = if (isGainer) lightGreen else lightRed
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
             }
             item {
-               LiquidityWarning(isLowLiquidity)
+                LiquidityWarning(isLowLiquidity)
             }
             item {
                 Row(
@@ -364,28 +367,24 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp) // Ensures proper spacing
                 ) {
-                    Box(
+                    Button(
                         modifier = Modifier
                             .weight(1f) // Ensures both buttons take equal width
-                            .background(
-                                MaterialTheme.colorScheme.tertiary,
-                                RoundedCornerShape(8.dp)
-                            )
                             .border(2.dp, green, RoundedCornerShape(8.dp))
-                            .padding(16.dp)
                             .sharedElement(
                                 state = rememberSharedContentState(key = "coinCardTransaction/${"buy"}_${coinId}"),
                                 animatedVisibilityScope = animatedVisibilityScope
-                            )
-                            .clickable {
-                                val gson = Gson() // Or use kotlinx.serialization
-                                val coinDataJson = gson.toJson(coinData)
-                                navController.navigate(Screen.TransactionScreen.route + "/${"buy"}/${coinDataJson}") {
-                                    launchSingleTop = true
-                                }
+                            ),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                        shape = RoundedCornerShape(8.dp),
+                        onClick = {
+                            val gson = Gson() // Or use kotlinx.serialization
+                            val coinDataJson = gson.toJson(coinData)
+                            navController.navigate(Screen.TransactionScreen.route + "/${"buy"}/${coinDataJson}") {
+                                launchSingleTop = true
                             }
-                        ,
-                        contentAlignment = Alignment.Center
+                        },
+                        contentPadding = PaddingValues(vertical = 16.dp),
                     ) {
                         Text(
                             text = "Buy",
@@ -394,28 +393,24 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                         )
                     }
 
-                    Box(
+                    Button(
                         modifier = Modifier
                             .weight(1f) // Ensures both buttons take equal width
-                            .background(
-                                MaterialTheme.colorScheme.tertiary,
-                                RoundedCornerShape(8.dp)
-                            )
                             .border(2.dp, lightRed, RoundedCornerShape(8.dp))
-                            .padding(16.dp)
                             .sharedElement(
                                 state = rememberSharedContentState(key = "coinCardTransaction/${"sell"}_${coinId}"),
                                 animatedVisibilityScope = animatedVisibilityScope
-                            )
-                            .clickable {
-                                val gson = Gson() // Or use kotlinx.serialization
-                                val coinDataJson = gson.toJson(coinData)
-                                navController.navigate(Screen.TransactionScreen.route + "/${"sell"}/${coinDataJson}") {
-                                    launchSingleTop = true
-                                }
+                            ),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                        shape = RoundedCornerShape(8.dp),
+                        onClick = {
+                            val gson = Gson() // Or use kotlinx.serialization
+                            val coinDataJson = gson.toJson(coinData)
+                            navController.navigate(Screen.TransactionScreen.route + "/${"sell"}/${coinDataJson}") {
+                                launchSingleTop = true
                             }
-                        ,
-                        contentAlignment = Alignment.Center
+                        },
+                        contentPadding = PaddingValues(vertical = 16.dp),
                     ) {
                         Text(
                             text = "Sell",

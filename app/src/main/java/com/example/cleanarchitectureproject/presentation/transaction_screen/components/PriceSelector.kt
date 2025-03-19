@@ -3,11 +3,14 @@ package com.example.cleanarchitectureproject.presentation.transaction_screen.com
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.LocalTextSelectionColors
@@ -38,9 +42,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
-import com.example.cleanarchitectureproject.presentation.transaction_screen.helper.DecimalChecker
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlin.math.log
@@ -96,6 +100,37 @@ fun PriceSelector(
             }
         }
 
+        else{
+            Box(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 12.dp, start = 16.dp, end = 16.dp),
+                contentAlignment = Alignment.TopStart
+            ) {
+                Box(
+                    modifier = Modifier
+                        .border(
+                            width = 2.dp,
+                            color = red,
+                            shape = RoundedCornerShape(100.dp)
+                        )
+                        .clickable {
+                            selectedPrice = 100 // Extract number and update progress
+                            flag = !flag
+                        } // Make it clickable
+                        .padding(10.dp)
+                        .width(80.dp)
+                ) {
+                    Text(
+                        text = "Sell All",
+                        color = MaterialTheme.colorScheme.secondary,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+        }
+
 
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -123,7 +158,8 @@ fun PriceSelector(
                 )
             } else {
                 CircularSlider(
-                    modifier = Modifier.size(300.dp),
+                    modifier = Modifier.size(300.dp)
+                        .offset(y=-20.dp),
                     initialValue = selectedPrice,
                     primaryColor = primaryColor,
                     secondaryColor = secondaryColor,
@@ -145,12 +181,13 @@ fun PriceSelector(
         }
 
         Spacer(modifier = Modifier.height(3.dp))
-        OrDivider()
+        OrDivider(isBuy)
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 10.dp, vertical = 12.dp)
+                .offset(y=if (!isBuy) -20.dp else 0.dp)
                 .background(Color.Transparent),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp) // Ensures proper spacing
@@ -208,14 +245,11 @@ fun PriceSelector(
                     {
                         if(text1.value=="")
                         {
-                            val quantity = if(DecimalChecker.hasMoreThanSixDecimals(cryptoQuantity.value.toDouble()))cryptoQuantity.value.toDoubleOrNull()?.let { String.format("%.6f", it).toDouble() } ?: 0.0 else cryptoQuantity.value
-                            val amount = amountOfDollars.value.toDoubleOrNull()?.let { String.format("%.2f", it).toDouble() } ?: 0.0
-
-                            isBuyClicked(true,quantity.toString(),amount.toString())
+                            isBuyClicked(true,cryptoQuantity.value,amountOfDollars.value)
                         }
                         else
                         {
-                            val quantity = String.format("%.6f", text1.value.toDouble() / pricePerCoin).toDouble()
+                            val quantity = String.format("%.2f", text1.value.toDouble() / pricePerCoin).toDouble()
                             isBuyClicked(true,quantity.toString(),text1.value)
                         }
                     }
@@ -223,9 +257,7 @@ fun PriceSelector(
                     {
                         if(text1.value=="")
                         {
-                            val quantity = cryptoQuantity.value.toDoubleOrNull()?.let { String.format("%.6f", it).toDouble() } ?: 0.0
-                            val amount = amountOfDollars.value.toDoubleOrNull()?.let { String.format("%.2f", it).toDouble() } ?: 0.0
-                            isBuyClicked(false,quantity.toString(),amount.toString())
+                            isBuyClicked(false,cryptoQuantity.value,amountOfDollars.value)
                         }
                         else
                         {
