@@ -47,6 +47,8 @@ import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenT
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
+import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
+import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
 import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
@@ -79,8 +81,7 @@ fun SharedTransitionScope.MainScreen(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (isTab)
-        {
+        if (isTab) {
             when (isMarketScreen) {
                 "market" -> {
                     bottomBarVisibility = true
@@ -89,12 +90,21 @@ fun SharedTransitionScope.MainScreen(
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 }
+
                 "saved" -> {
                     SavedCoinsScreenTab(
                         navController = navController,
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 }
+
+                "profile" -> {
+                    ProfileScreenTab(
+                        navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
+                }
+
                 else -> {
                     bottomBarVisibility = true
                     HomeScreenTab(
@@ -133,16 +143,14 @@ fun SharedTransitionScope.MainScreen(
                                 0 -> viewModel.toggleTab("home")
                                 1 -> viewModel.toggleTab("market")
                                 2 -> viewModel.toggleTab("saved")
-                                3 -> viewModel.toggleTab("settings")
+                                3 -> viewModel.toggleTab("profile")
                             }
                         }
                     )
                 }
             }
 
-        }
-        else
-        {
+        } else {
 
             when (isMarketScreen) {
                 "market" -> {
@@ -152,15 +160,19 @@ fun SharedTransitionScope.MainScreen(
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 }
+
                 "saved" -> {
                     SavedCoinsScreen(
                         navController = navController,
                         animatedVisibilityScope = animatedVisibilityScope
                     )
                 }
-                "settings" -> {
-                    /*val url="https://coindcx.com/insta/buy/btc"
-                    TransactionScreen(url = url)*/
+
+                "profile" -> {
+                    ProfileScreen(
+                        navController,
+                        animatedVisibilityScope = animatedVisibilityScope
+                    )
                 }
                 else -> {
                     HomeScreen(
@@ -199,7 +211,7 @@ fun SharedTransitionScope.MainScreen(
                                 0 -> viewModel.toggleTab("home")
                                 1 -> viewModel.toggleTab("market")
                                 2 -> viewModel.toggleTab("saved")
-                                3 -> viewModel.toggleTab("settings")
+                                3 -> viewModel.toggleTab("profile")
                             }
                         }
                     )

@@ -28,6 +28,8 @@ import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.onboarding_screen.BubblePagerContent
+import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
+import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
 import com.example.cleanarchitectureproject.presentation.splash_screen.SplashScreen
@@ -143,6 +145,17 @@ class MainActivity : AppCompatActivity() {
                             )
                         }
 
+                        //Profile screen
+                        composable(
+                            route = Screen.ProfileScreen.route
+                        ) {
+                            ProfileScreen(navController, animatedVisibilityScope = this)
+                        }
+                        composable(
+                            route = Screen.ProfileScreenTab.route
+                        ) {
+                            ProfileScreenTab(navController, animatedVisibilityScope = this)
+                        }
                         //Transaction Screen
                         composable(
                             route = Screen.TransactionScreen.route+ "/{transaction}/{coinData}",
