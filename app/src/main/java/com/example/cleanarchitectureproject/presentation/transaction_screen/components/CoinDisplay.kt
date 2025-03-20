@@ -20,10 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.example.cleanarchitectureproject.R
 
 @Composable
@@ -54,8 +58,12 @@ fun CoinDisplay(
             }
             else
             {
-                Image(
-                    painter = rememberAsyncImagePainter(imageUrl), // Replace with your coin icon
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(imageUrl)
+                        .crossfade(true)
+                        .size(Size.ORIGINAL)
+                        .build(), // Replace with your coin icon
                     contentDescription = "CoinImage",
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.size(18.dp) // Icon size

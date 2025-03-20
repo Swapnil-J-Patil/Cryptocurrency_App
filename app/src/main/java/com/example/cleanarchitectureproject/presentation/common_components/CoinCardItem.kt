@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.size.Size
 import com.example.cleanarchitectureproject.R
 
 @Composable
@@ -61,6 +62,7 @@ fun CoinCardItem(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(logo)
                     .crossfade(true)
+                    .size(Size.ORIGINAL)
                     .build(),
                 contentDescription = "Currency Logo",
                 contentScale = ContentScale.FillBounds,

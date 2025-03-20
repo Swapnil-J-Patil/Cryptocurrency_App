@@ -27,9 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -69,8 +73,12 @@ fun SharedTransitionScope.CurrencyCardItem(
                     .background(green.copy(alpha = 0.2f)), // Background color for the icon
                 contentAlignment = Alignment.Center // Center the icon inside the box
             ) {
-                Image(
-                    painter = rememberAsyncImagePainter(image),
+                AsyncImage(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(image)
+                        .crossfade(true)
+                        .size(Size.ORIGINAL)
+                        .build(),
                     contentDescription = "Profile Icon",
                     contentScale = ContentScale.FillBounds,
                     modifier = Modifier.fillMaxSize()

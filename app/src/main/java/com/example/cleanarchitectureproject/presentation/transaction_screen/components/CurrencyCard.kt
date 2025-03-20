@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import coil.size.Size
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
@@ -102,8 +103,12 @@ fun SharedTransitionScope.CurrencyCard(
         ) {
             // Currency Logo (10%)
 
-            Image(
-                painter = rememberAsyncImagePainter(image),
+            AsyncImage(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(image)
+                    .crossfade(true)
+                    .size(Size.ORIGINAL)
+                    .build(),
                 contentDescription = "Currency Logo",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier

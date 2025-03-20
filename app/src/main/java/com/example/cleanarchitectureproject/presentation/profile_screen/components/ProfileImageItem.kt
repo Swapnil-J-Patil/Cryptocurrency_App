@@ -38,7 +38,11 @@ fun ProfileImageItem(
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
-            model = profile.imageUrl,
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(profile.imageUrl)
+                .crossfade(true)
+                .size(Size.ORIGINAL)
+                .build(),
             contentDescription = profile.imageUrl,
             contentScale = ContentScale.Crop, // Prevents distortion
             modifier = modifier

@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.size.Size
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
@@ -110,6 +111,7 @@ fun SquareCoinCardItem(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(logo)
                     .crossfade(true)
+                    .size(Size.ORIGINAL)
                     .build(),
                 contentDescription = "Currency Logo",
                 contentScale = ContentScale.FillBounds,
