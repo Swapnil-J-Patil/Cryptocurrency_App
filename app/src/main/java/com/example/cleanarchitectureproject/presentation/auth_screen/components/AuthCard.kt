@@ -61,7 +61,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.auth_screen.AuthViewModel
-import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
+import com.example.cleanarchitectureproject.presentation.common_components.Divider
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
@@ -323,7 +323,7 @@ fun AuthCard(
 
             if (isSignIn == true) {
                 Spacer(modifier = Modifier.height(16.dp))
-                OrDivider()
+                Divider()
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     horizontalArrangement = Arrangement.SpaceAround,

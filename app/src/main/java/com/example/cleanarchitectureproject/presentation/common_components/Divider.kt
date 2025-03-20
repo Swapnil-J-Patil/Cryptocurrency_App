@@ -10,15 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun OrDivider(
-    isBuy: Boolean?=true
+fun Divider(
+    isBuy: Boolean?=true,
+    text: String ="Or",
+    padding: Dp =16.dp
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxWidth().padding(horizontal = padding)
             .offset(y=if (isBuy==false) -20.dp else 0.dp)
     ) {
         Divider(
@@ -27,7 +30,7 @@ fun OrDivider(
             thickness = 2.dp
         )
         Text(
-            text = "Or",
+            text = text,
             color = MaterialTheme.colorScheme.secondary,
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 8.dp)

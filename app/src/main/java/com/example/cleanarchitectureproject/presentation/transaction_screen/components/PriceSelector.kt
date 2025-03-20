@@ -44,7 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.cleanarchitectureproject.presentation.common_components.OrDivider
+import com.example.cleanarchitectureproject.presentation.common_components.Divider
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlin.math.log
@@ -181,7 +181,7 @@ fun PriceSelector(
         }
 
         Spacer(modifier = Modifier.height(3.dp))
-        OrDivider(isBuy)
+        Divider(isBuy)
 
         Row(
             modifier = Modifier

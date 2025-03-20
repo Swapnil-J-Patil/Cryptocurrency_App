@@ -66,7 +66,9 @@ fun SharedTransitionScope.ProfileScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
 ) {
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
-
+    var name by remember {
+        mutableStateOf("Swapnil Patil")
+    }
     SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier.fillMaxSize()
@@ -91,7 +93,6 @@ fun SharedTransitionScope.ProfileScreen(
                             )
                             .size(50.dp)
                             .clip(CircleShape)
-                            .background(Color.Green.copy(alpha = 0.2f))
                             .clickable {
                                 selectedProfile = ProfileDataList.characters.first()
                             }
@@ -101,7 +102,8 @@ fun SharedTransitionScope.ProfileScreen(
                             modifier = Modifier.sharedElement(
                                 state = rememberSharedContentState(key = "profile-image"),
                                 animatedVisibilityScope = this@AnimatedVisibility
-                            )
+                            ),
+
                         )
                     }
                 }
@@ -110,8 +112,9 @@ fun SharedTransitionScope.ProfileScreen(
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(start = 80.dp, top = 45.dp), // Ensures text doesn't shift
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 80.dp, top = 42.dp), // Ensures text doesn't shift
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
@@ -122,7 +125,7 @@ fun SharedTransitionScope.ProfileScreen(
                     fontFamily = Poppins
                 )
                 Text(
-                    text = "Swapnil Patil",
+                    text = name,
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.secondary,
                     fontFamily = Poppins
@@ -142,7 +145,9 @@ fun SharedTransitionScope.ProfileScreen(
         // Profile Detail View
         ProfileDetailView(
             profile = selectedProfile,
-            onDismiss = { selectedProfile = null }
+            onDismiss = { selectedProfile = null },
+            userName = name,
+            profileList = ProfileDataList.characters.filter { it != selectedProfile }
         )
     }
 }
