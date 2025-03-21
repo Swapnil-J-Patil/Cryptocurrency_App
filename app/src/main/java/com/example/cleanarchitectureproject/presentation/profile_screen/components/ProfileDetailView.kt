@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -52,12 +53,14 @@ import coil.size.Size
 import com.example.cleanarchitectureproject.domain.model.ProfileData
 import com.example.cleanarchitectureproject.presentation.common_components.Divider
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileDataList
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun SharedTransitionScope.ProfileDetailView(
     profile: ProfileData?,
-    onDismiss: () -> Unit,
+    onSave: (ProfileData, String) -> Unit,
+    onDisMiss: () -> Unit,
     userName: String,
     profileList: List<ProfileData>
 ) {
@@ -68,22 +71,24 @@ fun SharedTransitionScope.ProfileDetailView(
     var selectedImage by remember {
         mutableStateOf(profile)
     }
+    LaunchedEffect(userName) {
+        name = userName
+    }
     LaunchedEffect(profile) {
-        selectedImage=profile
+        selectedImage = profile
     }
     AnimatedContent(
         targetState = profile,
         transitionSpec = { fadeIn() togetherWith fadeOut() },
         label = "ProfileDetailView"
     ) { profile ->
-        if (profile!= null && selectedImage != null) {
+        if (profile != null && selectedImage != null) {
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Transparent)
-                    .padding(16.dp)
-                    .clickable { onDismiss() },
+                    .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -132,7 +137,7 @@ fun SharedTransitionScope.ProfileDetailView(
 
                     Divider(text = "Change Avatar", padding = 10.dp)
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     FlowRow(
                         maxItemsInEachRow = 5,
@@ -141,19 +146,52 @@ fun SharedTransitionScope.ProfileDetailView(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        profileList.forEach{profile->
+                        profileList.forEach { profile ->
                             ProfileImageItem(
                                 profile = profile,
                                 modifier = Modifier.clickable {
-                                    selectedImage=profile
+                                    selectedImage = profile
                                 }
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    TextButton(onClick = onDismiss) {
-                        Text("Save")
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(
+                            onClick = {
+                                onDisMiss()
+                            },
+                            modifier = Modifier
+                                .weight(0.5f),
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                        TextButton(
+                            onClick = {
+                                onSave(selectedImage!!, name)
+                            },
+                            modifier = Modifier
+                                .weight(0.5f),
+                        ) {
+                            Text(
+                                text = "Save",
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = green
+                            )
+                        }
                     }
+                    Spacer(modifier = Modifier.height(4.dp))
+
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
@@ -36,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,6 +58,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.domain.model.ProfileData
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
+import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
@@ -64,10 +67,23 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.green
 fun SharedTransitionScope.ProfileScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    keyStoreViewModel: KeyStoreViewModel = hiltViewModel()
+
 ) {
+    val tokens by keyStoreViewModel.tokens.collectAsState()
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
-    var name by remember {
-        mutableStateOf("Swapnil Patil")
+    var currentProfile by remember { mutableStateOf<ProfileData>(ProfileDataList.characters.first()) }
+    var currentName by remember { mutableStateOf("Swapnil Patil") }
+
+    LaunchedEffect(tokens) {
+        if (!tokens.isNullOrEmpty())
+        {
+            Log.d("tokensKeystore", "ProfileScreen: ${tokens}")
+            currentName=tokens.get(0)
+            if (tokens.size >= 3) {
+                currentProfile = ProfileDataList.characters.get(tokens.get(2).toInt())
+            }
+        }
     }
     SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -94,11 +110,11 @@ fun SharedTransitionScope.ProfileScreen(
                             .size(50.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedProfile = ProfileDataList.characters.first()
+                                selectedProfile = currentProfile
                             }
                     ) {
                         ProfileImageItem(
-                            profile = ProfileDataList.characters.first(),
+                            profile = currentProfile,
                             modifier = Modifier.sharedElement(
                                 state = rememberSharedContentState(key = "profile-image"),
                                 animatedVisibilityScope = this@AnimatedVisibility
@@ -125,7 +141,7 @@ fun SharedTransitionScope.ProfileScreen(
                     fontFamily = Poppins
                 )
                 Text(
-                    text = name,
+                    text = currentName,
                     style = MaterialTheme.typography.headlineSmall,
                     color = MaterialTheme.colorScheme.secondary,
                     fontFamily = Poppins
@@ -145,9 +161,23 @@ fun SharedTransitionScope.ProfileScreen(
         // Profile Detail View
         ProfileDetailView(
             profile = selectedProfile,
-            onDismiss = { selectedProfile = null },
-            userName = name,
-            profileList = ProfileDataList.characters.filter { it != selectedProfile }
+            onSave = { profile,username->
+                currentProfile=profile
+                currentName=username
+                val index= profile.id -1
+                keyStoreViewModel.clearTokens()
+
+                keyStoreViewModel.saveToken(username)
+                keyStoreViewModel.saveToken("dummyemail@gmail.com")
+                keyStoreViewModel.saveToken(index.toString())
+
+                selectedProfile = null
+                     },
+            onDisMiss = {
+                selectedProfile=null
+            },
+            userName = currentName,
+            profileList = ProfileDataList.characters.filter { it != currentProfile }
         )
     }
 }

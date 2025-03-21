@@ -146,6 +146,10 @@ fun SharedTransitionScope.AuthScreen(
                 is BiometricResult.AuthenticationSuccess -> {
                     prefsManager.setBiometricAuthCompleted(true)
                     prefsManager.setFirebaseAuthCompleted(false)
+                    keyStoreViewModel.clearTokens()
+                    keyStoreViewModel.saveToken("Swapnil Patil")
+                    keyStoreViewModel.saveToken("dummyemail@gmail.com")
+                    keyStoreViewModel.saveToken("0")
 
                     navController.navigate(Screen.MainScreen.route) {
                         popUpTo(Screen.AuthScreen.route) { inclusive = true }
@@ -212,10 +216,12 @@ fun SharedTransitionScope.AuthScreen(
         authState?.let { result ->
             when (result) {
                 is AuthState.SignedIn -> {
+
                     prefsManager.setFirebaseAuthCompleted(true)
                     keyStoreViewModel.clearTokens()
                     keyStoreViewModel.saveToken(userName)
                     keyStoreViewModel.saveToken(userEmail)
+                    keyStoreViewModel.saveToken("0")
                     navController.navigate(Screen.MainScreen.route) {
                         popUpTo(Screen.AuthScreen.route) { inclusive = true }
                     }
