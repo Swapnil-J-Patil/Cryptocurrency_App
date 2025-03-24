@@ -260,7 +260,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                                     isActive = isSelected.value,
                                     activeIcon = Icons.Filled.PlayArrow,
                                     inactiveIcon = Icons.Filled.PlayArrow,
-                                    contentDescription = "Bottom Navigation Icon",
+                                    contentDescription = "Percentage gain or lose icon",
                                     color = color,
                                     rotationMax = rotationMax,
                                     rotationMin = rotationMin

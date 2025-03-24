@@ -1,14 +1,22 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components.pie_chart
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
@@ -23,6 +31,7 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -31,6 +40,7 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.request.SuccessResult
+import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
 import com.example.cleanarchitectureproject.presentation.ui.theme.aquaMint
 import com.example.cleanarchitectureproject.presentation.ui.theme.blueBright
 import com.example.cleanarchitectureproject.presentation.ui.theme.darkCyan
@@ -40,6 +50,8 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.mutedLime
 import com.example.cleanarchitectureproject.presentation.ui.theme.orangeBright
 import com.example.cleanarchitectureproject.presentation.ui.theme.redBright
 import com.example.cleanarchitectureproject.presentation.ui.theme.emeraldGreen
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
+import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -47,7 +59,7 @@ import kotlin.math.sin
 @Composable
 fun PieChart(
     data: Map<String, Int>,
-    radiusOuter: Dp = 100.dp,
+    radiusOuter: Dp = 120.dp,
     chartBarWidth: Dp = 25.dp,
     animDuration: Int = 1000,
     arcSpacing: Float = 18f, // Space between arcs
@@ -62,6 +74,18 @@ fun PieChart(
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
     }
+    val isSelected = remember {
+        mutableStateOf(false)
+    }
+    val animatedAlpha by animateFloatAsState(targetValue = if (isSelected.value) 1f else .5f)
+    val animatedIconSize by animateDpAsState(
+        targetValue = if (isSelected.value) 26.dp else 20.dp,
+        animationSpec = spring(
+            stiffness = Spring.StiffnessLow,
+            dampingRatio = Spring.DampingRatioMediumBouncy
+        )
+    )
+    val isGainer=true
     data.values.forEachIndexed { index, values ->
         floatValue.add(index, (360 * values.toFloat() / totalSum.toFloat()) - arcSpacing)
     }
@@ -74,13 +98,10 @@ fun PieChart(
 
 // Load the image asynchronously
     var imageBitmap by remember { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
-
-    LaunchedEffect(Unit) {
-        val result = imageLoader.execute(imageRequest)
-        if (result is SuccessResult) {
-            imageBitmap = result.drawable.toBitmap().asImageBitmap()
-        }
-    }
+    val degree = if (isGainer) 270f else 90f
+    val color = if (isGainer) green else lightRed
+    val rotationMax = 360f
+    val rotationMin = 0f
     val arcColors = listOf(
         listOf(Color(0xFFff7e5f), Color(0xFFfeb47b)),
         listOf(Color(0xFF00c6ff), Color(0xFF0072ff)),
@@ -107,10 +128,18 @@ fun PieChart(
             easing = LinearOutSlowInEasing
         )
     )
-
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(Unit) {
+        val result = imageLoader.execute(imageRequest)
+        if (result is SuccessResult) {
+            imageBitmap = result.drawable.toBitmap().asImageBitmap()
+        }
         animationPlayed = true
+
+        delay(2000L) // Delay for 1 second (1000 milliseconds)
+        isSelected.value = true
     }
+
+
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -262,7 +291,49 @@ fun PieChart(
                 }
 
             }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Portfolio Value",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium
+                )
 
+                Text(
+                    text = "$14,053.00",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top=5.dp)
+                ) {
+                    Text(
+                        text = "5.1%",
+                        color = green,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium
+                    )
+                    FlipIcon(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .alpha(animatedAlpha)
+                            .rotate(degree)
+                            .size(animatedIconSize),
+                        isActive = isSelected.value,
+                        activeIcon = Icons.Filled.PlayArrow,
+                        inactiveIcon = Icons.Filled.PlayArrow,
+                        contentDescription = "Percentage gain or lose icon",
+                        color = color,
+                        rotationMax = rotationMax,
+                        rotationMin = rotationMin
+                    )
+                }
+            }
         }
     }
 }
