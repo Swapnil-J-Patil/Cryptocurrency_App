@@ -8,10 +8,20 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +32,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +44,8 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,8 +59,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,11 +74,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.domain.model.ProfileData
+import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -74,20 +94,51 @@ fun SharedTransitionScope.ProfileScreen(
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
     var currentProfile by remember { mutableStateOf<ProfileData>(ProfileDataList.characters.first()) }
     var currentName by remember { mutableStateOf("Swapnil Patil") }
-
+    val tabTitles = listOf("Portfolio", "Transactions")
+    var visibility by remember {
+        mutableStateOf(false)
+    }
+    val brushColors = listOf(Color(0xFF23af92), Color(0xFF0E5C4C))
+    val infiniteTransition = rememberInfiniteTransition(label = "background")
+    val targetOffset = with(LocalDensity.current) {
+        1000.dp.toPx()
+    }
+    val animatedOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = targetOffset, // Adjust based on desired movement range
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 10000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset"
+    )
     LaunchedEffect(tokens) {
-        if (!tokens.isNullOrEmpty())
-        {
+        if (!tokens.isNullOrEmpty()) {
             Log.d("tokensKeystore", "ProfileScreen: ${tokens}")
-            currentName=tokens.get(0)
+            currentName = tokens.get(0)
             if (tokens.size >= 3) {
                 currentProfile = ProfileDataList.characters.get(tokens.get(2).toInt())
             }
         }
     }
+    LaunchedEffect(Unit) {
+        visibility=!visibility
+    }
     SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier.fillMaxSize()
+                .drawWithCache {
+                    val brushSize = 400f
+                    val brush = Brush.linearGradient(
+                        colors = brushColors,
+                        start = Offset(animatedOffset, animatedOffset),
+                        end = Offset(animatedOffset + brushSize, animatedOffset + brushSize),
+                        tileMode = TileMode.Mirror
+                    )
+                    onDrawBehind {
+                        drawRect(brush)
+                    }
+                }
 
         ) {
             Row(
@@ -120,10 +171,10 @@ fun SharedTransitionScope.ProfileScreen(
                                 animatedVisibilityScope = this@AnimatedVisibility
                             ),
 
-                        )
+                            )
                     }
                 }
-               // Spacer(modifier = Modifier.width(15.dp))
+                // Spacer(modifier = Modifier.width(15.dp))
 
             }
 
@@ -136,14 +187,14 @@ fun SharedTransitionScope.ProfileScreen(
                 Text(
                     text = "Hello",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    color = lightBackground,
                     fontWeight = FontWeight.Bold,
                     fontFamily = Poppins
                 )
                 Text(
                     text = currentName,
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = Color.White,
                     fontFamily = Poppins
                 )
             }
@@ -152,19 +203,67 @@ fun SharedTransitionScope.ProfileScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Transparent)
-                    .padding(top = 145.dp, start = 15.dp, end = 15.dp),
+                    .padding(top = 115.dp),
             ) {
+                AnimatedVisibility(
+                    visible = visibility,
+                    enter = slideInVertically(
+                        initialOffsetY = { it }, // Starts from full height (bottom)
+                        animationSpec = tween(
+                            durationMillis = 800, // Slightly increased duration for a smoother feel
+                            easing = LinearOutSlowInEasing // Smoother easing for entering animation
+                        )
+                    ) + fadeIn(
+                        animationSpec = tween(
+                            durationMillis = 800,
+                            easing = LinearOutSlowInEasing
+                        )
+                    ),
+                    exit = slideOutVertically(
+                        targetOffsetY = { it }, // Moves to full height (bottom)
+                        animationSpec = tween(
+                            durationMillis = 800,
+                            easing = FastOutSlowInEasing // Keeps a natural exit motion
+                        )
+                    ) + fadeOut(
+                        animationSpec = tween(
+                            durationMillis = 800,
+                            easing = FastOutSlowInEasing
+                        )
+                    )
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(bottom = 16.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                        elevation = CardDefaults.cardElevation(16.dp),
+                        shape = RoundedCornerShape(20.dp)
+                    ) {
+                        Tabs(
+                            screen = "profile",
+                            tabTitles = tabTitles,
+                            onItemClick = { item, flag ->
 
+                            },
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            onAuthClick = { type, method, email, password ->
+
+                            }
+                        )
+                    }
+                }
             }
         }
 
         // Profile Detail View
         ProfileDetailView(
             profile = selectedProfile,
-            onSave = { profile,username->
-                currentProfile=profile
-                currentName=username
-                val index= profile.id -1
+            onSave = { profile, username ->
+                currentProfile = profile
+                currentName = username
+                val index = profile.id - 1
                 keyStoreViewModel.clearTokens()
 
                 keyStoreViewModel.saveToken(username)
@@ -172,9 +271,9 @@ fun SharedTransitionScope.ProfileScreen(
                 keyStoreViewModel.saveToken(index.toString())
 
                 selectedProfile = null
-                     },
+            },
             onDisMiss = {
-                selectedProfile=null
+                selectedProfile = null
             },
             userName = currentName,
             profileList = ProfileDataList.characters.filter { it != currentProfile }

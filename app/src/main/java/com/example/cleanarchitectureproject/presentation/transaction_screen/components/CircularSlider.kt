@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen.components
 
 import android.graphics.Paint
+import android.graphics.SweepGradient
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -204,25 +205,39 @@ fun CircularSlider(
                 center = circleCenter
             )
 
-            drawArc(
-                color = primaryColor,
-                startAngle = 90f,
-                sweepAngle = (360f/maxValue) * positionValue.toFloat(),
-                style = Stroke(
-                    width = circleThickness,
-                    cap = StrokeCap.Round
-                ),
-                useCenter = false,
-                size = Size(
-                    width = circleRadius * 2f,
-                    height = circleRadius * 2f
-                ),
-                topLeft = Offset(
-                    (width - circleRadius * 2f)/2f,
-                    (height - circleRadius * 2f)/2f
+            drawIntoCanvas { canvas ->
+                val sweepGradient = android.graphics.SweepGradient(
+                    circleCenter.x,
+                    circleCenter.y,
+                    intArrayOf(secondaryColor.toArgb(), primaryColor.toArgb(), secondaryColor.toArgb()), // Repeat colors for a smooth transition
+                    floatArrayOf(0f, positionValue.toFloat() / maxValue, 1f) // Control gradient spread
                 )
 
-            )
+                val paint = android.graphics.Paint().apply {
+                    shader = sweepGradient
+                    style = android.graphics.Paint.Style.STROKE
+                    strokeWidth = circleThickness
+                    strokeCap = android.graphics.Paint.Cap.ROUND
+                    isAntiAlias = true
+                }
+
+                // Ensure gradient starts at the correct position
+                canvas.nativeCanvas.save()
+                canvas.nativeCanvas.rotate(90f, circleCenter.x, circleCenter.y) // Align gradient with arc start
+                canvas.nativeCanvas.drawArc(
+                    (width - circleRadius * 2f) / 2f,
+                    (height - circleRadius * 2f) / 2f,
+                    (width + circleRadius * 2f) / 2f,
+                    (height + circleRadius * 2f) / 2f,
+                    0f,  // Start from 0 to ensure uniform gradient
+                    (360f / maxValue) * positionValue.toFloat(),
+                    false,
+                    paint
+                )
+                canvas.nativeCanvas.restore()
+            }
+
+
 
             val outerRadius = circleRadius + circleThickness/2f
             val gap = 15f
@@ -255,7 +270,6 @@ fun CircularSlider(
                         strokeWidth = 1.dp.toPx()
                     )
                 }
-
             }
 
             drawContext.canvas.nativeCanvas.apply {

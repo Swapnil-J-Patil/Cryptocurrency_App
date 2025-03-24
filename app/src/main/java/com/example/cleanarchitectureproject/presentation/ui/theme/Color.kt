@@ -24,3 +24,10 @@ val blueBright = Color(0xFF3274F1)
 val orangeBright = Color(0xFFF46411)
 val redBright = Color(0xFFEA383B)
 
+val emeraldGreen=Color(0xFF30C785)
+val mutedLime=Color(0xFF6FCF97)
+val darkCyan=Color(0xFF147A66)
+val aquaMint=Color(0xFF5AD8C0)
+
+
+

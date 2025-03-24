@@ -28,6 +28,8 @@ import com.example.cleanarchitectureproject.presentation.coin_live_price.compone
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopGainersScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopLosersScreen
 import com.example.cleanarchitectureproject.presentation.auth_screen.components.AuthCard
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.PortfolioCard
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.TransactionsCard
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import kotlinx.coroutines.launch
 
@@ -152,7 +154,8 @@ fun SharedTransitionScope.Tabs(
             "login" -> {
                 TabRow(
                     selectedTabIndex = pagerState.currentPage,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 16.dp)
                         .background(MaterialTheme.colorScheme.tertiary)
                     ,
@@ -164,7 +167,8 @@ fun SharedTransitionScope.Tabs(
                 ) {
                     tabTitles.forEachIndexed { index, title ->
                         Tab(
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
                                 .background(MaterialTheme.colorScheme.tertiary)
                             ,
                             selected = pagerState.currentPage == index,
@@ -218,6 +222,65 @@ fun SharedTransitionScope.Tabs(
                     }
                 }
             }
+            "profile" ->
+            {
+                TabRow(
+                    selectedTabIndex = pagerState.currentPage,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 16.dp)
+                        .background(MaterialTheme.colorScheme.tertiary)
+                    ,
+                    indicator = { tabPositions ->
+                        TabRowDefaults.Indicator(
+                            Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
+                        )
+                    }
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            modifier = Modifier
+                                .weight(1f)
+                                .background(MaterialTheme.colorScheme.tertiary)
+                            ,
+                            selected = pagerState.currentPage == index,
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            },
+                            text = {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.bodyLarge.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (pagerState.currentPage == index)
+                                            MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    ),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        )
+                    }
+                }
+
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) { page ->
+                    when (page) {
+                        0 -> {
+                            PortfolioCard()
+                        }
+                        1 -> {
+                            TransactionsCard()
+                        }
+                    }
+                }
+            }
             else -> {
                 ScrollableTabRow(
                     selectedTabIndex = pagerState.currentPage,
@@ -237,7 +300,9 @@ fun SharedTransitionScope.Tabs(
                                     pagerState.animateScrollToPage(index)
                                 }
                             },
-                            modifier = Modifier.width(width.dp).background(MaterialTheme.colorScheme.background),
+                            modifier = Modifier
+                                .width(width.dp)
+                                .background(MaterialTheme.colorScheme.background),
                             text = {
                                 Text(
                                     text = title,
@@ -258,12 +323,15 @@ fun SharedTransitionScope.Tabs(
                     state = pagerState,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top=24.dp,bottom=10.dp)
+                        .padding(top = 24.dp, bottom = 10.dp)
                         .background(MaterialTheme.colorScheme.background),
                     verticalAlignment = Alignment.Top
 
                 ) { page ->
-                    WebViewItem(url = urls[page], Modifier.height(height.dp).background(MaterialTheme.colorScheme.background))
+                    WebViewItem(url = urls[page],
+                        Modifier
+                            .height(height.dp)
+                            .background(MaterialTheme.colorScheme.background))
                 }
             }
         }
