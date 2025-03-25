@@ -23,5 +23,6 @@ data class PortfolioEntity(
     val quotes: List<QuoteCM>?,
     val isAudited: Boolean?,
     val badges: List<Int>?,
-    val quantity: Double ?=0.0
+    val quantity: Double ?=0.0,
+    val purchasedAt: Double ?=0.0
 )

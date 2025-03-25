@@ -61,7 +61,7 @@ fun PriceSelector(
     isBuy: Boolean,
     alternateColor: Color,
     availableCoins: Double?=0.0,
-    isBuyClicked:(Boolean,String,String)-> Unit
+    isBuyClicked:(Boolean,String,String,String)-> Unit
 ) {
     val prices = listOf(25, 50, 75, 100)
     var selectedPrice by remember { mutableStateOf(25) } // Holds the slider progress
@@ -74,6 +74,7 @@ fun PriceSelector(
     val amountOfDollars = remember {
         mutableStateOf("")
     }
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -245,24 +246,24 @@ fun PriceSelector(
                     {
                         if(text1.value=="")
                         {
-                            isBuyClicked(true,cryptoQuantity.value,amountOfDollars.value)
+                            isBuyClicked(true,cryptoQuantity.value,amountOfDollars.value,pricePerCoin.toString())
                         }
                         else
                         {
                             val quantity = String.format("%.2f", text1.value.toDouble() / pricePerCoin).toDouble()
-                            isBuyClicked(true,quantity.toString(),text1.value)
+                            isBuyClicked(true,quantity.toString(),text1.value,pricePerCoin.toString())
                         }
                     }
                     else
                     {
                         if(text1.value=="")
                         {
-                            isBuyClicked(false,cryptoQuantity.value,amountOfDollars.value)
+                            isBuyClicked(false,cryptoQuantity.value,amountOfDollars.value,pricePerCoin.toString())
                         }
                         else
                         {
                             val amount = String.format("%.2f", text1.value.toDouble() * (pricePerCoin ?: 0.0)).toDouble()
-                            isBuyClicked(false,text1.value,amount.toString())
+                            isBuyClicked(false,text1.value,amount.toString(),pricePerCoin.toString())
                         }
                     }
                 }

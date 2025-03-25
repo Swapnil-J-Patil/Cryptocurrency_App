@@ -7,6 +7,8 @@ import com.example.cleanarchitectureproject.common.Resource
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
@@ -38,17 +40,19 @@ class PortfolioViewModel @Inject constructor(
 
     ) : ViewModel() {
 
-    private val _coinListState = mutableStateOf(PortfolioCoinState())
-    val coinListState: State<PortfolioCoinState> = _coinListState
+    private val _coinListState = MutableLiveData(PortfolioCoinState())
+    val coinListState: LiveData<PortfolioCoinState> = _coinListState
 
-    private val _currencyList = MutableStateFlow<List<CryptocurrencyCoin>>(emptyList())
-    private val currencyList: StateFlow<List<CryptocurrencyCoin>> = _currencyList
+    private val _currencyList = MutableLiveData<List<CryptocurrencyCoin>>(emptyList())
+    val currencyList: LiveData<List<CryptocurrencyCoin>> = _currencyList
 
+    private val _searchQuery = MutableLiveData("")
+    val searchQuery: LiveData<String> = _searchQuery
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery
+    val portfolioValue= MutableLiveData(0.0)
+    val portfolioPercentage= MutableLiveData(0.0)
 
-    val filteredCoins = searchQuery
+    /*val filteredCoins = searchQuery
         .combine(currencyList) { query, allCoins ->
             if (query.isBlank()) allCoins
             else allCoins.filter { coin ->
@@ -63,29 +67,32 @@ class PortfolioViewModel @Inject constructor(
         _searchQuery.value = query
         Log.d("FilteredCoins", "Size: ${filteredCoins.value.size}, List: $filteredCoins")
 
-    }
+    }*/
 
     init {
-        //loadCrypto()
+        loadCrypto()
     }
-    private fun loadCrypto() {
+    fun loadCrypto() {
         viewModelScope.launch {
             getAllCryptoUseCase().collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _coinListState.value = PortfolioCoinState(isLoading = true)
-                        Log.d("SavedCoinViewModel", "Loading data...")
+                        Log.d("portfolioViewmodel", "Loading data...")
                     }
 
                     is Resource.Success -> {
+                        portfolioValue.value=0.0
+                        portfolioValue.value=0.0
                         _coinListState.value = PortfolioCoinState(cryptocurrency = result.data)
-                        result.data?.let { processCoins(it) }
-                        Log.d("SavedCoinViewModel", "Successfully loaded: ${result.data}")
+                        result.data?.let {
+                            processCoins(it) }
+                        Log.d("portfolioViewmodel", "Successfully loaded: ${result.data}")
                     }
 
                     is Resource.Error -> {
                         _coinListState.value = PortfolioCoinState(error = result.message ?: "Unknown error")
-                        Log.e("SavedCoinViewModel", "Error loading data: ${result.message}")
+                        Log.e("portfolioViewmodel", "Error loading data: ${result.message}")
                     }
                 }
             }
@@ -138,17 +145,28 @@ class PortfolioViewModel @Inject constructor(
         }
     }
 
+
     private fun processCoins(coins: List<PortfolioCoin>) {
         viewModelScope.launch {
             val cryptocurrencyCoins = coins.map { coin ->
+                Log.d("portfolioViewmodel", "coins : ${coins.size} and ${coins}" )
+
                 val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
 
+
                 val percentage = firstQuote!!.percentChange1h.toString()
+                val currentPrice = firstQuote.price * (coin.quantity ?: 0.0) //need to change this later to get live price
+                val purchasedPrice = (coin.purchasedAt?.toDouble() ?: 0.0) * (coin.quantity ?: 0.0)
+                val percentageChange = (currentPrice -purchasedPrice) / purchasedPrice * 100
 
+                portfolioValue.value = portfolioValue.value?.plus(currentPrice)
+                portfolioPercentage.value = portfolioPercentage.value?.plus(percentageChange)
+                Log.d("portfolioViewmodel", "price: $currentPrice and portfolioPrice: ${portfolioValue.value}" )
+                Log.d("portfolioViewmodel", "percentage: $percentageChange and portfolioPrice: ${portfolioPercentage.value}" )
 
-                val price = firstQuote.price
-                val formattedPrice = "$ " + if (price < 1000) price.toString().take(5) else price.toString().take(3) + ".."
-                val color = if (coin.quotes[0].percentChange1h > 0.0) green else lightRed
+                val formattedPrice = "$ " + if (currentPrice < 1000 && currentPrice.toString().length > 5) currentPrice.toString().substring(0, 5) else currentPrice.toString().substring(0, 3) + ".."
+                val formatedPercentage=if(percentageChange > 0.0)"+" else "-" + if (percentageChange.toString().length > 5) percentageChange.toString().substring(0, 5)  + " %" else percentageChange.toString() + " %"
+                val color = if (currentPrice - purchasedPrice > 0) green else lightRed
 
                 CryptocurrencyCoin(
                     id = coin.id,
@@ -169,7 +187,7 @@ class PortfolioViewModel @Inject constructor(
                     isAudited = coin.isAudited?:false,
                     auditInfoList = emptyList(),
                     badges = coin.badges?: emptyList(),
-                    percentage = percentage,
+                    percentage = formatedPercentage,
                     price = formattedPrice,
                     logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
                     graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",

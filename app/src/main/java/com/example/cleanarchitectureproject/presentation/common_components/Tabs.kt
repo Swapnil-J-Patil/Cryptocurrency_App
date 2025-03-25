@@ -24,6 +24,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
+import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
+import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.components.WebViewItem
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopGainersScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.components.gainer_and_loser.TopLosersScreen
@@ -51,21 +53,26 @@ fun SharedTransitionScope.Tabs(
     gainersGraph: List<String>? = emptyList(),
     losersGraph: List<String>? = emptyList(),
     symbol: String? = null,
-    listType: String?=null,
-    coin: CryptoCoin?=null,
-    transaction: String?=null,
-    onAuthClick: (String,String,String,String) -> Unit,
+    listType: String? = null,
+    coin: CryptoCoin? = null,
+    transaction: String? = null,
+    onAuthClick: (String, String, String, String) -> Unit,
+    portfolioCoins: List<CryptocurrencyCoin>? = emptyList(),
+    portfolioValue: Double? = 0.0,
+    portfolioPercentage: Double? = 0.0
 
-    ) {
+) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
-    val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
-    val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
+    val screenWidth =
+        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val screenHeight =
+        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
 
     val width = screenWidth * 0.3
-    val height=if(screenWidth> 600) screenHeight*0.9 else screenHeight*0.5
+    val height = if (screenWidth > 600) screenHeight * 0.9 else screenHeight * 0.5
     val isDarkTheme = isSystemInDarkTheme()
-    val theme=if(isDarkTheme)"Dark" else "Light"
+    val theme = if (isDarkTheme) "Dark" else "Light"
 
     val urls = remember {
         listOf(
@@ -136,6 +143,7 @@ fun SharedTransitionScope.Tabs(
                                 listType = listType!!
                             )
                         }
+
                         1 -> losers?.let {
                             TopLosersScreen(
                                 it,
@@ -151,14 +159,14 @@ fun SharedTransitionScope.Tabs(
                     }
                 }
             }
+
             "login" -> {
                 TabRow(
                     selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 16.dp)
-                        .background(MaterialTheme.colorScheme.tertiary)
-                    ,
+                        .background(MaterialTheme.colorScheme.tertiary),
                     indicator = { tabPositions ->
                         TabRowDefaults.Indicator(
                             Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
@@ -169,8 +177,7 @@ fun SharedTransitionScope.Tabs(
                         Tab(
                             modifier = Modifier
                                 .weight(1f)
-                                .background(MaterialTheme.colorScheme.tertiary)
-                            ,
+                                .background(MaterialTheme.colorScheme.tertiary),
                             selected = pagerState.currentPage == index,
                             onClick = {
                                 coroutineScope.launch {
@@ -200,37 +207,37 @@ fun SharedTransitionScope.Tabs(
                         .fillMaxSize()
                 ) { page ->
                     when (page) {
-                        0 ->  AuthCard(
+                        0 -> AuthCard(
                             firstText = "Email Address",
                             secondText = "Password",
                             buttonText = "Sign In",
                             color = green,
                             isSignIn = true,
-                            onAuthClick = {type,method,email,password->
-                                onAuthClick(type,method,email,password)
+                            onAuthClick = { type, method, email, password ->
+                                onAuthClick(type, method, email, password)
                             }
                         )
+
                         1 -> AuthCard(
                             firstText = "Email Address",
                             secondText = "Password",
                             buttonText = "Sign Up",
                             color = green,
-                            onAuthClick = {type,method,email,password->
-                                onAuthClick(type,method,email,password)
+                            onAuthClick = { type, method, email, password ->
+                                onAuthClick(type, method, email, password)
                             }
                         )
                     }
                 }
             }
-            "profile" ->
-            {
+
+            "profile" -> {
                 TabRow(
                     selectedTabIndex = pagerState.currentPage,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 8.dp, vertical = 16.dp)
-                        .background(MaterialTheme.colorScheme.tertiary)
-                    ,
+                        .background(MaterialTheme.colorScheme.tertiary),
                     indicator = { tabPositions ->
                         TabRowDefaults.Indicator(
                             Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage])
@@ -241,8 +248,7 @@ fun SharedTransitionScope.Tabs(
                         Tab(
                             modifier = Modifier
                                 .weight(1f)
-                                .background(MaterialTheme.colorScheme.tertiary)
-                            ,
+                                .background(MaterialTheme.colorScheme.tertiary),
                             selected = pagerState.currentPage == index,
                             onClick = {
                                 coroutineScope.launch {
@@ -273,14 +279,23 @@ fun SharedTransitionScope.Tabs(
                 ) { page ->
                     when (page) {
                         0 -> {
-                            PortfolioCard()
+                            if (portfolioCoins != null && portfolioValue != null && portfolioPercentage != null) {
+
+                                PortfolioCard(
+                                    portfolioCoins = portfolioCoins,
+                                    portfolioValue = portfolioValue,
+                                    portfolioPercentage = portfolioPercentage
+                                )
+                            }
                         }
+
                         1 -> {
                             TransactionsCard()
                         }
                     }
                 }
             }
+
             else -> {
                 ScrollableTabRow(
                     selectedTabIndex = pagerState.currentPage,
@@ -328,10 +343,12 @@ fun SharedTransitionScope.Tabs(
                     verticalAlignment = Alignment.Top
 
                 ) { page ->
-                    WebViewItem(url = urls[page],
+                    WebViewItem(
+                        url = urls[page],
                         Modifier
                             .height(height.dp)
-                            .background(MaterialTheme.colorScheme.background))
+                            .background(MaterialTheme.colorScheme.background)
+                    )
                 }
             }
         }

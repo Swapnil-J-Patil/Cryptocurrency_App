@@ -37,13 +37,15 @@ fun SharedTransitionScope.TopGainersScreen(
     gainersLogo: List<String>? = emptyList(),
     gainersGraph: List<String>? = emptyList(),
     listType: String
-    ) {
-    val screenWidth = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
-    val screenHeight = LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
+) {
+    val screenWidth =
+        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
+    val screenHeight =
+        LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.heightPixels / density }
 
     val listState = rememberLazyGridState()
     val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
-    val adaptiveHeight = screenHeight *0.5
+    val adaptiveHeight = screenHeight * 0.5
     // Precompute visible indices
 
     LazyVerticalGrid(
@@ -78,7 +80,10 @@ fun SharedTransitionScope.TopGainersScreen(
             }
 
             CoinCardItem(
-                currencyName = if(gainer.name.length > 10) gainer.name.substring(0,8) +".." else gainer.name,
+                currencyName = if (gainer.name.length > 10) gainer.name.substring(
+                    0,
+                    8
+                ) + ".." else gainer.name,
                 symbol = gainer.symbol,
                 percentage = gainersPercentage?.getOrNull(index) ?: "",
                 price = gainersPrice?.getOrNull(index) ?: "",

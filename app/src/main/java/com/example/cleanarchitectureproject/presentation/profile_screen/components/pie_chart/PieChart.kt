@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -67,7 +68,9 @@ fun PieChart(
     ringBorderColor: Color = Color.Transparent,
     minValue:Int = 0,
     maxValue:Int = 120,
-
+    portfolioValue: String,
+    portfolioPercentage: String,
+    portfolioColor: Color
 ) {
     val totalSum = data.values.sum()
     val floatValue = mutableListOf<Float>()
@@ -85,7 +88,7 @@ fun PieChart(
             dampingRatio = Spring.DampingRatioMediumBouncy
         )
     )
-    val isGainer=true
+    val isGainer= if(portfolioColor== green) true else false
     data.values.forEachIndexed { index, values ->
         floatValue.add(index, (360 * values.toFloat() / totalSum.toFloat()) - arcSpacing)
     }
@@ -296,14 +299,14 @@ fun PieChart(
             ) {
                 Text(
                     text = "Portfolio Value",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
 
                 Text(
-                    text = "$14,053.00",
-                    color = Color.White,
+                    text = portfolioValue,
+                    color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -313,8 +316,8 @@ fun PieChart(
                     modifier = Modifier.padding(top=5.dp)
                 ) {
                     Text(
-                        text = "5.1%",
-                        color = green,
+                        text = portfolioPercentage,
+                        color = portfolioColor,
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )

@@ -175,7 +175,7 @@ class MainActivity : AppCompatActivity() {
                                 coinDataJson,
                                 CryptoCoin::class.java
                             )
-                            TransactionScreen( animatedVisibilityScope = this, transaction = transaction, coin = coinData, context = this@MainActivity, navController = navController)
+                            TransactionScreen( animatedVisibilityScope = this, transaction = transaction, coin = coinData, context = this@MainActivity, navController = navController,)
                         }
                         //ZoomedChart Screen
                         composable(

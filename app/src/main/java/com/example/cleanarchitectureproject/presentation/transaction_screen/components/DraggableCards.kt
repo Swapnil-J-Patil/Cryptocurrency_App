@@ -59,7 +59,7 @@ fun DraggableCards(
     imageUrl: String,
     context: Context,
     transaction: String,
-    isBuyClicked:(Boolean,String,String)->Unit,
+    isBuyClicked:(Boolean,String,String,String)->Unit,
     savedQuantity: Double?,
     dollars: Double
 ) {
@@ -150,8 +150,8 @@ fun DraggableCards(
                         isBuy = false,
                         alternateColor = lightRed,
                         availableCoins = cryptoQuantity.value,
-                        isBuyClicked = {flag, quantity, usd->
-                            isBuyClicked(flag,quantity,usd)
+                        isBuyClicked = {flag, quantity, usd,currentPrice->
+                            isBuyClicked(flag,quantity,usd,currentPrice)
                         }
                     )
                 }
@@ -248,8 +248,8 @@ fun DraggableCards(
                         leadingIcon = "$",
                         isBuy = true,
                         alternateColor = green,
-                        isBuyClicked = {flag, quantity, usd->
-                            isBuyClicked(flag,quantity,usd)
+                        isBuyClicked = {flag, quantity, usd,currentPrice->
+                            isBuyClicked(flag,quantity,usd,currentPrice)
                         }
                     )
                 }

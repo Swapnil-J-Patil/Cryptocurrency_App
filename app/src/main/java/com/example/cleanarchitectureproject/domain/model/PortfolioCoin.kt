@@ -20,5 +20,6 @@ data class PortfolioCoin(
     val quotes: List<QuoteCM>?,
     val isAudited: Boolean?,
     val badges: List<Int>?,
-    val quantity: Double?
+    val quantity: Double?,
+    val purchasedAt: Double?
 )

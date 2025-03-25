@@ -15,7 +15,8 @@ class GetAllCryptoPortfolioUseCase @Inject constructor(
     operator fun invoke(): Flow<Resource<List<PortfolioCoin>>> = flow {
         try {
             emit(Resource.Loading())  // Emit loading state
-            repository.getAllCrypto().collect { cryptoList ->
+            repository.getAllCrypto()
+                .collect { cryptoList ->
                 emit(Resource.Success(cryptoList)) // Emit success state with actual data
             }
         } catch (e: Exception) {

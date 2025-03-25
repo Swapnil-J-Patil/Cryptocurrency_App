@@ -67,13 +67,24 @@ fun CircularSlider(
 
     LaunchedEffect(flag) {
 
-        val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
-        val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0  // Avoid division by zero
-        formattedUsdValue = "%,.2f".format(usdValue)  // Format as currency
-        formattedAmount = "%,.2f".format(amountOfCoin)  // Format coin amount with precision
+        if (isBuy) {
+            val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
+            val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0  // Avoid division by zero
+            formattedUsdValue = "%,.2f".format(usdValue)  // Format as currency
+            formattedAmount = "%,.2f".format(amountOfCoin)  // Format coin amount with precision
 
-        positionValue = initialValue
-        oldPositionValue = initialValue
+            positionValue = initialValue
+            oldPositionValue = initialValue
+        } else {
+
+            val amountOfCoin =  (initialValue / 100.0) * (availableCoins ?: 0.0)
+            val usdValue = amountOfCoin * pricePerCoin
+            formattedUsdValue = "%,.2f".format(usdValue)
+            formattedAmount = "%,.2f".format(amountOfCoin)
+
+            positionValue = initialValue
+            oldPositionValue = initialValue
+        }
     }
     LaunchedEffect(availableCoins) {
         if (isBuy) {

@@ -53,6 +53,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -78,6 +79,8 @@ import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
+import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
+import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioCoinState
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
@@ -87,9 +90,15 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackgroun
 fun SharedTransitionScope.ProfileScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    keyStoreViewModel: KeyStoreViewModel = hiltViewModel()
-
+    keyStoreViewModel: KeyStoreViewModel = hiltViewModel(),
+    viewModel: PortfolioViewModel = hiltViewModel()
 ) {
+    //viewModel.loadCrypto()
+    val portfolioCoinList by viewModel.currencyList.observeAsState()
+    val portfolioValue by viewModel.portfolioValue.observeAsState()
+    val portfolioPercentage by viewModel.portfolioPercentage.observeAsState()
+
+
     val tokens by keyStoreViewModel.tokens.collectAsState()
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
     var currentProfile by remember { mutableStateOf<ProfileData>(ProfileDataList.characters.first()) }
@@ -126,7 +135,8 @@ fun SharedTransitionScope.ProfileScreen(
     }
     SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .drawWithCache {
                     val brushSize = 400f
                     val brush = Brush.linearGradient(
@@ -241,17 +251,23 @@ fun SharedTransitionScope.ProfileScreen(
                         elevation = CardDefaults.cardElevation(16.dp),
                         shape = RoundedCornerShape(20.dp)
                     ) {
-                        Tabs(
-                            screen = "profile",
-                            tabTitles = tabTitles,
-                            onItemClick = { item, flag ->
+                        portfolioCoinList.let {
+                            Tabs(
+                                screen = "profile",
+                                tabTitles = tabTitles,
+                                onItemClick = { item, flag ->
 
-                            },
-                            animatedVisibilityScope = animatedVisibilityScope,
-                            onAuthClick = { type, method, email, password ->
+                                },
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                onAuthClick = { type, method, email, password ->
 
-                            }
-                        )
+                                },
+                                portfolioCoins = it,
+                                portfolioValue = portfolioValue,
+                                portfolioPercentage = portfolioPercentage
+                            )
+                        }
+
                     }
                 }
             }

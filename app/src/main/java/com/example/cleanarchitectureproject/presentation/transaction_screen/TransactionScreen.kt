@@ -90,6 +90,9 @@ fun SharedTransitionScope.TransactionScreen(
     var toastMessage by remember { mutableStateOf("Success!") }
     val coroutineScope = rememberCoroutineScope()
     var toastType by remember { mutableStateOf<SweetToastProperty>(Error()) }
+    val currentPrice = remember {
+        mutableStateOf("")
+    }
     var visibility by remember {
         mutableStateOf(false)
     }
@@ -105,6 +108,7 @@ fun SharedTransitionScope.TransactionScreen(
     val amountOfDollars = remember {
         mutableStateOf("")
     }
+
     var savedQuantity by remember { mutableStateOf<Double?>(0.0) }
 
     LaunchedEffect(Unit) {
@@ -115,6 +119,7 @@ fun SharedTransitionScope.TransactionScreen(
             Log.d("savedQuantity", "TransactionScreen: $quantity")
             savedQuantity = quantity  // Update state to trigger recomposition
         }
+
 
     }
     Box(
@@ -178,11 +183,14 @@ fun SharedTransitionScope.TransactionScreen(
                             imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
                             context = context,
                             transaction = transaction,
-                            isBuyClicked = { flag, quantity, usd ->
+                            isBuyClicked = { flag, quantity, usd,coinPrice ->
+                                Log.d("portfolioSaved", "TransactionScreen Before: ${coinPrice} ")
+
                                 isBuyClicked = flag
                                 isTransaction = true
                                 cryptoQuantity.value = quantity
                                 amountOfDollars.value = usd
+                                currentPrice.value =coinPrice
                             },
                             savedQuantity=savedQuantity,
                             dollars = it
@@ -206,7 +214,7 @@ fun SharedTransitionScope.TransactionScreen(
                 onConfirm = {
                     val cleanQuantity = cryptoQuantity.value.replace(",", "").toDouble()
                     val cleanDollars = amountOfDollars.value.replace(",", "").toDouble()
-
+                    Log.d("portfolioSaved", "TransactionScreen After: ${currentPrice.value} ")
                     val availableDollars = dollars?.replace(",", "")?.toDouble()?: 0.0
                     val availableQuantity =savedQuantity?: 0.0
 
@@ -244,7 +252,8 @@ fun SharedTransitionScope.TransactionScreen(
                                 quotes = coin.quotes,
                                 isAudited = coin.isAudited,
                                 badges = coin.badges ?: emptyList(),
-                                quantity = sum
+                                quantity = sum,
+                                purchasedAt = currentPrice.value.toDouble()
                             )
 
                             viewModel.addCrypto(coinData)
@@ -304,7 +313,8 @@ fun SharedTransitionScope.TransactionScreen(
                                 quotes = coin.quotes,
                                 isAudited = coin.isAudited,
                                 badges = coin.badges ?: emptyList(),
-                                quantity = diff
+                                quantity = diff,
+                                purchasedAt = coin.quotes?.get(0)?.price //Replace this later
                             )
 
                             viewModel.addCrypto(coinData)

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c964e67e68c2200f3fea8518983e7894",
+    "identityHash": "120619df5b55007aa5e95e41655bc620",
     "entities": [
       {
         "tableName": "portfolio",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `symbol` TEXT, `slug` TEXT, `tags` TEXT, `cmcRank` INTEGER, `marketPairCount` INTEGER, `circulatingSupply` REAL, `selfReportedCirculatingSupply` REAL, `totalSupply` REAL, `maxSupply` REAL, `isActive` INTEGER, `lastUpdated` TEXT, `dateAdded` TEXT, `quotes` TEXT, `isAudited` INTEGER, `badges` TEXT, `quantity` REAL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `symbol` TEXT, `slug` TEXT, `tags` TEXT, `cmcRank` INTEGER, `marketPairCount` INTEGER, `circulatingSupply` REAL, `selfReportedCirculatingSupply` REAL, `totalSupply` REAL, `maxSupply` REAL, `isActive` INTEGER, `lastUpdated` TEXT, `dateAdded` TEXT, `quotes` TEXT, `isAudited` INTEGER, `badges` TEXT, `quantity` REAL, `purchasedAt` REAL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -115,6 +115,12 @@
             "columnName": "quantity",
             "affinity": "REAL",
             "notNull": false
+          },
+          {
+            "fieldPath": "purchasedAt",
+            "columnName": "purchasedAt",
+            "affinity": "REAL",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -130,7 +136,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c964e67e68c2200f3fea8518983e7894')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '120619df5b55007aa5e95e41655bc620')"
     ]
   }
 }

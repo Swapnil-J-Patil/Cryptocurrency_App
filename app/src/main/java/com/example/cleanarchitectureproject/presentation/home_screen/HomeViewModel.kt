@@ -91,7 +91,7 @@ class HomeViewModel @Inject constructor(
 
             _gainerPriceList.value = topGainers.map { gainer ->
                 val price = gainer.quotes[0].price
-                "$ " + if (price < 1000) price.toString().substring(0, 5) else price.toString().substring(0, 3) + ".."
+                "$ " + if (price < 1000 && price.toString().length > 5) price.toString().substring(0, 5) else price.toString().substring(0, 3) + ".."
             }
 
             _gainerLogoList.value = topGainers.map { gainer ->

@@ -37,7 +37,8 @@ class PortfolioRepositoryImpl @Inject constructor(
                     quotes = entity.quotes,
                     isAudited = entity.isAudited,
                     badges = entity.badges ?: emptyList(),
-                    quantity = entity.quantity
+                    quantity = entity.quantity,
+                    purchasedAt = entity.purchasedAt
                 )
             }
         }
@@ -62,7 +63,8 @@ class PortfolioRepositoryImpl @Inject constructor(
             quotes = crypto.quotes,
             isAudited = crypto.isAudited,
             badges = crypto.badges ?: emptyList(),
-            quantity = crypto.quantity
+            quantity = crypto.quantity,
+            purchasedAt = crypto.purchasedAt
         )
         dao.insertCrypto(entity)
     }
@@ -119,7 +121,8 @@ class PortfolioRepositoryImpl @Inject constructor(
                 quotes = entity.quotes,
                 isAudited = entity.isAudited,
                 badges = entity.badges ?: emptyList(),
-                quantity = entity.quantity
+                quantity = entity.quantity,
+                purchasedAt= entity.purchasedAt
             )
         }
     }
