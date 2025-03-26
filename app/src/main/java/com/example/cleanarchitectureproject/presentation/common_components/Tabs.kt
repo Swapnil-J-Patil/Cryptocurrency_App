@@ -57,10 +57,9 @@ fun SharedTransitionScope.Tabs(
     coin: CryptoCoin? = null,
     transaction: String? = null,
     onAuthClick: (String, String, String, String) -> Unit,
-    portfolioCoins: List<CryptocurrencyCoin>? = emptyList(),
+    portfolioCoins: List<PortfolioCoin>? = emptyList(),
     portfolioValue: Double? = 0.0,
-    portfolioPercentage: Double? = 0.0
-
+    portfolioPercentage: Double? = 0.0,
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
@@ -279,12 +278,12 @@ fun SharedTransitionScope.Tabs(
                 ) { page ->
                     when (page) {
                         0 -> {
-                            if (portfolioCoins != null && portfolioValue != null && portfolioPercentage != null) {
+                            if (portfolioCoins != null && portfolioValue != null && portfolioPercentage != null ) {
 
                                 PortfolioCard(
                                     portfolioCoins = portfolioCoins,
                                     portfolioValue = portfolioValue,
-                                    portfolioPercentage = portfolioPercentage
+                                    portfolioPercentage = portfolioPercentage,
                                 )
                             }
                         }

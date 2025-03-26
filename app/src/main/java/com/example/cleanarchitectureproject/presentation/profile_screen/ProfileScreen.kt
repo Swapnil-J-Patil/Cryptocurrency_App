@@ -98,7 +98,6 @@ fun SharedTransitionScope.ProfileScreen(
     val portfolioValue by viewModel.portfolioValue.observeAsState()
     val portfolioPercentage by viewModel.portfolioPercentage.observeAsState()
 
-
     val tokens by keyStoreViewModel.tokens.collectAsState()
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
     var currentProfile by remember { mutableStateOf<ProfileData>(ProfileDataList.characters.first()) }
@@ -264,7 +263,7 @@ fun SharedTransitionScope.ProfileScreen(
                                 },
                                 portfolioCoins = it,
                                 portfolioValue = portfolioValue,
-                                portfolioPercentage = portfolioPercentage
+                                portfolioPercentage = portfolioPercentage,
                             )
                         }
 

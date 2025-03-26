@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
@@ -37,30 +38,72 @@ import java.text.DecimalFormat
 @Composable
 fun PortfolioCard(
     modifier: Modifier = Modifier,
-    portfolioCoins: List<CryptocurrencyCoin>,
+    portfolioCoins: List<PortfolioCoin>,
     portfolioValue: Double,
-    portfolioPercentage: Double
-    ) {
+    portfolioPercentage: Double,
+) {
     val listState = rememberLazyListState()
 
     val df = DecimalFormat("#,##0.00") // Ensures two decimal places
     val formattedPrice = "$ ${df.format(portfolioValue)}"
-    val formatedPercentage=if(portfolioPercentage > 0.0)"+" else "-" + portfolioPercentage.toString() + " %"
-    val portfolioColor=if(portfolioPercentage > 0.0) green else lightRed
+    val formattedPercentage =
+        if (portfolioPercentage >= 0.0) "+" + df.format(portfolioPercentage) + " %" else df.format(
+            portfolioPercentage
+        ) + " %"
+    val portfolioColor = if (portfolioPercentage >= 0.0) green else lightRed
+
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(bottom = 30.dp)
     ) {
 
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth(),
             state = listState,
-            ) {
+        ) {
             item {
                 Spacer(modifier = Modifier.height(50.dp))
 
-                PieChart(
+                if (portfolioCoins.isNotEmpty()) {
+                    // Sort coins by quantity in descending order, safely handling null values
+                    val sortedCoins = portfolioCoins.sortedByDescending { it.quantity ?: 0.0 }
+
+                    val pieChartData: Map<String, Int> = when {
+                        sortedCoins.size <= 4 -> {
+                            // If there are 4 or fewer coins, use them all directly
+                            sortedCoins.associate { it.name to (it.quantity?.toInt() ?: 0) }
+                        }
+                        else -> {
+                            // Take the first 4 coins
+                            val topCoins = sortedCoins.take(4)
+                                .associate { it.name to (it.quantity?.toInt() ?: 0) }
+
+                            // Sum the quantities of the remaining coins
+                            val othersQuantity = sortedCoins.drop(4).sumOf { it.quantity ?: 0.0 }.toInt()
+
+                            // Include "Others" only if there's a remaining quantity
+                            if (othersQuantity > 0) {
+                                topCoins + ("Others" to othersQuantity)
+                            } else {
+                                topCoins
+                            }
+                        }
+                    }
+
+                    // Pass to PieChart
+                    PieChart(
+                        data = pieChartData,
+                        ringBorderColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        ringBgColor = MaterialTheme.colorScheme.tertiary,
+                        portfolioValue = formattedPrice,
+                        portfolioPercentage = formattedPercentage,
+                        portfolioColor = portfolioColor
+                    )
+                }
+
+                /*PieChart(
                     data = mapOf(
                         Pair("Sample-1", 150),
                         Pair("Sample-2", 120),
@@ -73,11 +116,13 @@ fun PortfolioCard(
                     portfolioValue = formattedPrice,
                     portfolioPercentage = formatedPercentage,
                     portfolioColor = portfolioColor
-                )
+                )*/
                 Spacer(modifier = Modifier.height(60.dp))
             }
 
-            itemsIndexed(portfolioCoins, key = { _, coin -> coin.id }) { index, portfolioCoin ->  // Use key
+            itemsIndexed(
+                portfolioCoins,
+                key = { _, coin -> coin.id }) { index, portfolioCoin ->  // Use key
                 val isVisible = remember {
                     derivedStateOf {
                         val visibleItems = listState.layoutInfo.visibleItemsInfo
@@ -103,21 +148,22 @@ fun PortfolioCard(
                 /*While navigating
                         percentage = portfolioCoin.quotes.get(0).percentChange1h.toString(),
                 price = portfolioCoin.quotes.get(0).price.toString(),*/
-                CoinCardItem(
-                    currencyName = if (portfolioCoin.name.length > 10) portfolioCoin.name.substring(
-                        0,
-                        8
-                    ) + ".." else portfolioCoin.name,
-                    symbol = portfolioCoin.symbol,
-                    percentage = portfolioCoin.percentage,
-                    price = portfolioCoin.price,
-                    image = portfolioCoin.graph ,
-                    color = portfolioCoin.color,
-                    logo = portfolioCoin.logo,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp, horizontal = 15.dp)
-                        .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
+                if (portfolioCoins.isNotEmpty() && index < portfolioCoins.size) {
+                    val formattedPP = "$ ${df.format(portfolioCoin.purchasedAt)}"
+                    val formattedCP = "$ ${df.format(portfolioCoin.currentPrice)}"
+                    val formattedQuantity = "${df.format(portfolioCoin.quantity)}"
+                    PortfolioCoinCardItem(
+                        symbol = portfolioCoin.symbol!!,
+                        purchasedPrice = formattedPP,
+                        currentPrice = formattedCP,
+                        graph = portfolioCoin.graph.toString(),
+                        color = portfolioCoin.color!!,
+                        logo = portfolioCoin.logo.toString(),
+                        quantity = formattedQuantity,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp, horizontal = 15.dp)
+                            .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
                         /*.clickable {
                             onItemClick(portfolioCoin, true)
                         }
@@ -125,7 +171,8 @@ fun PortfolioCard(
                             state = rememberSharedContentState(key = "coinCard/${listType}_${portfolioCoin.id}"),
                             animatedVisibilityScope = animatedVisibilityScope
                         ),*/
-                )
+                    )
+                }
             }
             item {
                 Spacer(modifier = Modifier.height(30.dp))

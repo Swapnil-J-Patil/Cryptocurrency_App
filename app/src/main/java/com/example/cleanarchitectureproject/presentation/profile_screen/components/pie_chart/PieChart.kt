@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components.pie_chart
 
+import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -73,6 +74,7 @@ fun PieChart(
     portfolioColor: Color
 ) {
     val totalSum = data.values.sum()
+    Log.d("PiechartValues", "totalSum: $totalSum and values: ${data.values} ")
     val floatValue = mutableListOf<Float>()
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)

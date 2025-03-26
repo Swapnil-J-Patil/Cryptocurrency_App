@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.domain.model
 
+import androidx.compose.ui.graphics.Color
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 
 data class PortfolioCoin(
@@ -21,5 +22,10 @@ data class PortfolioCoin(
     val isAudited: Boolean?,
     val badges: List<Int>?,
     val quantity: Double?,
-    val purchasedAt: Double?
+    val purchasedAt: Double?,
+    val currentPrice: Double?=0.0,
+    val logo: String?="",
+    val graph: String?="",
+    val color: Color?= Color.White,
+    val isGainer: Boolean?=false,
 )

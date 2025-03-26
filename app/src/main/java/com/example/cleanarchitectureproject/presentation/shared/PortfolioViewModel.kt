@@ -9,14 +9,19 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoDataCM
+import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptocurrencyCMDTO
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
+import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
 import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.DeleteCryptoPortfolioUseCase
 import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.GetAllCryptoPortfolioUseCase
 import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.GetCoinPortfolioUseCase
 import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.InsertCryptoPortfolioUseCase
 import com.example.cleanarchitectureproject.domain.use_case.portfolio_coins.IsCoinSavedPortfolioUseCase
+import com.example.cleanarchitectureproject.presentation.home_screen.CoinStatsState
 import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioCoinState
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
@@ -26,8 +31,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,42 +45,30 @@ class PortfolioViewModel @Inject constructor(
     private val insertCryptoUseCase: InsertCryptoPortfolioUseCase,
     private val deleteCryptoUseCase: DeleteCryptoPortfolioUseCase,
     private val isCoinSavedUseCase: IsCoinSavedPortfolioUseCase,
+    private val getCurrencyStatsUseCase: GetCurrencyStatsUseCase,
 
     ) : ViewModel() {
 
     private val _coinListState = MutableLiveData(PortfolioCoinState())
     val coinListState: LiveData<PortfolioCoinState> = _coinListState
 
-    private val _currencyList = MutableLiveData<List<CryptocurrencyCoin>>(emptyList())
-    val currencyList: LiveData<List<CryptocurrencyCoin>> = _currencyList
+    private val _statsState = mutableStateOf(CoinStatsState())
+    val statsState: State<CoinStatsState> = _statsState
 
-    private val _searchQuery = MutableLiveData("")
-    val searchQuery: LiveData<String> = _searchQuery
+    private val _currencyList = MutableLiveData<List<PortfolioCoin>>(emptyList())
+    val currencyList: LiveData<List<PortfolioCoin>> = _currencyList
+
+    private val _filteredCurrencyList = MutableLiveData<List<Double>>(emptyList())
+    val filteredCurrencyList: LiveData<List<Double>> = _filteredCurrencyList
 
     val portfolioValue= MutableLiveData(0.0)
     val portfolioPercentage= MutableLiveData(0.0)
 
-    /*val filteredCoins = searchQuery
-        .combine(currencyList) { query, allCoins ->
-            if (query.isBlank()) allCoins
-            else allCoins.filter { coin ->
-                coin.name.contains(query, ignoreCase = true) ||
-                        coin.symbol.contains(query, ignoreCase = true) ||
-                        coin.id.toString().contains(query)
-            }
-        }
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
-    fun updateSearchQuery(query: String) {
-        _searchQuery.value = query
-        Log.d("FilteredCoins", "Size: ${filteredCoins.value.size}, List: $filteredCoins")
-
-    }*/
 
     init {
         loadCrypto()
     }
-    fun loadCrypto() {
+    private fun loadCrypto() {
         viewModelScope.launch {
             getAllCryptoUseCase().collect { result ->
                 when (result) {
@@ -85,6 +81,7 @@ class PortfolioViewModel @Inject constructor(
                         portfolioValue.value=0.0
                         portfolioValue.value=0.0
                         _coinListState.value = PortfolioCoinState(cryptocurrency = result.data)
+                        getCoinStats()
                         result.data?.let {
                             processCoins(it) }
                         Log.d("portfolioViewmodel", "Successfully loaded: ${result.data}")
@@ -99,6 +96,36 @@ class PortfolioViewModel @Inject constructor(
         }
     }
 
+    private fun getCoinStats() {
+        getCurrencyStatsUseCase().onEach { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val allCoins = result.data?.data?.cryptoCurrencyList ?: emptyList()
+
+                    // Get the list of IDs from currencyList
+                    val selectedCoinIds = _coinListState.value?.cryptocurrency?.map { it.id } ?: emptyList()
+
+                    // Extract only the prices of the selected coins
+                    val filteredPrices = selectedCoinIds.mapNotNull { id ->
+                        allCoins.find { it.id == id }?.quotes?.firstOrNull()?.price
+                    }
+
+                    // Update state with ordered filtered prices
+                    _filteredCurrencyList.value = filteredPrices
+                }
+
+                is Resource.Error -> {
+                    _statsState.value = CoinStatsState(
+                        error = result.message ?: "An unexpected error occurred"
+                    )
+                }
+
+                is Resource.Loading -> {
+                    _statsState.value = CoinStatsState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun getSavedCoinQuantity(coinId: String, onResult: (Double?) -> Unit) {
         viewModelScope.launch {
@@ -145,66 +172,60 @@ class PortfolioViewModel @Inject constructor(
         }
     }
 
-
     private fun processCoins(coins: List<PortfolioCoin>) {
         viewModelScope.launch {
-            val cryptocurrencyCoins = coins.map { coin ->
-                Log.d("portfolioViewmodel", "coins : ${coins.size} and ${coins}" )
+            filteredCurrencyList.observeForever { filteredPrices ->
+                val cryptocurrencyCoins = coins.mapIndexed { index,coin ->
+                    Log.d("portfolioViewmodel", "coins : ${coins.size} and ${coins}")
 
-                val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
+                    val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
 
 
-                val percentage = firstQuote!!.percentChange1h.toString()
-                val currentPrice = firstQuote.price * (coin.quantity ?: 0.0) //need to change this later to get live price
-                val purchasedPrice = (coin.purchasedAt?.toDouble() ?: 0.0) * (coin.quantity ?: 0.0)
-                val percentageChange = (currentPrice -purchasedPrice) / purchasedPrice * 100
+                    val percentage = firstQuote!!.percentChange1h.toString()
+                    val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price ?: 0.0
 
-                portfolioValue.value = portfolioValue.value?.plus(currentPrice)
-                portfolioPercentage.value = portfolioPercentage.value?.plus(percentageChange)
-                Log.d("portfolioViewmodel", "price: $currentPrice and portfolioPrice: ${portfolioValue.value}" )
-                Log.d("portfolioViewmodel", "percentage: $percentageChange and portfolioPrice: ${portfolioPercentage.value}" )
+                    val currentPrice = livePrice * (coin.quantity ?: 0.0) //need to change this later to get live price
+                    val purchasedPrice = (coin.purchasedAt?.toDouble() ?: 0.0) * (coin.quantity ?: 0.0)
 
-                val formattedPrice = "$ " + if (currentPrice < 1000 && currentPrice.toString().length > 5) currentPrice.toString().substring(0, 5) else currentPrice.toString().substring(0, 3) + ".."
-                val formatedPercentage=if(percentageChange > 0.0)"+" else "-" + if (percentageChange.toString().length > 5) percentageChange.toString().substring(0, 5)  + " %" else percentageChange.toString() + " %"
-                val color = if (currentPrice - purchasedPrice > 0) green else lightRed
+                    val percentageChange = (currentPrice - purchasedPrice) / purchasedPrice * 100
 
-                CryptocurrencyCoin(
-                    id = coin.id,
-                    name = coin.name,
-                    symbol = coin.symbol.toString(),
-                    slug = coin.slug.toString(),
-                    tags = coin.tags?: emptyList(),
-                    cmcRank = coin.cmcRank?:0,
-                    marketPairCount = coin.marketPairCount?:0,
-                    circulatingSupply = coin.circulatingSupply?:0.0,
-                    selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply?:0.0,
-                    totalSupply = coin.totalSupply?:0.0,
-                    maxSupply = coin.maxSupply,
-                    isActive = coin.isActive?:0,
-                    lastUpdated = coin.lastUpdated.toString(),
-                    dateAdded = coin.dateAdded.toString(),
-                    quotes = coin.quotes,
-                    isAudited = coin.isAudited?:false,
-                    auditInfoList = emptyList(),
-                    badges = coin.badges?: emptyList(),
-                    percentage = formatedPercentage,
-                    price = formattedPrice,
-                    logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
-                    graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
-                    color = color,
-                    isGainer = firstQuote.percentChange1h > 0
-                )
+
+                    portfolioValue.value = portfolioValue.value?.plus(currentPrice)
+                    portfolioPercentage.value = portfolioPercentage.value?.plus(percentageChange)
+
+                    val color = if (currentPrice - purchasedPrice > 0) green else lightRed
+
+                    PortfolioCoin(
+                        id = coin.id,
+                        name = coin.name,
+                        symbol = coin.symbol.toString(),
+                        slug = coin.slug.toString(),
+                        tags = coin.tags ?: emptyList(),
+                        cmcRank = coin.cmcRank ?: 0,
+                        marketPairCount = coin.marketPairCount ?: 0,
+                        circulatingSupply = coin.circulatingSupply ?: 0.0,
+                        selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply ?: 0.0,
+                        totalSupply = coin.totalSupply ?: 0.0,
+                        maxSupply = coin.maxSupply,
+                        isActive = coin.isActive ?: 0,
+                        lastUpdated = coin.lastUpdated.toString(),
+                        dateAdded = coin.dateAdded.toString(),
+                        quotes = coin.quotes,
+                        isAudited = coin.isAudited ?: false,
+                        badges = coin.badges ?: emptyList(),
+                        purchasedAt = purchasedPrice,
+                        currentPrice = currentPrice,
+                        logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
+                        graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
+                        color = color,
+                        isGainer = percentageChange > 0,
+                        quantity = coin.quantity
+                    )
+                }
+
+                _currencyList.value = cryptocurrencyCoins
             }
-
-            _currencyList.value = cryptocurrencyCoins
         }
     }
 
-    fun getDynamicThreshold(marketCap: Double): Pair<Double, Double> {
-        return when {
-            marketCap > 1_000_000_000 -> 1_000_000.0 to 0.02 // Large cap: $1M+ volume, 2% turnover
-            marketCap > 100_000_000 -> 100_000.0 to 0.015 // Mid cap: $100K+ volume, 1.5% turnover
-            else -> 10_000.0 to 0.01 // Small cap: $10K+ volume, 1% turnover
-        }
-    }
 }
