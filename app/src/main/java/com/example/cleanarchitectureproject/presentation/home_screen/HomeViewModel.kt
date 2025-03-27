@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -83,15 +84,24 @@ class HomeViewModel @Inject constructor(
     }
 
     fun processGainersAndLosers(topGainers: List<CryptoCurrencyCM>, topLosers: List<CryptoCurrencyCM>) {
+        val dfSmall = DecimalFormat("0.#####") // Up to 6 decimal places
+        val dfPercentage = DecimalFormat("#,##0.00") // Ensures percentages are formatted properly
+
         viewModelScope.launch {
             _gainerPercentageList.value = topGainers.map { gainer ->
-                val percentage = gainer.quotes[0].percentChange1h.toString()
-                "+" + if (percentage.length > 5) percentage.substring(0, 5)  + " %" else percentage + " %"
+                val percentage = gainer.quotes[0].percentChange1h
+                val formattedPercentage = dfPercentage.format(percentage) + " %"
+                if (percentage >= 0) "+$formattedPercentage" else formattedPercentage
             }
 
             _gainerPriceList.value = topGainers.map { gainer ->
                 val price = gainer.quotes[0].price
-                "$ " + if (price < 1000 && price.toString().length > 5) price.toString().substring(0, 5) else price.toString().substring(0, 3) + ".."
+                val formattedPrice = when {
+                    price < 0.0001 -> "0.00.."  // Extremely small values
+                    price < 100 -> dfSmall.format(price) // Up to 6 decimal places
+                    else -> price.toInt().toString().take(3) + ".." // Large numbers (first 3 digits + "..")
+                }
+                "$ $formattedPrice"
             }
 
             _gainerLogoList.value = topGainers.map { gainer ->
@@ -103,12 +113,18 @@ class HomeViewModel @Inject constructor(
             }
 
             _loserPercentageList.value = topLosers.map { loser ->
-                val percentage = loser.quotes[0].percentChange1h.toString()
-                if (percentage.length > 5) percentage.substring(0, 6)  + " %" else percentage + " %"
+                val percentage = loser.quotes[0].percentChange1h
+                dfPercentage.format(percentage) + " %"
             }
 
             _loserPriceList.value = topLosers.map { loser ->
-                "$ " + loser.quotes[0].price.toString().substring(0, 5)
+                val price = loser.quotes[0].price
+                val formattedPrice = when {
+                    price < 0.0001 -> "0.00.."  // Extremely small values
+                    price < 1000 -> dfSmall.format(price) // Up to 6 decimal places
+                    else -> price.toInt().toString().take(3) + ".." // Large numbers (first 3 digits + "..")
+                }
+                "$ $formattedPrice"
             }
 
             _loserLogoList.value = topLosers.map { loser ->
@@ -146,4 +162,13 @@ class HomeViewModel @Inject constructor(
             Log.d("cryptoCurrency", "Sorted Losers: $sortedCryptocurrencies")
         }
     }
+    fun formatPrice(value: Double): String {
+        val priceStr = value.toBigDecimal().toPlainString() // Avoid scientific notation
+
+        return when {
+            priceStr.length >= 10 -> priceStr.substring(0, 10)  // Truncate if too long
+            else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
+        }
+    }
+
 }

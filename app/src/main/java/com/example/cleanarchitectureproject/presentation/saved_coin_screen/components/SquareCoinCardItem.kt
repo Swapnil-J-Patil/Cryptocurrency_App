@@ -1,5 +1,8 @@
 package com.example.cleanarchitectureproject.presentation.saved_coin_screen.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -56,8 +59,9 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.lightGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SquareCoinCardItem(
+fun SharedTransitionScope.SquareCoinCardItem(
     currencyName: String,
     symbol: String,
     percentage: String,
@@ -67,7 +71,10 @@ fun SquareCoinCardItem(
     logo: String,
     quotes: QuoteCM,
     isGainer:Boolean,
-    isTab: Boolean
+    isTab: Boolean,
+    listType:String,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    coinId: String
 ) {
     val degree= if(isGainer) 270f else 90f
     val rotationMax= 360f
@@ -102,6 +109,10 @@ fun SquareCoinCardItem(
                 .fillMaxWidth()
                 .height(40.dp)
                 .background(Color.Transparent)
+                .sharedElement(
+                    state = rememberSharedContentState(key = "coinCard/${listType}_${coinId}"),
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
                 .padding(horizontal = 8.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -193,9 +204,9 @@ fun SquareCoinCardItem(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .width(lineChartWidth)
+                    .fillMaxWidth()
                     .height(120.dp)
-                    .padding(start = 10.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
+                    .padding(start = 10.dp, end = 10.dp, top = 10.dp, bottom = 10.dp)
             )
             {
                 LineChartItem(

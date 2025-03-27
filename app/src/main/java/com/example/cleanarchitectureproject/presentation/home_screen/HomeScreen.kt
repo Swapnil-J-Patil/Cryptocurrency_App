@@ -61,6 +61,7 @@ import com.example.cleanarchitectureproject.presentation.home_screen.components.
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -188,12 +189,8 @@ fun SharedTransitionScope.HomeScreen(
                                 onCardClicked = { item ->
 
                                     ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
-                                    val price =
-                                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                            .substring(
-                                                0,
-                                                10
-                                            ) else item.quotes[0].price.toString()
+                                    val price = "$ " + viewModel.formatPrice(item.quotes[0].price)
+
                                     val percentage =
                                         item.quotes[0].percentChange1h.toString()
                                     coroutineScope.launch {
@@ -223,26 +220,22 @@ fun SharedTransitionScope.HomeScreen(
                             gainersPercentage = gainerPercentageList,
                             losersPercentage = loserPercentageList,
                             onItemClick = { item, isGainer ->
+                                val price = "$ " + viewModel.formatPrice(item.quotes[0].price)
 
-                                ///{coinId}/{coinSymbol}/{imageUrl}/{price}/{percentage}/{isSaved}
-                                val price =
-                                    "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                        .substring(
-                                            0,
-                                            10
-                                        ) else item.quotes[0].price.toString()
-                                val percentage =
-                                    item.quotes[0].percentChange1h.toString()
+                                val percentage = item.quotes[0].percentChange1h.toString()
 
                                 coroutineScope.launch {
                                     isSaved = savedCoinViewModel.isCoinSaved(item.id.toString())
                                     Log.d("isSaved", "HomeScreen isSaved value: $isSaved")
+
                                     val coinData = item.toCryptoCoin()
-                                    val gson =
-                                        Gson() // Or use kotlinx.serialization
+                                    val gson = Gson() // Or use kotlinx.serialization
                                     val coinDataJson = gson.toJson(coinData)
                                     val listType = "gainersAndLosers"
-                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}")
+
+                                    navController.navigate(
+                                        Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${isGainer}/${isSaved}/${coinDataJson}/${listType}"
+                                    )
                                 }
                             },
                             animatedVisibilityScope,

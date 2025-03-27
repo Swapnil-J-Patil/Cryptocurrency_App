@@ -60,6 +60,7 @@ fun SharedTransitionScope.Tabs(
     portfolioCoins: List<PortfolioCoin>? = emptyList(),
     portfolioValue: Double? = 0.0,
     portfolioPercentage: Double? = 0.0,
+    dollars: Double =0.0
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
@@ -284,6 +285,7 @@ fun SharedTransitionScope.Tabs(
                                     portfolioCoins = portfolioCoins,
                                     portfolioValue = portfolioValue,
                                     portfolioPercentage = portfolioPercentage,
+                                    dollars = dollars
                                 )
                             }
                         }

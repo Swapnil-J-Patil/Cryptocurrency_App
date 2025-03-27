@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
@@ -74,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.ProfileData
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
@@ -91,12 +93,15 @@ fun SharedTransitionScope.ProfileScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
     keyStoreViewModel: KeyStoreViewModel = hiltViewModel(),
-    viewModel: PortfolioViewModel = hiltViewModel()
+    viewModel: PortfolioViewModel = hiltViewModel(),
+    context:Context
 ) {
     //viewModel.loadCrypto()
     val portfolioCoinList by viewModel.currencyList.observeAsState()
     val portfolioValue by viewModel.portfolioValue.observeAsState()
     val portfolioPercentage by viewModel.portfolioPercentage.observeAsState()
+    val prefsManager = remember { PrefsManager(context) }
+    val dollars = prefsManager.getDollarAmount()
 
     val tokens by keyStoreViewModel.tokens.collectAsState()
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
@@ -251,20 +256,23 @@ fun SharedTransitionScope.ProfileScreen(
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         portfolioCoinList.let {
-                            Tabs(
-                                screen = "profile",
-                                tabTitles = tabTitles,
-                                onItemClick = { item, flag ->
+                            if (dollars != null) {
+                                Tabs(
+                                    screen = "profile",
+                                    tabTitles = tabTitles,
+                                    onItemClick = { item, flag ->
 
-                                },
-                                animatedVisibilityScope = animatedVisibilityScope,
-                                onAuthClick = { type, method, email, password ->
+                                    },
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                    onAuthClick = { type, method, email, password ->
 
-                                },
-                                portfolioCoins = it,
-                                portfolioValue = portfolioValue,
-                                portfolioPercentage = portfolioPercentage,
-                            )
+                                    },
+                                    portfolioCoins = it,
+                                    portfolioValue = portfolioValue,
+                                    portfolioPercentage = portfolioPercentage,
+                                    dollars = dollars.toDouble()
+                                )
+                            }
                         }
 
                     }

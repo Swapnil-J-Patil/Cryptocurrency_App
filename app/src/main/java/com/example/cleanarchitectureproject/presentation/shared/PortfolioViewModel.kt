@@ -61,35 +61,48 @@ class PortfolioViewModel @Inject constructor(
     private val _filteredCurrencyList = MutableLiveData<List<Double>>(emptyList())
     val filteredCurrencyList: LiveData<List<Double>> = _filteredCurrencyList
 
-    val portfolioValue= MutableLiveData(0.0)
-    val portfolioPercentage= MutableLiveData(0.0)
+    val portfolioValue = MutableLiveData(0.0)
+    val portfolioPercentage = MutableLiveData(0.0)
 
 
     init {
         loadCrypto()
+
+        // Observe filteredCurrencyList and call processCoins only when data is available
+        _filteredCurrencyList.observeForever { filteredPrices ->
+            val coins = _coinListState.value?.cryptocurrency
+            if (!coins.isNullOrEmpty() && filteredPrices.isNotEmpty()) {
+                processCoins(coins, filteredPrices)
+            }
+        }
     }
+
+
     private fun loadCrypto() {
         viewModelScope.launch {
             getAllCryptoUseCase().collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _coinListState.value = PortfolioCoinState(isLoading = true)
-                        Log.d("portfolioViewmodel", "Loading data...")
+                        Log.d("portfolioViewmodelPVM", "Loading data...")
                     }
 
                     is Resource.Success -> {
-                        portfolioValue.value=0.0
-                        portfolioValue.value=0.0
+                        portfolioValue.value = 0.0
+                        portfolioValue.value = 0.0
                         _coinListState.value = PortfolioCoinState(cryptocurrency = result.data)
                         getCoinStats()
-                        result.data?.let {
-                            processCoins(it) }
-                        Log.d("portfolioViewmodel", "Successfully loaded: ${result.data}")
+                       /* if (!result.data.isNullOrEmpty()) {
+                            processCoins(result.data)
+                            Log.d("portfolioViewmodelPVM", "Successfully loaded: ${result.data.size}")
+                        }*/
+
                     }
 
                     is Resource.Error -> {
-                        _coinListState.value = PortfolioCoinState(error = result.message ?: "Unknown error")
-                        Log.e("portfolioViewmodel", "Error loading data: ${result.message}")
+                        _coinListState.value =
+                            PortfolioCoinState(error = result.message ?: "Unknown error")
+                        Log.e("portfolioViewmodelPVM", "Error loading data: ${result.message}")
                     }
                 }
             }
@@ -103,7 +116,8 @@ class PortfolioViewModel @Inject constructor(
                     val allCoins = result.data?.data?.cryptoCurrencyList ?: emptyList()
 
                     // Get the list of IDs from currencyList
-                    val selectedCoinIds = _coinListState.value?.cryptocurrency?.map { it.id } ?: emptyList()
+                    val selectedCoinIds =
+                        _coinListState.value?.cryptocurrency?.map { it.id } ?: emptyList()
 
                     // Extract only the prices of the selected coins
                     val filteredPrices = selectedCoinIds.mapNotNull { id ->
@@ -149,8 +163,15 @@ class PortfolioViewModel @Inject constructor(
             insertCryptoUseCase(crypto).collect { result ->
                 when (result) {
                     is Resource.Loading -> Log.d("SavedCoinViewModel", "Inserting crypto...")
-                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully inserted: ${crypto.name}")
-                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error inserting crypto: ${result.message}")
+                    is Resource.Success -> Log.d(
+                        "SavedCoinViewModel",
+                        "Successfully inserted: ${crypto.name}"
+                    )
+
+                    is Resource.Error -> Log.e(
+                        "SavedCoinViewModel",
+                        "Error inserting crypto: ${result.message}"
+                    )
                 }
             }
         }
@@ -165,67 +186,71 @@ class PortfolioViewModel @Inject constructor(
             deleteCryptoUseCase(coin).collect { result ->
                 when (result) {
                     is Resource.Loading -> Log.d("SavedCoinViewModel", "Deleting crypto...")
-                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully deleted: ${coin.name}")
-                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error deleting crypto: ${result.message}")
+                    is Resource.Success -> Log.d(
+                        "SavedCoinViewModel",
+                        "Successfully deleted: ${coin.name}"
+                    )
+
+                    is Resource.Error -> Log.e(
+                        "SavedCoinViewModel",
+                        "Error deleting crypto: ${result.message}"
+                    )
                 }
             }
         }
     }
 
-    private fun processCoins(coins: List<PortfolioCoin>) {
-        viewModelScope.launch {
-            filteredCurrencyList.observeForever { filteredPrices ->
-                val cryptocurrencyCoins = coins.mapIndexed { index,coin ->
-                    Log.d("portfolioViewmodel", "coins : ${coins.size} and ${coins}")
+    private fun processCoins(coins: List<PortfolioCoin>, filteredPrices: List<Double>) {
+        val cryptocurrencyCoins = coins.mapIndexed { index, coin ->
+            Log.d("portfolioViewmodelPVM", "Processing coins...")
 
-                    val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
+            val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
+            val percentage = firstQuote?.percentChange1h?.toString() ?: "0.0"
+            val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price ?: 0.0
 
+            val currentPrice = livePrice * (coin.quantity ?: 0.0)
+            val purchasedPrice = (coin.purchasedAt?.toDouble() ?: 0.0) * (coin.quantity ?: 0.0)
 
-                    val percentage = firstQuote!!.percentChange1h.toString()
-                    val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price ?: 0.0
-
-                    val currentPrice = livePrice * (coin.quantity ?: 0.0) //need to change this later to get live price
-                    val purchasedPrice = (coin.purchasedAt?.toDouble() ?: 0.0) * (coin.quantity ?: 0.0)
-
-                    val percentageChange = (currentPrice - purchasedPrice) / purchasedPrice * 100
-
-
-                    portfolioValue.value = portfolioValue.value?.plus(currentPrice)
-                    portfolioPercentage.value = portfolioPercentage.value?.plus(percentageChange)
-
-                    val color = if (currentPrice - purchasedPrice > 0) green else lightRed
-
-                    PortfolioCoin(
-                        id = coin.id,
-                        name = coin.name,
-                        symbol = coin.symbol.toString(),
-                        slug = coin.slug.toString(),
-                        tags = coin.tags ?: emptyList(),
-                        cmcRank = coin.cmcRank ?: 0,
-                        marketPairCount = coin.marketPairCount ?: 0,
-                        circulatingSupply = coin.circulatingSupply ?: 0.0,
-                        selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply ?: 0.0,
-                        totalSupply = coin.totalSupply ?: 0.0,
-                        maxSupply = coin.maxSupply,
-                        isActive = coin.isActive ?: 0,
-                        lastUpdated = coin.lastUpdated.toString(),
-                        dateAdded = coin.dateAdded.toString(),
-                        quotes = coin.quotes,
-                        isAudited = coin.isAudited ?: false,
-                        badges = coin.badges ?: emptyList(),
-                        purchasedAt = purchasedPrice,
-                        currentPrice = currentPrice,
-                        logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
-                        graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
-                        color = color,
-                        isGainer = percentageChange > 0,
-                        quantity = coin.quantity
-                    )
-                }
-
-                _currencyList.value = cryptocurrencyCoins
+            val percentageChange = if (purchasedPrice > 0) {
+                ((currentPrice - purchasedPrice) / purchasedPrice) * 100
+            } else {
+                0.0
             }
+
+            portfolioValue.value = (portfolioValue.value ?: 0.0) + currentPrice
+            portfolioPercentage.value = (portfolioPercentage.value ?: 0.0) + percentageChange
+
+            val color = if (currentPrice - purchasedPrice > 0) green else lightRed
+
+            PortfolioCoin(
+                id = coin.id,
+                name = coin.name,
+                symbol = coin.symbol.toString(),
+                slug = coin.slug.toString(),
+                tags = coin.tags ?: emptyList(),
+                cmcRank = coin.cmcRank ?: 0,
+                marketPairCount = coin.marketPairCount ?: 0,
+                circulatingSupply = coin.circulatingSupply ?: 0.0,
+                selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply ?: 0.0,
+                totalSupply = coin.totalSupply ?: 0.0,
+                maxSupply = coin.maxSupply,
+                isActive = coin.isActive ?: 0,
+                lastUpdated = coin.lastUpdated.toString(),
+                dateAdded = coin.dateAdded.toString(),
+                quotes = coin.quotes,
+                isAudited = coin.isAudited ?: false,
+                badges = coin.badges ?: emptyList(),
+                purchasedAt = purchasedPrice,
+                currentPrice = currentPrice,
+                logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
+                graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
+                color = color,
+                isGainer = percentageChange > 0,
+                quantity = coin.quantity
+            )
         }
+
+        _currencyList.value = cryptocurrencyCoins
     }
 
 }

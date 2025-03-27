@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components.pie_chart
 
+import android.graphics.Bitmap
 import android.util.Log
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
@@ -25,8 +26,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
@@ -71,7 +74,8 @@ fun PieChart(
     maxValue:Int = 120,
     portfolioValue: String,
     portfolioPercentage: String,
-    portfolioColor: Color
+    portfolioColor: Color,
+    imageUrls: List<String?> // New parameter for images
 ) {
     val totalSum = data.values.sum()
     Log.d("PiechartValues", "totalSum: $totalSum and values: ${data.values} ")
@@ -102,7 +106,7 @@ fun PieChart(
         .build()
 
 // Load the image asynchronously
-    var imageBitmap by remember { mutableStateOf<androidx.compose.ui.graphics.ImageBitmap?>(null) }
+    val imageBitmaps = remember { mutableStateListOf<ImageBitmap?>(null, null, null, null, null) }
     val degree = if (isGainer) 270f else 90f
     val color = if (isGainer) green else lightRed
     val rotationMax = 360f
@@ -133,11 +137,27 @@ fun PieChart(
             easing = LinearOutSlowInEasing
         )
     )
+    LaunchedEffect(imageUrls) {
+        imageUrls.forEachIndexed { index, url ->
+            if (url != null) {
+                val request = ImageRequest.Builder(context)
+                    .data(url)
+                    .size(50, 50)
+                    .allowHardware(false) // Disable hardware bitmaps
+                    .build()
+                val result = imageLoader.execute(request)
+                if (result is SuccessResult) {
+                    imageBitmaps[index] = result.drawable.toBitmap().copy(Bitmap.Config.ARGB_8888, true).asImageBitmap()
+                }
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
-        val result = imageLoader.execute(imageRequest)
+       /* val result = imageLoader.execute(imageRequest)
         if (result is SuccessResult) {
             imageBitmap = result.drawable.toBitmap().asImageBitmap()
-        }
+        }*/
         animationPlayed = true
 
         delay(2000L) // Delay for 1 second (1000 milliseconds)
@@ -274,24 +294,33 @@ fun PieChart(
 
 
                     drawIntoCanvas { canvas ->
-                        imageBitmap?.let { bitmap ->
-                            val paint = Paint()
-                            val imageSize = 28.dp.toPx() // Adjust the size of the image
-
-                            // Calculate the top-left position so the image is centered at lineEnd
+                        imageBitmaps.getOrNull(index)?.let { bitmap ->
+                            val imageSize = 28.dp.toPx() // Adjust size as needed
                             val imageOffset = Offset(
                                 x = lineEnd.x - imageSize / 2 + 18,
                                 y = lineEnd.y - imageSize / 2 + 18
                             )
 
-                            // Draw the image at the correct position
+                            val roundBitmap = bitmap.asAndroidBitmap().let {
+                                Bitmap.createBitmap(it.width, it.height, Bitmap.Config.ARGB_8888).apply {
+                                    val canvas = android.graphics.Canvas(this)
+                                    val paint = android.graphics.Paint().apply {
+                                        isAntiAlias = true
+                                        shader = android.graphics.BitmapShader(it, android.graphics.Shader.TileMode.CLAMP, android.graphics.Shader.TileMode.CLAMP)
+                                    }
+                                    val radius = it.width.coerceAtMost(it.height) / 2f
+                                    canvas.drawCircle(it.width / 2f, it.height / 2f, radius, paint)
+                                }
+                            }.asImageBitmap()
+
                             canvas.drawImage(
-                                image = bitmap,
+                                image = roundBitmap,
                                 topLeftOffset = imageOffset,
-                                paint = paint
+                                paint = Paint()
                             )
                         }
                     }
+
                     lastValue += value + arcSpacing // Add spacing between arcs
                 }
 

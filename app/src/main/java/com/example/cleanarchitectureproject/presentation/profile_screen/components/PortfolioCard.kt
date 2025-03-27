@@ -5,6 +5,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -30,6 +32,7 @@ import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.pie_chart.PieChart
+import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CoinDisplay
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
@@ -41,6 +44,7 @@ fun PortfolioCard(
     portfolioCoins: List<PortfolioCoin>,
     portfolioValue: Double,
     portfolioPercentage: Double,
+    dollars: Double
 ) {
     val listState = rememberLazyListState()
 
@@ -64,30 +68,54 @@ fun PortfolioCard(
             state = listState,
         ) {
             item {
-                Spacer(modifier = Modifier.height(50.dp))
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterEnd
+                )
+                {
+                    CoinDisplay(amount = dollars.toDouble(), isSell = false)
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(30.dp))
 
                 if (portfolioCoins.isNotEmpty()) {
-                    // Sort coins by quantity in descending order, safely handling null values
+                    // Sort coins by quantity in descending order
                     val sortedCoins = portfolioCoins.sortedByDescending { it.quantity ?: 0.0 }
 
-                    val pieChartData: Map<String, Int> = when {
+                    val pieChartData: Map<String, Int>
+                    val imageUrls: List<String?>
+
+                    when {
                         sortedCoins.size <= 4 -> {
                             // If there are 4 or fewer coins, use them all directly
-                            sortedCoins.associate { it.name to (it.quantity?.toInt() ?: 0) }
+                            pieChartData = sortedCoins.associate { it.name to (it.quantity?.toInt() ?: 0) }
+                            imageUrls = sortedCoins.map { it.logo.toString() }
                         }
+
                         else -> {
                             // Take the first 4 coins
                             val topCoins = sortedCoins.take(4)
                                 .associate { it.name to (it.quantity?.toInt() ?: 0) }
 
+                            // Extract the top 4 image URLs
+                            val topImageUrls = sortedCoins.take(4).map { it.logo }
+
                             // Sum the quantities of the remaining coins
                             val othersQuantity = sortedCoins.drop(4).sumOf { it.quantity ?: 0.0 }.toInt()
 
-                            // Include "Others" only if there's a remaining quantity
-                            if (othersQuantity > 0) {
+                            pieChartData = if (othersQuantity > 0) {
                                 topCoins + ("Others" to othersQuantity)
                             } else {
                                 topCoins
+                            }
+
+                            val dummyUrl="https://cdn-icons-png.freepik.com/256/17470/17470916.png?semt=ais_hybrid"
+                            // Add a dummy image for "Others"
+                            imageUrls = if (othersQuantity > 0) {
+                                topImageUrls + dummyUrl
+                            } else {
+                                topImageUrls
                             }
                         }
                     }
@@ -99,25 +127,16 @@ fun PortfolioCard(
                         ringBgColor = MaterialTheme.colorScheme.tertiary,
                         portfolioValue = formattedPrice,
                         portfolioPercentage = formattedPercentage,
-                        portfolioColor = portfolioColor
+                        portfolioColor = portfolioColor,
+                        imageUrls = imageUrls // Pass the image URLs
                     )
                 }
 
-                /*PieChart(
-                    data = mapOf(
-                        Pair("Sample-1", 150),
-                        Pair("Sample-2", 120),
-                        Pair("Sample-3", 110),
-                        Pair("Sample-4", 170),
-                        Pair("Sample-5", 120),
-                    ),
-                    ringBorderColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    ringBgColor = MaterialTheme.colorScheme.tertiary,
-                    portfolioValue = formattedPrice,
-                    portfolioPercentage = formatedPercentage,
-                    portfolioColor = portfolioColor
-                )*/
-                Spacer(modifier = Modifier.height(60.dp))
+
+
+            }
+            item {
+                Spacer(modifier = Modifier.height(40.dp))
             }
 
             itemsIndexed(

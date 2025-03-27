@@ -58,6 +58,7 @@ import com.example.cleanarchitectureproject.presentation.home_screen.components.
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -185,12 +186,9 @@ fun SharedTransitionScope.HomeScreenTab(
                                         items = it.cryptoCurrencyList,
                                         onCardClicked = { item ->
 
-                                            val price =
-                                                "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                                    .substring(
-                                                        0,
-                                                        10
-                                                    ) else item.quotes[0].price.toString()
+                                            val price = "$ " + viewModel.formatPrice(item.quotes[0].price)
+
+
                                             val percentage =
                                                 item.quotes[0].percentChange1h.toString()
 
@@ -223,12 +221,9 @@ fun SharedTransitionScope.HomeScreenTab(
                                 losersPercentage = loserPercentageList,
                                 onItemClick = { item, isGainer ->
 
-                                    val price =
-                                        "$ " + if (item.quotes[0].price.toString().length > 10) item.quotes[0].price.toString()
-                                            .substring(
-                                                0,
-                                                10
-                                            ) else item.quotes[0].price.toString()
+                                    val dfSmall = DecimalFormat("0.########")  // Small numbers (avoids scientific notation)
+                                    val price = "$ " + viewModel.formatPrice(item.quotes[0].price)
+
                                     val percentage =
                                         item.quotes[0].percentChange1h.toString()
 

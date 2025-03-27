@@ -68,6 +68,7 @@ import com.example.cleanarchitectureproject.presentation.saved_coin_screen.compo
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -194,12 +195,14 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                         }
                                     }
                                     val listType = "savedCoins"
-                                    val price =
-                                        "$ " + if (coin.quotes[0].price.toString().length > 10) coin.quotes[0].price.toString()
-                                            .substring(
-                                                0,
-                                                10
-                                            ) else coin.quotes[0].price.toString()
+                                    val price = "$ " + viewModel.formatPrice(coin.quotes[0].price)
+                                    val dfSmall = DecimalFormat("0.#####") // Up to 6 decimal places
+                                    val formattedPrice = when {
+                                        coin.quotes[0].price < 0.0001 -> "0.00.."  // Extremely small values
+                                        coin.quotes[0].price < 100 -> dfSmall.format(coin.quotes[0].price) // Up to 6 decimal places
+                                        else -> price.toInt().toString().take(3) + ".." // Large numbers (first 3 digits + "..")
+                                    }
+                                    "$ $formattedPrice"
                                     val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
                                     val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
                                         if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
@@ -211,7 +214,7 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                         symbol = coin.symbol,
                                         percentage = if (coin.isGainer) "+" + formattedPercentage + "%" else formattedPercentage + "%",
                                         isGainer = coin.isGainer,
-                                        price = coin.price,
+                                        price = formattedPrice,
                                         color = coin.color,
                                         logo = coin.logo,
                                         quotes = coin.quotes[0],
@@ -222,10 +225,6 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                             .graphicsLayer(
                                                 scaleX = scale.value,
                                                 scaleY = scale.value
-                                            )
-                                            .sharedElement(
-                                                state = rememberSharedContentState(key = "coinCard/${listType}_${coin.id}"),
-                                                animatedVisibilityScope = animatedVisibilityScope
                                             )
                                             .clickable {
                                                 //onItemClick(coin, true)
@@ -241,7 +240,10 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                                     }
                                                 }
                                             },
-                                        isTab = true
+                                        isTab = true,
+                                        coinId = coin.id.toString(),
+                                        listType = listType,
+                                        animatedVisibilityScope = animatedVisibilityScope
                                     )
                                 }
                             }

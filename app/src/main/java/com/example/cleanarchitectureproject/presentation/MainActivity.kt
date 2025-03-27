@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
                         composable(
                             route = Screen.ProfileScreen.route
                         ) {
-                            ProfileScreen(navController, animatedVisibilityScope = this)
+                            ProfileScreen(navController, animatedVisibilityScope = this, context = this@MainActivity)
                         }
                         composable(
                             route = Screen.ProfileScreenTab.route

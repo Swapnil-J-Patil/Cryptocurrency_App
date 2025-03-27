@@ -171,7 +171,8 @@ fun SharedTransitionScope.MainScreen(
                 "profile" -> {
                     ProfileScreen(
                         navController,
-                        animatedVisibilityScope = animatedVisibilityScope
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        context = LocalContext.current
                     )
                 }
                 else -> {

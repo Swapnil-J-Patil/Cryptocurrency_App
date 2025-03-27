@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -90,13 +91,19 @@ class MarketViewModel @Inject constructor(
     private fun processCoins(coins: List<CryptoCurrencyCM>) {
         viewModelScope.launch {
             val cryptocurrencyCoins = coins.map { coin ->
+                val dfSmall = DecimalFormat("0.#####") // Up to 6 decimal places
+                val dfPercentage = DecimalFormat("#,##0.00") // Ensures percentages are formatted properly
                 val firstQuote = coin.quotes.firstOrNull() // Handle missing quotes
 
                 val percentage = firstQuote?.percentChange1h.toString()
 
 
                 val price = firstQuote!!.price
-                val formattedPrice = "$ " + if (price < 1000) price.toString().take(5) else price.toString().take(3) + ".."
+                val formattedPrice = "$ " + when {
+                    price < 0.0001 -> "0.00.."  // Extremely small values
+                    price < 100 -> dfSmall.format(price) // Up to 6 decimal places
+                    else -> price.toInt().toString().take(3) + ".." // Large numbers (first 3 digits + "..")
+                }
                 val color = if (coin.quotes[0].percentChange1h > 0.0) green else lightRed
 
                 CryptocurrencyCoin(
@@ -128,6 +135,14 @@ class MarketViewModel @Inject constructor(
             }
 
             _currencyList.value = cryptocurrencyCoins
+        }
+    }
+    fun formatPrice(value: Double): String {
+        val priceStr = value.toBigDecimal().toPlainString() // Avoid scientific notation
+
+        return when {
+            priceStr.length >= 10 -> priceStr.substring(0, 10)  // Truncate if too long
+            else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
         }
     }
 }

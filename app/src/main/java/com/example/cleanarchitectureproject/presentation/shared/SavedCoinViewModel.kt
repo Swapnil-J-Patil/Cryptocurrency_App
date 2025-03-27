@@ -183,4 +183,13 @@ class SavedCoinViewModel @Inject constructor(
     fun isLiquidityLow(quote: QuoteCM, volumeThreshold: Double, turnoverThreshold: Double): Boolean {
         return quote.volume24h < volumeThreshold || quote.turnover < turnoverThreshold
     }
+    fun formatPrice(value: Double): String {
+        val priceStr = value.toBigDecimal().toPlainString() // Avoid scientific notation
+
+        return when {
+            priceStr.length >= 10 -> priceStr.substring(0, 10)  // Truncate if too long
+            else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
+        }
+    }
+
 }

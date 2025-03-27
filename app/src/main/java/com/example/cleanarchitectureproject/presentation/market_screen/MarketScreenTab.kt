@@ -65,6 +65,7 @@ import com.example.cleanarchitectureproject.presentation.common_components.CoinC
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -192,12 +193,8 @@ fun SharedTransitionScope.MarketScreenTab(
                                         }
                                     }
                                     val listType = "marketScreen_new"
-                                    val price =
-                                        "$ " + if (coin.quotes[0].price.toString().length > 10) coin.quotes[0].price.toString()
-                                            .substring(
-                                                0,
-                                                10
-                                            ) else coin.quotes[0].price.toString()
+                                    val price = "$ " + viewModel.formatPrice(coin.quotes[0].price)
+
                                     val firstQuote = coin.quotes.firstOrNull() // Handle missing quotes
                                     val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
                                         if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
