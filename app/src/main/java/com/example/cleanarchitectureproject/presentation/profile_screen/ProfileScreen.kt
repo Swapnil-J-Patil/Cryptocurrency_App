@@ -51,6 +51,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -86,6 +87,7 @@ import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioC
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -99,7 +101,7 @@ fun SharedTransitionScope.ProfileScreen(
     //viewModel.loadCrypto()
     val portfolioCoinList by viewModel.currencyList.observeAsState()
     val portfolioValue by viewModel.portfolioValue.observeAsState()
-    val portfolioPercentage by viewModel.portfolioPercentage.observeAsState()
+    val totalInvestment by viewModel.totalInvestment.observeAsState()
     val prefsManager = remember { PrefsManager(context) }
     val dollars = prefsManager.getDollarAmount()
 
@@ -136,6 +138,18 @@ fun SharedTransitionScope.ProfileScreen(
     }
     LaunchedEffect(Unit) {
         visibility=!visibility
+       /* while (true)
+        {
+            delay(2000)
+            viewModel.getCoinStats()
+        }*/
+        viewModel.startFetchingCoinStats()
+
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopFetchingCoinStats()
+        }
     }
     SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
         Box(
@@ -256,6 +270,8 @@ fun SharedTransitionScope.ProfileScreen(
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         portfolioCoinList.let {
+                            val portfolioPercentage= ((portfolioValue?.minus(totalInvestment!!))?.div(totalInvestment!!))?.times(100)
+
                             if (dollars != null) {
                                 Tabs(
                                     screen = "profile",
@@ -270,7 +286,8 @@ fun SharedTransitionScope.ProfileScreen(
                                     portfolioCoins = it,
                                     portfolioValue = portfolioValue,
                                     portfolioPercentage = portfolioPercentage,
-                                    dollars = dollars.toDouble()
+                                    dollars = dollars.toDouble(),
+                                    totalInvestment = totalInvestment
                                 )
                             }
                         }

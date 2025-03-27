@@ -2,21 +2,30 @@ package com.example.cleanarchitectureproject.presentation.profile_screen.compone
 
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -34,8 +43,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -57,9 +68,11 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.redBright
 import com.example.cleanarchitectureproject.presentation.ui.theme.emeraldGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.random.Random
 
 @Composable
 fun PieChart(
@@ -75,6 +88,7 @@ fun PieChart(
     portfolioValue: String,
     portfolioPercentage: String,
     portfolioColor: Color,
+    totalInvestment: String,
     imageUrls: List<String?> // New parameter for images
 ) {
     val totalSum = data.values.sum()
@@ -137,6 +151,9 @@ fun PieChart(
             easing = LinearOutSlowInEasing
         )
     )
+    var isFlipped by remember { mutableStateOf(false) }
+
+
     LaunchedEffect(imageUrls) {
         imageUrls.forEachIndexed { index, url ->
             if (url != null) {
@@ -327,21 +344,47 @@ fun PieChart(
 
             }
             Column(
+                modifier = Modifier.clickable {
+                    isFlipped = !isFlipped
+                },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Portfolio Value",
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
 
-                Text(
-                    text = portfolioValue,
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                AnimatedVisibility(visible = isFlipped, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                    Column {
+                        Text(
+                            text = "Total Investment",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Text(
+                            text = totalInvestment,
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                AnimatedVisibility(visible = !isFlipped, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                    Column {
+                        Text(
+                            text = "Portfolio Value",
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        Text(
+                            text = portfolioValue,
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -372,6 +415,8 @@ fun PieChart(
         }
     }
 }
+
+
 
 
 

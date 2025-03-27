@@ -27,6 +27,8 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +36,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -62,8 +65,9 @@ class PortfolioViewModel @Inject constructor(
     val filteredCurrencyList: LiveData<List<Double>> = _filteredCurrencyList
 
     val portfolioValue = MutableLiveData(0.0)
-    val portfolioPercentage = MutableLiveData(0.0)
+    val totalInvestment = MutableLiveData(0.0)
 
+    private var fetchJob: Job? = null
 
     init {
         loadCrypto()
@@ -77,6 +81,26 @@ class PortfolioViewModel @Inject constructor(
         }
     }
 
+    fun startFetchingCoinStats() {
+        fetchJob?.cancel()  // Ensure previous job is canceled before starting a new one
+        fetchJob = viewModelScope.launch {
+            while (isActive) { // Ensures cancellation if ViewModel is cleared
+               /* val coins = _coinListState.value?.cryptocurrency
+                val filteredPrices=_filteredCurrencyList.value
+                if (filteredPrices != null) {
+                    if (!coins.isNullOrEmpty() && filteredPrices.isNotEmpty()) {
+                        processCoins(coins, filteredPrices)
+                    }
+                }*/
+                getCoinStats()
+                delay(2000)
+            }
+        }
+    }
+
+    fun stopFetchingCoinStats() {
+        fetchJob?.cancel()
+    }
 
     private fun loadCrypto() {
         viewModelScope.launch {
@@ -89,7 +113,7 @@ class PortfolioViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         portfolioValue.value = 0.0
-                        portfolioValue.value = 0.0
+                        totalInvestment.value = 0.0
                         _coinListState.value = PortfolioCoinState(cryptocurrency = result.data)
                         getCoinStats()
                        /* if (!result.data.isNullOrEmpty()) {
@@ -109,7 +133,7 @@ class PortfolioViewModel @Inject constructor(
         }
     }
 
-    private fun getCoinStats() {
+    fun getCoinStats() {
         getCurrencyStatsUseCase().onEach { result ->
             when (result) {
                 is Resource.Success -> {
@@ -201,8 +225,11 @@ class PortfolioViewModel @Inject constructor(
     }
 
     private fun processCoins(coins: List<PortfolioCoin>, filteredPrices: List<Double>) {
+        Log.d("portfolioViewmodelPVM", "Processing coins...")
+        portfolioValue.value = 0.0
+        totalInvestment.value = 0.0
         val cryptocurrencyCoins = coins.mapIndexed { index, coin ->
-            Log.d("portfolioViewmodelPVM", "Processing coins...")
+           // Log.d("portfolioViewmodelPVM", "Processing coins...")
 
             val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
             val percentage = firstQuote?.percentChange1h?.toString() ?: "0.0"
@@ -218,9 +245,9 @@ class PortfolioViewModel @Inject constructor(
             }
 
             portfolioValue.value = (portfolioValue.value ?: 0.0) + currentPrice
-            portfolioPercentage.value = (portfolioPercentage.value ?: 0.0) + percentageChange
+            totalInvestment.value = (totalInvestment.value ?: 0.0) + purchasedPrice
 
-            val color = if (currentPrice - purchasedPrice > 0) green else lightRed
+            val color = if (currentPrice - purchasedPrice >= 0) green else lightRed
 
             PortfolioCoin(
                 id = coin.id,
@@ -245,7 +272,7 @@ class PortfolioViewModel @Inject constructor(
                 logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
                 graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
                 color = color,
-                isGainer = percentageChange > 0,
+                isGainer = percentageChange >= 0,
                 quantity = coin.quantity
             )
         }

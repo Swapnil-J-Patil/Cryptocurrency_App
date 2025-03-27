@@ -45,12 +45,14 @@ fun PortfolioCard(
     portfolioCoins: List<PortfolioCoin>,
     portfolioValue: Double,
     portfolioPercentage: Double,
+    totalInvestment: Double,
     dollars: Double
 ) {
     val listState = rememberLazyListState()
 
     val df = DecimalFormat("#,##0.00") // Ensures two decimal places
     val formattedPrice = "$ ${df.format(portfolioValue)}"
+    val formattedInvestment="$ ${df.format(totalInvestment)}"
     val formattedPercentage =
         if (portfolioPercentage >= 0.0) "+" + df.format(portfolioPercentage) + " %" else df.format(
             portfolioPercentage
@@ -120,6 +122,7 @@ fun PortfolioCard(
                     portfolioValue = formattedPrice,
                     portfolioPercentage = formattedPercentage,
                     portfolioColor = portfolioColor,
+                    totalInvestment = formattedInvestment,
                     imageUrls = imageUrls // Pass the image URLs
                 )
                 Spacer(modifier = Modifier.height(20.dp))
@@ -182,9 +185,9 @@ fun PortfolioCard(
                     )
                 }
             }
-            /*item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }*/
+            item {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
 
         }
     }
