@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,38 @@ fun PortfolioCard(
         ) + " %"
     val portfolioColor = if (portfolioPercentage >= 0.0) green else lightRed
 
+    val sortedCoins = remember(portfolioCoins) {
+        portfolioCoins.sortedByDescending { it.quantity ?: 0.0 }
+    }
+
+    val (pieChartData, imageUrls) = remember(sortedCoins) {
+        when {
+            sortedCoins.size <= 4 -> {
+                sortedCoins.associate { it.name to (it.quantity?.toInt() ?: 0) } to
+                        sortedCoins.map { it.logo.toString() }
+            }
+
+            else -> {
+                val topCoins = sortedCoins.take(4)
+                    .associate { it.name to (it.quantity?.toInt() ?: 0) }
+                val topImageUrls = sortedCoins.take(4).map { it.logo }
+                val othersQuantity = sortedCoins.drop(4).sumOf { it.quantity ?: 0.0 }.toInt()
+
+                val dummyUrl =
+                    "https://cdn-icons-png.freepik.com/256/17470/17470916.png?semt=ais_hybrid"
+                if (othersQuantity > 0) {
+                    topCoins + ("Others" to othersQuantity) to (topImageUrls + dummyUrl)
+                } else {
+                    topCoins to topImageUrls
+                }
+            }
+        }
+    }
+    val pieChartState = remember { mutableStateOf(pieChartData) }
+
+    LaunchedEffect(pieChartData) {
+        pieChartState.value = pieChartData
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -67,6 +100,7 @@ fun PortfolioCard(
                 .fillMaxWidth(),
             state = listState,
         ) {
+
             item {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
@@ -77,75 +111,30 @@ fun PortfolioCard(
                 }
             }
             item {
-                Spacer(modifier = Modifier.height(30.dp))
-
-                if (portfolioCoins.isNotEmpty()) {
-                    // Sort coins by quantity in descending order
-                    val sortedCoins = portfolioCoins.sortedByDescending { it.quantity ?: 0.0 }
-
-                    val pieChartData: Map<String, Int>
-                    val imageUrls: List<String?>
-
-                    when {
-                        sortedCoins.size <= 4 -> {
-                            // If there are 4 or fewer coins, use them all directly
-                            pieChartData = sortedCoins.associate { it.name to (it.quantity?.toInt() ?: 0) }
-                            imageUrls = sortedCoins.map { it.logo.toString() }
-                        }
-
-                        else -> {
-                            // Take the first 4 coins
-                            val topCoins = sortedCoins.take(4)
-                                .associate { it.name to (it.quantity?.toInt() ?: 0) }
-
-                            // Extract the top 4 image URLs
-                            val topImageUrls = sortedCoins.take(4).map { it.logo }
-
-                            // Sum the quantities of the remaining coins
-                            val othersQuantity = sortedCoins.drop(4).sumOf { it.quantity ?: 0.0 }.toInt()
-
-                            pieChartData = if (othersQuantity > 0) {
-                                topCoins + ("Others" to othersQuantity)
-                            } else {
-                                topCoins
-                            }
-
-                            val dummyUrl="https://cdn-icons-png.freepik.com/256/17470/17470916.png?semt=ais_hybrid"
-                            // Add a dummy image for "Others"
-                            imageUrls = if (othersQuantity > 0) {
-                                topImageUrls + dummyUrl
-                            } else {
-                                topImageUrls
-                            }
-                        }
-                    }
-
-                    // Pass to PieChart
-                    PieChart(
-                        data = pieChartData,
-                        ringBorderColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        ringBgColor = MaterialTheme.colorScheme.tertiary,
-                        portfolioValue = formattedPrice,
-                        portfolioPercentage = formattedPercentage,
-                        portfolioColor = portfolioColor,
-                        imageUrls = imageUrls // Pass the image URLs
-                    )
-                }
-
-
+                Spacer(modifier = Modifier.height(20.dp))
+                // Pass to PieChart
+                PieChart(
+                    data = pieChartState.value,
+                    ringBorderColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    ringBgColor = MaterialTheme.colorScheme.tertiary,
+                    portfolioValue = formattedPrice,
+                    portfolioPercentage = formattedPercentage,
+                    portfolioColor = portfolioColor,
+                    imageUrls = imageUrls // Pass the image URLs
+                )
+                Spacer(modifier = Modifier.height(20.dp))
 
             }
-            item {
+            /*item {
                 Spacer(modifier = Modifier.height(40.dp))
-            }
-
+            }*/
             itemsIndexed(
                 portfolioCoins,
                 key = { _, coin -> coin.id }) { index, portfolioCoin ->  // Use key
                 val isVisible = remember {
                     derivedStateOf {
                         val visibleItems = listState.layoutInfo.visibleItemsInfo
-                        visibleItems.any { it.index == index }
+                        visibleItems.any { it.index -1 == index }
                     }
                 }
                 val scale = remember { Animatable(0f) }
@@ -193,9 +182,9 @@ fun PortfolioCard(
                     )
                 }
             }
-            item {
-                Spacer(modifier = Modifier.height(30.dp))
-            }
+            /*item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }*/
 
         }
     }
