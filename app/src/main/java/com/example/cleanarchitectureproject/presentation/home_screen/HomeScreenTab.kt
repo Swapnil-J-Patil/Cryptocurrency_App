@@ -249,7 +249,10 @@ fun SharedTransitionScope.HomeScreenTab(
                                 listType = "gainersAndLosers",
                                 onAuthClick = {type,method,email,password->
 
-                                }
+                                },
+                                onFilter = {
+
+                                },
                             )
                         }
                     }

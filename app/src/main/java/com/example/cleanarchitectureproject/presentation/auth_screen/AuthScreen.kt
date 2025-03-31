@@ -352,6 +352,9 @@ fun SharedTransitionScope.AuthScreen(
                         onItemClick = { item, flag ->
 
                         },
+                        onFilter = {
+
+                        },
                         animatedVisibilityScope = animatedVisibilityScope,
                         onAuthClick = { type, method, email, password ->
                             when (type) {

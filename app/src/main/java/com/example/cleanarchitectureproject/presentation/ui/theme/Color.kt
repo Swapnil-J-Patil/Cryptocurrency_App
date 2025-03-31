@@ -29,5 +29,11 @@ val mutedLime=Color(0xFF6FCF97)
 val darkCyan=Color(0xFF147A66)
 val aquaMint=Color(0xFF5AD8C0)
 
+val DayYellow = Color(0xFFf6c000)
+val NightGray = Color(0xFF9098A3)
+
+val Blue = Color(0xFF12b8ff)
+val NavyBlue = Color(0xFF17173c)
+
 
 

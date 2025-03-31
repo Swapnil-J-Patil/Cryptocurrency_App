@@ -55,7 +55,8 @@ fun PortfolioCard(
     portfolioValue: Double,
     portfolioPercentage: Double,
     totalInvestment: Double,
-    dollars: Double
+    dollars: Double,
+    onFilter:()-> Unit
 ) {
     val listState = rememberLazyListState()
 
@@ -122,7 +123,7 @@ fun PortfolioCard(
                 {
                     Row(
                         modifier = Modifier.clickable {
-
+                            onFilter()
                         }
                     ) {
                         Icon(

@@ -250,7 +250,10 @@ fun SharedTransitionScope.HomeScreen(
                             listType = "gainersAndLosers",
                             onAuthClick = {type,method,email,password->
 
-                            }
+                            },
+                            onFilter = {
+
+                            },
                         )
                     }
                 }

@@ -13,9 +13,11 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -77,17 +79,24 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
+import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.domain.model.ProfileData
+import com.example.cleanarchitectureproject.presentation.Screen
+import com.example.cleanarchitectureproject.presentation.auth_screen.Error
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.FiltersPopup
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
 import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioCoinState
+import com.example.cleanarchitectureproject.presentation.transaction_screen.components.ConfirmationPopup
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
+import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -104,7 +113,9 @@ fun SharedTransitionScope.ProfileScreen(
     val totalInvestment by viewModel.totalInvestment.observeAsState()
     val prefsManager = remember { PrefsManager(context) }
     val dollars = prefsManager.getDollarAmount()
-
+    var isFilterClicked by remember {
+        mutableStateOf(false)
+    }
     val tokens by keyStoreViewModel.tokens.collectAsState()
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
     var currentProfile by remember { mutableStateOf<ProfileData>(ProfileDataList.characters.first()) }
@@ -287,13 +298,33 @@ fun SharedTransitionScope.ProfileScreen(
                                     portfolioValue = portfolioValue,
                                     portfolioPercentage = portfolioPercentage,
                                     dollars = dollars.toDouble(),
-                                    totalInvestment = totalInvestment
+                                    totalInvestment = totalInvestment,
+                                    onFilter = {
+                                        isFilterClicked=true
+                                    },
                                 )
                             }
                         }
 
                     }
                 }
+            }
+            AnimatedVisibility(
+                visible = isFilterClicked,
+                enter = scaleIn(
+                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                ),
+                exit = scaleOut()
+            ) {
+                FiltersPopup(
+                    onCancel = { isFilterClicked = false },
+                    onConfirm = {
+
+
+                    },
+                    filter = "sort",
+                    isTab = false
+                )
             }
         }
 

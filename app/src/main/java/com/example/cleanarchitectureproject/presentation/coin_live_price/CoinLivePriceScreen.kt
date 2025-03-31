@@ -300,6 +300,9 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     onItemClick = { item, flag ->
 
                     },
+                    onFilter = {
+
+                    },
                     symbol = coinSymbol,
                     onAuthClick = { type, method, email, password ->
 
