@@ -40,6 +40,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
+import kotlin.math.log
 
 @HiltViewModel
 class PortfolioViewModel @Inject constructor(
@@ -231,6 +232,10 @@ class PortfolioViewModel @Inject constructor(
         val cryptocurrencyCoins = coins.mapIndexed { index, coin ->
            // Log.d("portfolioViewmodelPVM", "Processing coins...")
 
+            /*if(coin.id ==35702)
+            {
+                removeCrypto(coin)
+            }*/
             val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
             val percentage = firstQuote?.percentChange1h?.toString() ?: "0.0"
             val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price ?: 0.0
@@ -243,6 +248,9 @@ class PortfolioViewModel @Inject constructor(
             } else {
                 0.0
             }
+
+            Log.d("percentageChange", "${coin.name}: price with quantity: $currentPrice $purchasedPrice $percentageChange ")
+            Log.d("percentageChange", "${coin.name}: price without quantity: $livePrice ${coin.purchasedAt} $percentageChange ")
 
             portfolioValue.value = (portfolioValue.value ?: 0.0) + currentPrice
             totalInvestment.value = (totalInvestment.value ?: 0.0) + purchasedPrice

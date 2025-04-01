@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun processGainersAndLosers(topGainers: List<CryptoCurrencyCM>, topLosers: List<CryptoCurrencyCM>) {
-        val dfSmall = DecimalFormat("0.#####") // Up to 6 decimal places
+        val dfSmall = DecimalFormat("0.####") // Up to 6 decimal places
         val dfPercentage = DecimalFormat("#,##0.00") // Ensures percentages are formatted properly
 
         viewModelScope.launch {

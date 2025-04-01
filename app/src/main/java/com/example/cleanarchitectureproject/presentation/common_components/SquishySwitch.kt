@@ -42,7 +42,9 @@ fun SquishyToggleSwitch(
     containerWidth: Int = 60,
     circleSize: Int = 24,
     padding: Int = 4,
-    shadowOffset: Int = 5
+    shadowOffset: Int = 5,
+    onTurnedOn:()->Unit,
+    onTurnedOff:()->Unit
 ) {
     var isToggled by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -133,6 +135,14 @@ fun SquishyToggleSwitch(
                 ) {
                     isToggled = !isToggled
                     animateToggle(isToggled)
+                    if(isToggled)
+                    {
+                        onTurnedOn()
+                    }
+                    else
+                    {
+                        onTurnedOff()
+                    }
                 }
 
         ) {

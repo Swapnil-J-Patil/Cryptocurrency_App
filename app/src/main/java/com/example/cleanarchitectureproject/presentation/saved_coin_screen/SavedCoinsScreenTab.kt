@@ -195,7 +195,7 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                         }
                                     }
                                     val listType = "savedCoins"
-                                    val price = "$ " + viewModel.formatPrice(coin.quotes[0].price)
+                                    val price = coin.quotes[0].price
                                     val dfSmall = DecimalFormat("0.#####") // Up to 6 decimal places
                                     val formattedPrice = when {
                                         coin.quotes[0].price < 0.0001 -> "0.00.."  // Extremely small values

@@ -193,8 +193,14 @@ fun SharedTransitionScope.MarketScreenTab(
                                         }
                                     }
                                     val listType = "marketScreen_new"
-                                    val price = "$ " + viewModel.formatPrice(coin.quotes[0].price)
-
+                                    val price = coin.quotes[0].price
+                                    val dfSmall = DecimalFormat("0.#####") // Up to 6 decimal places
+                                    val formattedPrice = when {
+                                        coin.quotes[0].price < 0.0001 -> "0.00.."  // Extremely small values
+                                        coin.quotes[0].price < 100 -> dfSmall.format(coin.quotes[0].price) // Up to 6 decimal places
+                                        else -> price.toInt().toString().take(3) + ".." // Large numbers (first 3 digits + "..")
+                                    }
+                                    "$ $formattedPrice"
                                     val firstQuote = coin.quotes.firstOrNull() // Handle missing quotes
                                     val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
                                         if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
@@ -205,7 +211,7 @@ fun SharedTransitionScope.MarketScreenTab(
                                         currencyName = coin.name,
                                         symbol = coin.symbol,
                                         percentage = if (coin.isGainer) "+" + formattedPercentage + "%" else formattedPercentage+ "%",
-                                        price = coin.price,
+                                        price = formattedPrice,
                                         image = coin.graph,
                                         color = coin.color,
                                         logo = coin.logo,

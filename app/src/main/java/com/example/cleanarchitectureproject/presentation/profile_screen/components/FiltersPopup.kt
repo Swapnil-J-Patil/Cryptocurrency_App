@@ -55,6 +55,8 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.common_components.SquishyToggleSwitch
+import com.example.cleanarchitectureproject.presentation.ui.theme.green
+import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 
 @Composable
 fun FiltersPopup(
@@ -97,23 +99,106 @@ fun FiltersPopup(
 
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Apply Filters",
+                        text = "Sort by",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.secondary
                     )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    )
+                    {
+                        Text(
+                            text = "Current value",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        SquishyToggleSwitch(green,
+                            onTurnedOn = {
+
+                            },
+                            onTurnedOff = {
+
+                            }) // Green
+                    }
+                   // Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    )
+                    {
+                        Text(
+                            text = "Returns",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        SquishyToggleSwitch(green,
+                            onTurnedOn = {
+
+                            },
+                            onTurnedOff = {
+
+                            }) // Green
+                    }
+                    //Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    )
+                    {
+                        Text(
+                            text = "PercentChange",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        SquishyToggleSwitch(green,
+                            onTurnedOn = {
+
+                            },
+                            onTurnedOff = {
+
+                            }) // Green
+                    }
+                    //Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    )
+                    {
+                        Text(
+                            text = "Coin Name",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        SquishyToggleSwitch(green,
+                            onTurnedOn = {
+
+                            },
+                            onTurnedOff = {
+
+                            }) // Green
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
-                    SquishyToggleSwitch(Color(0xFF4CCF59)) // Green
-                    Spacer(modifier = Modifier.height(16.dp))
-                    SquishyToggleSwitch(Color(0xFF3384FB)) // Blue
-                    Spacer(modifier = Modifier.height(16.dp))
-                    SquishyToggleSwitch(Color(0xFFFF3372)) // Red (Boo)
-                //                    Spacer(modifier = Modifier.height(20.dp))
                 }
             }
         }
