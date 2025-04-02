@@ -42,11 +42,12 @@ fun SquishyToggleSwitch(
     containerWidth: Int = 60,
     circleSize: Int = 24,
     padding: Int = 4,
+    isTurnedOn: Boolean =false,
     shadowOffset: Int = 5,
     onTurnedOn:()->Unit,
     onTurnedOff:()->Unit
 ) {
-    var isToggled by remember { mutableStateOf(false) }
+    var isToggled by remember { mutableStateOf(isTurnedOn) }
     val scope = rememberCoroutineScope()
 
     val transition = updateTransition(targetState = isToggled, label = "Switch Transition")
@@ -59,6 +60,7 @@ fun SquishyToggleSwitch(
     val thumbPosition = remember { Animatable(0f) }
     val squishX = remember { Animatable(1f) }
     val squishY = remember { Animatable(1f) }
+
 
     val trackColor by animateColorAsState(
         targetValue = androidx.compose.ui.graphics.lerp(Color.Gray, color, thumbPosition.value),
@@ -105,7 +107,9 @@ fun SquishyToggleSwitch(
             launch { squishY.animateTo(1f, animationSpec = tween(350)) }
         }
     }
-
+    LaunchedEffect(Unit) {
+        animateToggle(isTurnedOn)
+    }
     val maxTranslation =
         with(LocalDensity.current) { (containerWidth - circleSize - (padding * 2)).dp.toPx() }
 
@@ -135,12 +139,9 @@ fun SquishyToggleSwitch(
                 ) {
                     isToggled = !isToggled
                     animateToggle(isToggled)
-                    if(isToggled)
-                    {
+                    if (isToggled) {
                         onTurnedOn()
-                    }
-                    else
-                    {
+                    } else {
                         onTurnedOff()
                     }
                 }

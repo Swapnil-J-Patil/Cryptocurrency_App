@@ -36,7 +36,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -62,11 +64,11 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackgroun
 fun FiltersPopup(
     modifier: Modifier = Modifier,
     onCancel: () -> Unit,
-    onConfirm: () -> Unit,
     filter: String,
-    isTab: Boolean
+    isTab: Boolean,
+    currentFilters: MutableState<List<Boolean>>, // MutableState for filters
+    onFilters: (List<Boolean>) -> Unit
 ) {
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -95,7 +97,6 @@ fun FiltersPopup(
                         )
                     }
                 }
-                //Spacer(modifier = Modifier.height(12.dp))
 
                 Column(
                     modifier = Modifier
@@ -112,12 +113,12 @@ fun FiltersPopup(
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    )
-                    {
+                    ) {
                         Text(
                             text = "Current value",
                             style = MaterialTheme.typography.titleMedium,
@@ -125,21 +126,28 @@ fun FiltersPopup(
                             color = MaterialTheme.colorScheme.secondary
                         )
                         SquishyToggleSwitch(green,
+                            isTurnedOn = currentFilters.value[0], // Using currentFilters.value
                             onTurnedOn = {
-
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[0] = true
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
                             },
                             onTurnedOff = {
-
-                            }) // Green
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[0] = false
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
+                            }
+                        ) // Green
                     }
-                   // Spacer(modifier = Modifier.height(16.dp))
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    )
-                    {
+                    ) {
                         Text(
                             text = "Returns",
                             style = MaterialTheme.typography.titleMedium,
@@ -147,21 +155,28 @@ fun FiltersPopup(
                             color = MaterialTheme.colorScheme.secondary
                         )
                         SquishyToggleSwitch(green,
+                            isTurnedOn = currentFilters.value[1],
                             onTurnedOn = {
-
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[1] = true
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
                             },
                             onTurnedOff = {
-
-                            }) // Green
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[1] = false
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
+                            }
+                        ) // Green
                     }
-                    //Spacer(modifier = Modifier.height(16.dp))
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    )
-                    {
+                    ) {
                         Text(
                             text = "PercentChange",
                             style = MaterialTheme.typography.titleMedium,
@@ -169,21 +184,28 @@ fun FiltersPopup(
                             color = MaterialTheme.colorScheme.secondary
                         )
                         SquishyToggleSwitch(green,
+                            isTurnedOn = currentFilters.value[2],
                             onTurnedOn = {
-
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[2] = true
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
                             },
                             onTurnedOff = {
-
-                            }) // Green
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[2] = false
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
+                            }
+                        ) // Green
                     }
-                    //Spacer(modifier = Modifier.height(16.dp))
                     Row(
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(10.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    )
-                    {
+                    ) {
                         Text(
                             text = "Coin Name",
                             style = MaterialTheme.typography.titleMedium,
@@ -191,12 +213,20 @@ fun FiltersPopup(
                             color = MaterialTheme.colorScheme.secondary
                         )
                         SquishyToggleSwitch(green,
+                            isTurnedOn = currentFilters.value[3],
                             onTurnedOn = {
-
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[3] = true
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
                             },
                             onTurnedOff = {
-
-                            }) // Green
+                                val updatedFilters = currentFilters.value.toMutableList()
+                                updatedFilters[3] = false
+                                currentFilters.value = updatedFilters
+                                onFilters(updatedFilters)
+                            }
+                        ) // Green
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 }

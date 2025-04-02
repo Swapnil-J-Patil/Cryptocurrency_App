@@ -124,6 +124,25 @@ fun SharedTransitionScope.ProfileScreen(
     var visibility by remember {
         mutableStateOf(false)
     }
+    var currentFilters by remember { mutableStateOf(listOf(false, false, false, false)) }
+
+    val comparators = mutableListOf<Comparator<PortfolioCoin>>()
+
+    if (currentFilters[0]) comparators.add(compareByDescending<PortfolioCoin> { it.currentPrice ?: 0.0 }) // Sort by currentValue
+    if (currentFilters[1]) comparators.add(compareByDescending<PortfolioCoin> { it.returns }) // Sort by returns
+    if (currentFilters[2]) comparators.add(compareByDescending<PortfolioCoin> { it.returnPercentage }) // Sort by percentChange
+    if (currentFilters[3]) comparators.add(compareBy<PortfolioCoin> { it.name }) // Sort by name (A-Z)
+
+// Combine all selected comparators correctly
+    val finalComparator = comparators.reduceOrNull { acc, comparator -> acc.then(comparator) }
+
+// Apply sorting only if filters are selected, else return original list
+    val sortedCoins = portfolioCoinList?.let { list ->
+        finalComparator?.let { list.sortedWith(it) } ?: list
+    } ?: listOf()
+
+
+
     val brushColors = listOf(Color(0xFF23af92), Color(0xFF0E5C4C))
     val infiniteTransition = rememberInfiniteTransition(label = "background")
     val targetOffset = with(LocalDensity.current) {
@@ -280,7 +299,7 @@ fun SharedTransitionScope.ProfileScreen(
                         elevation = CardDefaults.cardElevation(16.dp),
                         shape = RoundedCornerShape(20.dp)
                     ) {
-                        portfolioCoinList.let {
+                        sortedCoins.let {
                             val portfolioPercentage= ((portfolioValue?.minus(totalInvestment!!))?.div(totalInvestment!!))?.times(100)
 
                             if (dollars != null) {
@@ -318,12 +337,12 @@ fun SharedTransitionScope.ProfileScreen(
             ) {
                 FiltersPopup(
                     onCancel = { isFilterClicked = false },
-                    onConfirm = {
-
-
-                    },
                     filter = "sort",
-                    isTab = false
+                    isTab = false,
+                    currentFilters = remember { mutableStateOf(currentFilters) }, // Pass the current filters
+                    onFilters = {
+                        currentFilters = it // Update the current filters when onFilters is triggered
+                    }
                 )
             }
         }

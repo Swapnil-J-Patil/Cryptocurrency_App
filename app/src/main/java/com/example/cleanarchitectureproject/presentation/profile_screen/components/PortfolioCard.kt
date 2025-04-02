@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -192,6 +193,11 @@ fun PortfolioCard(
                     val formattedPP = "$ ${df.format(portfolioCoin.purchasedAt)}"
                     val formattedCP = "$ ${df.format(portfolioCoin.currentPrice)}"
                     val formattedQuantity = "${df.format(portfolioCoin.quantity)}"
+
+                    if(portfolioCoin.symbol=="NIL")
+                    {
+                        Log.d("coinIssue", "coin in Portfolio Card: $portfolioCoin ")
+                    }
                     PortfolioCoinCardItem(
                         symbol = portfolioCoin.symbol!!,
                         purchasedPrice = formattedPP,

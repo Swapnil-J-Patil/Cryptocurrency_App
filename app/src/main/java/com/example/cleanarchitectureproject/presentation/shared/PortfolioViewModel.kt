@@ -148,6 +148,7 @@ class PortfolioViewModel @Inject constructor(
                     val filteredPrices = selectedCoinIds.mapNotNull { id ->
                         allCoins.find { it.id == id }?.quotes?.firstOrNull()?.price
                     }
+                    Log.d("coinIssue", "prices: $filteredPrices ")
 
                     // Update state with ordered filtered prices
                     _filteredCurrencyList.value = filteredPrices
@@ -232,19 +233,23 @@ class PortfolioViewModel @Inject constructor(
         val cryptocurrencyCoins = coins.mapIndexed { index, coin ->
            // Log.d("portfolioViewmodelPVM", "Processing coins...")
 
-            /*if(coin.id ==35702)
+            if(coin.id== 35509 || coin.id== 35702)
             {
+               /* val livePrice=filteredPrices.getOrNull(index) ?: coin.quotes?.firstOrNull()?.price
+                val currentPrice = livePrice?.times((coin.quantity!!))
+                Log.d("coinIssue", "coin: ${livePrice} and quantity:${coin.quantity} price with quantity: $currentPrice")
+*/
                 removeCrypto(coin)
-            }*/
+            }
             val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
             val percentage = firstQuote?.percentChange1h?.toString() ?: "0.0"
-            val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price ?: 0.0
+            val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price
 
-            val currentPrice = livePrice * (coin.quantity ?: 0.0)
+            val currentPrice = livePrice?.times((coin.quantity ?: 0.0))
             val purchasedPrice = (coin.purchasedAt?.toDouble() ?: 0.0) * (coin.quantity ?: 0.0)
 
             val percentageChange = if (purchasedPrice > 0) {
-                ((currentPrice - purchasedPrice) / purchasedPrice) * 100
+                ((currentPrice?.minus(purchasedPrice))?.div(purchasedPrice))?.times(100)
             } else {
                 0.0
             }
@@ -252,9 +257,9 @@ class PortfolioViewModel @Inject constructor(
             Log.d("percentageChange", "${coin.name}: price with quantity: $currentPrice $purchasedPrice $percentageChange ")
             Log.d("percentageChange", "${coin.name}: price without quantity: $livePrice ${coin.purchasedAt} $percentageChange ")
 
-            portfolioValue.value = (portfolioValue.value ?: 0.0) + currentPrice
+            portfolioValue.value = (portfolioValue.value ?: 0.0) + currentPrice!!
             totalInvestment.value = (totalInvestment.value ?: 0.0) + purchasedPrice
-
+            val returns=currentPrice- purchasedPrice
             val color = if (currentPrice - purchasedPrice >= 0) green else lightRed
 
             PortfolioCoin(
@@ -280,8 +285,10 @@ class PortfolioViewModel @Inject constructor(
                 logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
                 graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
                 color = color,
-                isGainer = percentageChange >= 0,
-                quantity = coin.quantity
+                isGainer = currentPrice - purchasedPrice >= 0,
+                quantity = coin.quantity,
+                returnPercentage = percentageChange ?:0.0,
+                returns = returns
             )
         }
 

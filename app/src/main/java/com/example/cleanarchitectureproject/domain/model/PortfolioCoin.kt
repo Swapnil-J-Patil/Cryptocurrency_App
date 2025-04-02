@@ -28,4 +28,6 @@ data class PortfolioCoin(
     val graph: String?="",
     val color: Color?= Color.White,
     val isGainer: Boolean?=false,
+    val returnPercentage: Double =0.0,
+    val returns: Double =0.0
 )
