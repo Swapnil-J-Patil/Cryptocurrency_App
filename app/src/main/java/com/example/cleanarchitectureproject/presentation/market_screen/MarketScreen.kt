@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -99,6 +100,15 @@ fun SharedTransitionScope.MarketScreen(
     val searchQuery by viewModel.searchQuery.collectAsState()
     val filteredCoins by viewModel.filteredCoins.collectAsState() // Observe filtered coins
 
+    LaunchedEffect(Unit) {
+        viewModel.startFetchingCoinStats()
+
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopFetchingCoinStats()
+        }
+    }
     // Precompute visible indices
     Box(
         modifier = Modifier

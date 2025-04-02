@@ -3,6 +3,7 @@ package com.example.cleanarchitectureproject.presentation.common_components
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth

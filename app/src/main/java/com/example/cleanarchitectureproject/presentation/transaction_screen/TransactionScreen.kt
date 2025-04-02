@@ -2,7 +2,6 @@ package com.example.cleanarchitectureproject.presentation.transaction_screen
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.animation.AnimatedVisibility
@@ -21,34 +20,18 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -64,7 +47,6 @@ import com.example.cleanarchitectureproject.presentation.transaction_screen.comp
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CurrencyCard
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.DraggableCards
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
-import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -77,7 +59,8 @@ fun SharedTransitionScope.TransactionScreen(
     transaction: String,
     coin: CryptoCoin,
     context: Context,
-    viewModel: PortfolioViewModel = hiltViewModel(),
+    portfolioViewModel: PortfolioViewModel = hiltViewModel(),
+    transactionViewModel: TransactionViewModel= hiltViewModel(),
     navController: NavController
 ) {
     val configuration = LocalConfiguration.current
@@ -110,13 +93,16 @@ fun SharedTransitionScope.TransactionScreen(
     }
 
     var savedQuantity by remember { mutableStateOf<Double?>(0.0) }
+    val livePrice by transactionViewModel.coinLivePrice.observeAsState()
 
     LaunchedEffect(Unit) {
+        transactionViewModel.startFetchingCoinStats(coin.id)
+       // delay(1000L) // Delay for 1 second (1000 milliseconds)
         visibility = true
     }
     LaunchedEffect(savedQuantity) {
-        viewModel.getSavedCoinQuantity(coin.id.toString()) { quantity ->
-            Log.d("savedQuantity", "TransactionScreen: $quantity")
+        portfolioViewModel.getSavedCoinQuantity(coin.id.toString()) { quantity ->
+            //Log.d("savedQuantity", "TransactionScreen: $quantity")
             savedQuantity = quantity  // Update state to trigger recomposition
         }
 
@@ -178,23 +164,25 @@ fun SharedTransitionScope.TransactionScreen(
                     )
                 ) {
                     dollars?.toDouble()?.let {
-                        DraggableCards(
-                            coin = coin,
-                            imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
-                            context = context,
-                            transaction = transaction,
-                            isBuyClicked = { flag, quantity, usd,coinPrice ->
-                                Log.d("portfolioSaved", "TransactionScreen Before: ${coinPrice} ")
+                            DraggableCards(
+                                coin = coin,
+                                imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
+                                context = context,
+                                transaction = transaction,
+                                isBuyClicked = { flag, quantity, usd,coinPrice ->
+                                    //Log.d("portfolioSaved", "TransactionScreen Before: ${coinPrice} ")
 
-                                isBuyClicked = flag
-                                isTransaction = true
-                                cryptoQuantity.value = quantity
-                                amountOfDollars.value = usd
-                                currentPrice.value =coinPrice
-                            },
-                            savedQuantity=savedQuantity,
-                            dollars = it
-                        )
+                                    isBuyClicked = flag
+                                    isTransaction = true
+                                    cryptoQuantity.value = quantity
+                                    amountOfDollars.value = usd
+                                    currentPrice.value =coinPrice
+                                },
+                                savedQuantity=savedQuantity,
+                                dollars = it,
+                                livePrice= livePrice?:0.0
+                            )
+
                     }
                 }
 
@@ -209,135 +197,131 @@ fun SharedTransitionScope.TransactionScreen(
             ),
             exit = scaleOut()
         ) {
-            ConfirmationPopup(
-                onCancel = { isTransaction = false },
-                onConfirm = {
-                    val cleanQuantity = cryptoQuantity.value.replace(",", "").toDouble()
-                    val cleanDollars = amountOfDollars.value.replace(",", "").toDouble()
-                    Log.d("portfolioSaved", "TransactionScreen After: ${currentPrice.value} ")
-                    val availableDollars = dollars?.replace(",", "")?.toDouble()?: 0.0
-                    val availableQuantity =savedQuantity?: 0.0
+            livePrice?.let {
+                    ConfirmationPopup(
+                        onCancel = { isTransaction = false },
+                        onConfirm = {
+                            val cleanQuantity = cryptoQuantity.value.replace(",", "").toDouble()
+                            val cleanDollars = amountOfDollars.value.replace(",", "").toDouble()
+                            // Log.d("portfolioSaved", "TransactionScreen After: ${currentPrice.value} ")
+                            val availableDollars = dollars?.replace(",", "")?.toDouble()?: 0.0
+                            val availableQuantity =savedQuantity?: 0.0
 
-                    if (isBuyClicked) {
-                        val remainingUsd = (availableDollars - cleanDollars)
-                        val sum = if (savedQuantity == null) cleanQuantity else savedQuantity?.plus(cleanQuantity)
+                            if (isBuyClicked) {
+                                val remainingUsd = (availableDollars - cleanDollars)
+                                val sum = if (savedQuantity == null) cleanQuantity else savedQuantity?.plus(cleanQuantity)
 
-                        if(remainingUsd < 0)
-                        {
-                            showToast = false // Dismiss current toast
-                            coroutineScope.launch { // Ensure state updates properly
-                                delay(100) // Small delay to allow recomposition
-                                toastMessage = "Insufficient balance! Add more dollars to proceed."
-                                toastType = Error()
-                                showToast = true
+                                if(remainingUsd < 0) {
+                                    showToast = false // Dismiss current toast
+                                    coroutineScope.launch { // Ensure state updates properly
+                                        delay(100) // Small delay to allow recomposition
+                                        toastMessage = "Insufficient balance! Add more dollars to proceed."
+                                        toastType = Error()
+                                        showToast = true
+                                    }
+                                } else {
+                                    val coinData = PortfolioCoin(
+                                        id = coin.id,
+                                        name = coin.name,
+                                        symbol = coin.symbol,
+                                        slug = coin.slug,
+                                        tags = coin.tags,
+                                        cmcRank = coin.cmcRank,
+                                        marketPairCount = coin.marketPairCount,
+                                        circulatingSupply = coin.circulatingSupply,
+                                        selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply,
+                                        totalSupply = coin.totalSupply,
+                                        maxSupply = coin.maxSupply,
+                                        isActive = coin.isActive,
+                                        lastUpdated = coin.lastUpdated,
+                                        dateAdded = coin.dateAdded,
+                                        quotes = coin.quotes,
+                                        isAudited = coin.isAudited,
+                                        badges = coin.badges ?: emptyList(),
+                                        quantity = sum,
+                                        purchasedAt = currentPrice.value.toDouble()
+                                    )
+
+                                    portfolioViewModel.addCrypto(coinData)
+                                    prefsManager.setDollarAmount(remainingUsd.toString())
+
+                                    portfolioViewModel.getSavedCoinQuantity(coin.id.toString()) { quantity ->
+                                        // Log.d("savedQuantity", "TransactionScreen: $quantity")
+                                        savedQuantity = quantity  // Update state to trigger recomposition
+                                    }
+                                    isTransaction = false
+                                    navController.navigate(Screen.SuccessScreen.route)
+                                }
+
+                            } else{
+                                val remainingQuantity=(availableQuantity - cleanQuantity)
+                                val remainingUsd = (availableDollars + cleanDollars)
+
+                                val diff= if(savedQuantity == null) 0.0 else savedQuantity?.minus(cleanQuantity)
+                                if(cleanQuantity==0.0) {
+                                    showToast = false // Dismiss current toast
+                                    coroutineScope.launch { // Ensure state updates properly
+                                        delay(100) // Small delay to allow recomposition
+                                        toastMessage = "You have no coins to sell!"
+                                        toastType = Error()
+                                        showToast = true
+                                    }
+                                } else if(remainingQuantity < 0) {
+                                    showToast = false // Dismiss current toast
+                                    coroutineScope.launch { // Ensure state updates properly
+                                        delay(100) // Small delay to allow recomposition
+                                        toastMessage = "Insufficient balance! Add more coins to proceed."
+                                        toastType = Error()
+                                        showToast = true
+                                    }
+                                } else {
+                                    val coinData = PortfolioCoin(
+                                        id = coin.id,
+                                        name = coin.name,
+                                        symbol = coin.symbol,
+                                        slug = coin.slug,
+                                        tags = coin.tags,
+                                        cmcRank = coin.cmcRank,
+                                        marketPairCount = coin.marketPairCount,
+                                        circulatingSupply = coin.circulatingSupply,
+                                        selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply,
+                                        totalSupply = coin.totalSupply,
+                                        maxSupply = coin.maxSupply,
+                                        isActive = coin.isActive,
+                                        lastUpdated = coin.lastUpdated,
+                                        dateAdded = coin.dateAdded,
+                                        quotes = coin.quotes,
+                                        isAudited = coin.isAudited,
+                                        badges = coin.badges ?: emptyList(),
+                                        quantity = diff,
+                                        purchasedAt = coin.quotes?.get(0)?.price //Replace this later
+                                    )
+
+                                    portfolioViewModel.addCrypto(coinData)
+                                    prefsManager.setDollarAmount(remainingUsd.toString())
+
+                                    portfolioViewModel.getSavedCoinQuantity(coin.id.toString()) { quantity ->
+                                        //Log.d("savedQuantity", "TransactionScreen: $quantity")
+                                        savedQuantity = quantity  // Update state to trigger recomposition
+                                    }
+                                    isTransaction = false
+                                    navController.navigate(Screen.SuccessScreen.route)
+                                }
                             }
-                        }
-                        else
-                        {
-                            val coinData = PortfolioCoin(
-                                id = coin.id,
-                                name = coin.name,
-                                symbol = coin.symbol,
-                                slug = coin.slug,
-                                tags = coin.tags,
-                                cmcRank = coin.cmcRank,
-                                marketPairCount = coin.marketPairCount,
-                                circulatingSupply = coin.circulatingSupply,
-                                selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply,
-                                totalSupply = coin.totalSupply,
-                                maxSupply = coin.maxSupply,
-                                isActive = coin.isActive,
-                                lastUpdated = coin.lastUpdated,
-                                dateAdded = coin.dateAdded,
-                                quotes = coin.quotes,
-                                isAudited = coin.isAudited,
-                                badges = coin.badges ?: emptyList(),
-                                quantity = sum,
-                                purchasedAt = currentPrice.value.toDouble()
-                            )
 
-                            viewModel.addCrypto(coinData)
-                            prefsManager.setDollarAmount(remainingUsd.toString())
+                        },
+                        color = if (isBuyClicked) green else red,
+                        usd = amountOfDollars.value,
+                        quantity = cryptoQuantity.value,
+                        imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
+                        isBuy = isBuyClicked,
+                        symbol = coin.symbol!!,
+                        isTab = isTab,
+                        pricePerCoin = it,
+                        availableCoins = savedQuantity?:0.0
+                    )
 
-                            viewModel.getSavedCoinQuantity(coin.id.toString()) { quantity ->
-                                Log.d("savedQuantity", "TransactionScreen: $quantity")
-                                savedQuantity = quantity  // Update state to trigger recomposition
-                            }
-                            isTransaction = false
-                            navController.navigate(Screen.SuccessScreen.route)
-                        }
-
-                    }
-                    else{
-                        val remainingQuantity=(availableQuantity - cleanQuantity)
-                        val remainingUsd = (availableDollars + cleanDollars)
-
-                        val diff= if(savedQuantity == null) 0.0 else savedQuantity?.minus(cleanQuantity)
-                        if(cleanQuantity==0.0)
-                        {
-                            showToast = false // Dismiss current toast
-                            coroutineScope.launch { // Ensure state updates properly
-                                delay(100) // Small delay to allow recomposition
-                                toastMessage = "You have no coins to sell!"
-                                toastType = Error()
-                                showToast = true
-                            }
-                        }
-                        else if(remainingQuantity < 0)
-                        {
-                            showToast = false // Dismiss current toast
-                            coroutineScope.launch { // Ensure state updates properly
-                                delay(100) // Small delay to allow recomposition
-                                toastMessage = "Insufficient balance! Add more coins to proceed."
-                                toastType = Error()
-                                showToast = true
-                            }
-                        }
-                        else
-                        {
-                            val coinData = PortfolioCoin(
-                                id = coin.id,
-                                name = coin.name,
-                                symbol = coin.symbol,
-                                slug = coin.slug,
-                                tags = coin.tags,
-                                cmcRank = coin.cmcRank,
-                                marketPairCount = coin.marketPairCount,
-                                circulatingSupply = coin.circulatingSupply,
-                                selfReportedCirculatingSupply = coin.selfReportedCirculatingSupply,
-                                totalSupply = coin.totalSupply,
-                                maxSupply = coin.maxSupply,
-                                isActive = coin.isActive,
-                                lastUpdated = coin.lastUpdated,
-                                dateAdded = coin.dateAdded,
-                                quotes = coin.quotes,
-                                isAudited = coin.isAudited,
-                                badges = coin.badges ?: emptyList(),
-                                quantity = diff,
-                                purchasedAt = coin.quotes?.get(0)?.price //Replace this later
-                            )
-
-                            viewModel.addCrypto(coinData)
-                            prefsManager.setDollarAmount(remainingUsd.toString())
-
-                            viewModel.getSavedCoinQuantity(coin.id.toString()) { quantity ->
-                                Log.d("savedQuantity", "TransactionScreen: $quantity")
-                                savedQuantity = quantity  // Update state to trigger recomposition
-                            }
-                            isTransaction = false
-                            navController.navigate(Screen.SuccessScreen.route)
-                        }
-                    }
-
-                },
-                color = if (isBuyClicked) green else red,
-                usd = amountOfDollars.value,
-                quantity = cryptoQuantity.value,
-                imageUrl = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
-                isBuy = isBuyClicked,
-                symbol = coin.symbol!!,
-                isTab = isTab
-            )
+            }
         }
         CustomSweetToast(
             message = toastMessage,

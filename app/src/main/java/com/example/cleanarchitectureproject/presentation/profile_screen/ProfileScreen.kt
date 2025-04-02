@@ -159,7 +159,7 @@ fun SharedTransitionScope.ProfileScreen(
     )
     LaunchedEffect(tokens) {
         if (!tokens.isNullOrEmpty()) {
-            Log.d("tokensKeystore", "ProfileScreen: ${tokens}")
+            //Log.d("tokensKeystore", "ProfileScreen: ${tokens}")
             currentName = tokens.get(0)
             if (tokens.size >= 3) {
                 currentProfile = ProfileDataList.characters.get(tokens.get(2).toInt())

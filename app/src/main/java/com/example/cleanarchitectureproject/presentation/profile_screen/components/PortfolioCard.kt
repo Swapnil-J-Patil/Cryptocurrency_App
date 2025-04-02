@@ -194,10 +194,10 @@ fun PortfolioCard(
                     val formattedCP = "$ ${df.format(portfolioCoin.currentPrice)}"
                     val formattedQuantity = "${df.format(portfolioCoin.quantity)}"
 
-                    if(portfolioCoin.symbol=="NIL")
+                   /* if(portfolioCoin.symbol=="NIL")
                     {
                         Log.d("coinIssue", "coin in Portfolio Card: $portfolioCoin ")
-                    }
+                    }*/
                     PortfolioCoinCardItem(
                         symbol = portfolioCoin.symbol!!,
                         purchasedPrice = formattedPP,

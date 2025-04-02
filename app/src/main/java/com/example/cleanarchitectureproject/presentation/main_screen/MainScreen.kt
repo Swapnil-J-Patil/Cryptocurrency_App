@@ -75,7 +75,7 @@ fun SharedTransitionScope.MainScreen(
         restore = { it }
     )) { mutableStateOf(0) }
     var bottomBarVisibility by remember { mutableStateOf(true) }
-    val isMarketScreen by viewModel.isMarketScreen.collectAsState()
+    val isMarketScreen by viewModel.currentTab.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),

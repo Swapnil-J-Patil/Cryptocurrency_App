@@ -13,6 +13,8 @@ import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.G
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -39,7 +42,23 @@ class MarketViewModel @Inject constructor(
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
-    val filteredCoins = searchQuery
+    private var fetchJob: Job? = null
+
+    fun startFetchingCoinStats() {
+        fetchJob?.cancel()  // Ensure previous job is canceled before starting a new one
+        fetchJob = viewModelScope.launch {
+            while (isActive) { // Ensures cancellation if ViewModel is cleared
+                getLivePrices()
+                delay(5000)
+            }
+        }
+    }
+
+    fun stopFetchingCoinStats() {
+        fetchJob?.cancel()
+    }
+
+    var filteredCoins = searchQuery
         .combine(currencyList) { query, allCoins ->
             if (query.isBlank()) allCoins
             else allCoins.filter { coin ->
@@ -54,14 +73,14 @@ class MarketViewModel @Inject constructor(
         viewModelScope.launch {
             getCoinStats()
             filteredCoins.collectLatest { coins ->
-                Log.d("FilteredCoinsUpdate", "Filtered Size: ${coins.size}, Coins: $coins")
+                //Log.d("FilteredCoinsUpdate", "Filtered Size: ${coins.size}, Coins: $coins")
             }
         }
     }
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
-        Log.d("FilteredCoins", "Size: ${filteredCoins.value.size}, List: $filteredCoins")
+       // Log.d("FilteredCoins", "Size: ${filteredCoins.value.size}, List: $filteredCoins")
 
     }
 
@@ -71,7 +90,7 @@ class MarketViewModel @Inject constructor(
                 is Resource.Success -> {
                     _coinListState.value = CoinListState(cryptocurrency = result.data)
                    // _coins.value= result.data?.data!!.cryptoCurrencyList
-                    Log.d("cryptoCurrency", "getCoin: ${result.data}")
+                   // Log.d("cryptoCurrency", "getCoin: ${result.data}")
                     result.data?.data?.let { processCoins(it.cryptoCurrencyList) }
                 }
 
@@ -84,6 +103,30 @@ class MarketViewModel @Inject constructor(
                 is Resource.Loading -> {
                     _coinListState.value = CoinListState(isLoading = true)
                 }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun getLivePrices() {
+        getCurrencyStatsUseCase().onEach { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val allCoins = result.data?.data?.cryptoCurrencyList ?: emptyList()
+
+                    // Get the list of IDs from currencyList
+                    val selectedCoinIds = filteredCoins.value.map { it.id }
+
+                    // Extract only the prices of the selected coins
+                    val coins = selectedCoinIds.mapNotNull { id ->
+                        allCoins.find { it.id == id }
+                    }
+
+                    processCoins(coins)
+                }
+
+                is Resource.Error -> { /* Handle Error */ }
+
+                is Resource.Loading -> { /* Handle Loading */ }
             }
         }.launchIn(viewModelScope)
     }
@@ -137,12 +180,6 @@ class MarketViewModel @Inject constructor(
             _currencyList.value = cryptocurrencyCoins
         }
     }
-    fun formatPrice(value: Double): String {
-        val priceStr = value.toBigDecimal().toPlainString() // Avoid scientific notation
 
-        return when {
-            priceStr.length >= 10 -> priceStr.substring(0, 10)  // Truncate if too long
-            else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
-        }
-    }
+
 }

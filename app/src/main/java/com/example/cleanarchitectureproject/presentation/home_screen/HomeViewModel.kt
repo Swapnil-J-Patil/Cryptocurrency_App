@@ -3,16 +3,21 @@ package com.example.cleanarchitectureproject.presentation.home_screen
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.common.Resource
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import javax.inject.Inject
@@ -55,8 +60,24 @@ class HomeViewModel @Inject constructor(
     private val _loserGraphList = MutableStateFlow<List<String>>(emptyList())
     val loserGraphList: StateFlow<List<String>> = _loserGraphList
 
+    private var fetchJob: Job? = null
+
     init {
         getCoinStats()
+    }
+
+    fun startFetchingCoinStats() {
+        fetchJob?.cancel()  // Ensure previous job is canceled before starting a new one
+        fetchJob = viewModelScope.launch {
+            while (isActive) { // Ensures cancellation if ViewModel is cleared
+                getLivePrices()
+                delay(2000)
+            }
+        }
+    }
+
+    fun stopFetchingCoinStats() {
+        fetchJob?.cancel()
     }
 
     private fun getCoinStats() {
@@ -64,7 +85,7 @@ class HomeViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     _statsState.value = CoinStatsState(cryptocurrency = result.data)
-                    Log.d("cryptoCurrency", "getCoin: ${result.data}")
+                    //Log.d("cryptoCurrency", "getCoin: ${result.data}")
                     getGainers(_statsState.value.cryptocurrency!!.data.cryptoCurrencyList)
                     getLosers(_statsState.value.cryptocurrency!!.data.cryptoCurrencyList)
                     processGainersAndLosers(_topGainers.value, _topLosers.value)
@@ -78,6 +99,61 @@ class HomeViewModel @Inject constructor(
 
                 is Resource.Loading -> {
                     _statsState.value = CoinStatsState(isLoading = true)
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun getLivePrices() {
+        getCurrencyStatsUseCase().onEach { result ->
+            when (result) {
+                is Resource.Success -> {
+                    val allCoins = result.data?.data?.cryptoCurrencyList ?: emptyList()
+                    val dfSmall = DecimalFormat("0.####") // Up to 6 decimal places
+
+                    // Get the list of IDs from currencyList
+                    val gainerCoinIds = _topGainers.value?.map { it.id } ?: emptyList()
+                    // Extract only the prices of the selected coins
+                    val filteredPricesGainers = gainerCoinIds.mapNotNull { id ->
+                        allCoins.find { it.id == id }?.quotes?.firstOrNull()?.price
+                    }
+                    //Log.d("coinIssue", "prices: $filteredPricesGainers ")
+                    // Update state with ordered filtered prices
+                    _gainerPriceList.value = filteredPricesGainers.map { price ->
+                        val formattedPrice = when {
+                            price < 0.0001 -> "0.00.."  // Extremely small values
+                            price < 100 -> dfSmall.format(price) // Up to 6 decimal places
+                            else -> price.toInt().toString().take(3) + ".." // Large numbers (first 3 digits + "..")
+                        }
+                        "$ $formattedPrice"
+                    }
+
+
+                    val losersCoinIds = _topLosers.value?.map { it.id } ?: emptyList()
+                    // Extract only the prices of the selected coins
+                    val filteredPricesLosers = losersCoinIds.mapNotNull { id ->
+                        allCoins.find { it.id == id }?.quotes?.firstOrNull()?.price
+                    }
+                    //Log.d("coinIssue", "prices: $filteredPricesLosers ")
+                    // Update state with ordered filtered prices
+                    _loserPriceList.value = filteredPricesLosers.map { price ->
+                        val formattedPrice = when {
+                            price < 0.0001 -> "0.00.."  // Extremely small values
+                            price < 100 -> dfSmall.format(price) // Up to 6 decimal places
+                            else -> price.toInt().toString().take(3) + ".." // Large numbers (first 3 digits + "..")
+                        }
+                        "$ $formattedPrice"
+                    }
+                }
+
+                is Resource.Error -> {
+                   /* _statsState.value = CoinStatsState(
+                        error = result.message ?: "An unexpected error occurred"
+                    )*/
+                }
+
+                is Resource.Loading -> {
+                    //_statsState.value = CoinStatsState(isLoading = true)
                 }
             }
         }.launchIn(viewModelScope)
@@ -146,7 +222,7 @@ class HomeViewModel @Inject constructor(
 
             // Update state with the sorted list
             _topGainers.value = sortedCryptocurrencies
-            Log.d("cryptoCurrency", "Sorted Gainers: $sortedCryptocurrencies")
+           // Log.d("cryptoCurrency", "Sorted Gainers: $sortedCryptocurrencies")
         }
     }
 
@@ -159,7 +235,7 @@ class HomeViewModel @Inject constructor(
 
             // Update state with the sorted list
             _topLosers.value = sortedCryptocurrencies
-            Log.d("cryptoCurrency", "Sorted Losers: $sortedCryptocurrencies")
+           // Log.d("cryptoCurrency", "Sorted Losers: $sortedCryptocurrencies")
         }
     }
     fun formatPrice(value: Double): String {

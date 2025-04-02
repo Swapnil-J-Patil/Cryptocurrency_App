@@ -61,7 +61,8 @@ fun DraggableCards(
     transaction: String,
     isBuyClicked:(Boolean,String,String,String)->Unit,
     savedQuantity: Double?,
-    dollars: Double
+    dollars: Double,
+    livePrice: Double
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -141,7 +142,8 @@ fun DraggableCards(
                 coin.quotes?.get(0)?.let {
 
                     PriceSelector(
-                        pricePerCoin = it.price,
+                        pricePerCoin = livePrice,
+                        initialPrice=it.price,
                         firstText = "Quantity",
                         buttonText = "SELL",
                         primaryColor = red,
@@ -240,7 +242,8 @@ fun DraggableCards(
                 coin.quotes?.get(0)?.let {
 
                     PriceSelector(
-                        pricePerCoin = it.price,
+                        pricePerCoin = livePrice,
+                        initialPrice=it.price,
                         firstText = "Amount",
                         buttonText = "BUY",
                         primaryColor = green,

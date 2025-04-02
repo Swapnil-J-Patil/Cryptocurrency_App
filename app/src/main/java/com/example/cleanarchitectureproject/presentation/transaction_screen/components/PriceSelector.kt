@@ -53,6 +53,7 @@ import kotlin.math.log
 @Composable
 fun PriceSelector(
     pricePerCoin: Double,
+    initialPrice:Double,
     firstText: String,
     buttonText: String,
     primaryColor: Color,
@@ -149,6 +150,7 @@ fun PriceSelector(
                         selectedPrice = position
                     },
                     pricePerCoin = pricePerCoin,
+                    initialPrice=initialPrice,
                     flag = flag,
                     isBuy = isBuy,
                     textColor = MaterialTheme.colorScheme.secondary,
@@ -169,6 +171,7 @@ fun PriceSelector(
                         selectedPrice = position
                     },
                     pricePerCoin = pricePerCoin,
+                    initialPrice=initialPrice,
                     flag = flag,
                     isBuy = isBuy,
                     availableCoins = availableCoins,

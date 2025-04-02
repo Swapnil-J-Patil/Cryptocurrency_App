@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.coin_live_price
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -43,8 +44,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -102,7 +105,6 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     navController: NavController,
     listType: String,
     viewModel: SavedCoinViewModel = hiltViewModel(),
-
     ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
@@ -113,7 +115,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val isLowLiquidity = viewModel.checkLiquidity(crypto = coinData)
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
-
+    val coinValue by viewModel.coinLivePrice.observeAsState()
+    var livePrice by remember {
+        mutableStateOf(coinPrice)
+    }
     val adaptiveHeight = if (screenWidth > 600.dp) 100.dp else 75.dp
     val adaptiveWeightLogo = if (screenWidth > 600.dp) 0.08f else 0.2f
     val adaptiveWeightDetails = if (screenWidth > 600.dp) 0.7f else 0.53f
@@ -142,8 +147,22 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     )
 
     LaunchedEffect(Unit) {
+        viewModel.startFetchingCoinStats(coinId.toInt())
         delay(1000L) // Delay for 1 second (1000 milliseconds)
         isSelected.value = true
+    }
+    LaunchedEffect(coinValue) {
+        val formattedPrice= coinValue?.let { viewModel.formatPrice(it) }
+        if (formattedPrice != null) {
+            //Log.d("FormattedPrice", "Price: $formattedPrice")
+            livePrice=formattedPrice
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopFetchingCoinStats()
+        }
     }
     Column(
         modifier = Modifier
@@ -238,7 +257,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = coinPrice,
+                                text = livePrice,
                                 maxLines = 1,
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.secondary,

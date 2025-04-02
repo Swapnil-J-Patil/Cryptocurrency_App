@@ -36,6 +36,7 @@ fun CircularSlider(
     circleRadius:Float,
     onPositionChange:(Int)->Unit,
     pricePerCoin: Double,
+    initialPrice: Double,
     flag: Boolean,
     isBuy: Boolean,
     availableCoins: Double?=0.0,
@@ -66,7 +67,6 @@ fun CircularSlider(
     var formattedUsdValue by remember { mutableStateOf("") }
 
     LaunchedEffect(flag) {
-
         if (isBuy) {
             val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
             val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0  // Avoid division by zero
@@ -101,8 +101,8 @@ fun CircularSlider(
             onBuyOrSell(formattedAmount,formattedUsdValue)
         }
     }
-    LaunchedEffect(initialValue) {
-
+    LaunchedEffect(pricePerCoin) {
+        Log.d("livePrice", "Current Price of coin: $pricePerCoin")
         if (isBuy) {
             val usdValue = initialValue.toDouble()
             val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
@@ -112,6 +112,22 @@ fun CircularSlider(
         } else {
             val amountOfCoin =  (initialValue / 100.0) * (availableCoins ?: 0.0)
             val usdValue = amountOfCoin * pricePerCoin
+            formattedUsdValue = "%,.2f".format(usdValue)
+            formattedAmount = "%,.2f".format(amountOfCoin)
+            onBuyOrSell(formattedAmount,formattedUsdValue)
+        }
+    }
+    LaunchedEffect(initialValue) {
+
+        if (isBuy) {
+            val usdValue = initialValue.toDouble()
+            val amountOfCoin = if (initialPrice > 0) usdValue / initialPrice else 0.0
+            formattedUsdValue = "%,.2f".format(usdValue)
+            formattedAmount = "%,.2f".format(amountOfCoin)
+            onBuyOrSell(formattedAmount,formattedUsdValue)
+        } else {
+            val amountOfCoin =  (initialValue / 100.0) * (availableCoins ?: 0.0)
+            val usdValue = amountOfCoin * initialPrice
             formattedUsdValue = "%,.2f".format(usdValue)
             formattedAmount = "%,.2f".format(amountOfCoin)
             onBuyOrSell(formattedAmount,formattedUsdValue)

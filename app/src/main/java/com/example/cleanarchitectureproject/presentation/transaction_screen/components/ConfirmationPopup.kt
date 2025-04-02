@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.transaction_screen.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,9 +67,30 @@ fun ConfirmationPopup(
     isBuy: Boolean,
     imageUrl: String,
     symbol: String,
-    isTab: Boolean
+    isTab: Boolean,
+    pricePerCoin: Double,
+    availableCoins: Double
 ) {
     var isChecked by remember { mutableStateOf(false) }
+    var liveUsd by remember { mutableStateOf(usd) }
+    var liveQuantity by remember { mutableStateOf(quantity) }
+
+    LaunchedEffect(pricePerCoin) {
+        Log.d("livePrice", "Current Price of coin: $pricePerCoin usd:$liveUsd quantity:$liveQuantity")
+        val availableDollars = liveUsd.replace(",", "").toDoubleOrNull() ?: 0.0
+        val availableQuantity= liveQuantity.replace(",", "").toDoubleOrNull() ?: 0.0
+        if (isBuy) {
+            val usdValue = availableDollars
+            val amountOfCoin = if (availableQuantity > 0.0) usdValue / pricePerCoin else 0.0
+            liveUsd = "%,.2f".format(usdValue)
+            liveQuantity = "%,.2f".format(amountOfCoin)
+        } else {
+            val amountOfCoin = (availableDollars / 100.0) * availableCoins
+            val usdValue = amountOfCoin * pricePerCoin
+            liveUsd = "%,.2f".format(usdValue)
+            liveQuantity = "%,.2f".format(amountOfCoin)
+        }
+    }
 
     Card(
         modifier = Modifier
@@ -193,10 +216,9 @@ fun ConfirmationPopup(
                         verticalArrangement = Arrangement.Top,
                         modifier = Modifier.weight(0.5f)
                     ) {
-                        if(!isBuy && quantity.length > 8 && !isTab)
-                        {
+                        if (!isBuy && liveQuantity.length > 8 && !isTab) {
                             Text(
-                                text = quantity,
+                                text = liveQuantity,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -207,11 +229,9 @@ fun ConfirmationPopup(
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                             )
-                        }
-                        else if(isBuy && usd.length > 8 && !isTab)
-                        {
+                        } else if (isBuy && liveUsd.length > 8 && !isTab) {
                             Text(
-                                text = usd,
+                                text = liveUsd,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -222,11 +242,9 @@ fun ConfirmationPopup(
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                             )
-                        }
-                        else
-                        {
+                        } else {
                             Text(
-                                text = if (isBuy) usd + " USD" else quantity + " $symbol",
+                                text = if (isBuy) liveUsd + " USD" else liveQuantity + " $symbol",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -239,10 +257,9 @@ fun ConfirmationPopup(
                         horizontalAlignment = Alignment.End,
                         modifier = Modifier.weight(0.5f)
                     ) {
-                        if(isBuy && quantity.length > 8 && !isTab)
-                        {
+                        if (isBuy && liveQuantity.length > 8 && !isTab) {
                             Text(
-                                text = quantity,
+                                text = liveQuantity,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -253,11 +270,9 @@ fun ConfirmationPopup(
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                             )
-                        }
-                        else if(!isBuy && usd.length > 8 && !isTab)
-                        {
+                        } else if (!isBuy && liveUsd.length > 8 && !isTab) {
                             Text(
-                                text = usd,
+                                text = liveUsd,
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -268,11 +283,9 @@ fun ConfirmationPopup(
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
                             )
-                        }
-                        else
-                        {
+                        } else {
                             Text(
-                                text = if (isBuy) quantity + " $symbol" else usd + " USD",
+                                text = if (isBuy) liveQuantity + " $symbol" else liveUsd + " USD",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.secondaryContainer,
                                 modifier = Modifier.padding(start = 8.dp, top = 4.dp)
@@ -299,7 +312,10 @@ fun ConfirmationPopup(
                     Checkbox(
                         checked = isChecked,
                         onCheckedChange = { isChecked = it },
-                        colors = CheckboxDefaults.colors(checkedColor = color, checkmarkColor = Color.White)
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = color,
+                            checkmarkColor = Color.White
+                        )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(

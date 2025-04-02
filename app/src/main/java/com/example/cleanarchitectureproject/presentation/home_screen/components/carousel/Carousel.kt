@@ -7,7 +7,10 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -25,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -103,27 +107,6 @@ fun SharedTransitionScope.Carousel(
                             state = rememberSharedContentState(key = "coinChart/${listType}_${id}"),
                             animatedVisibilityScope = animatedVisibilityScope
                         )
-                        .clickable {
-                            onClick(currency.get(page))
-                        }
-                        //.background(MaterialTheme.colorScheme.surfaceContainer)
-                        // .clip(RoundedCornerShape(16.dp)) // Rounded corners
-                        .graphicsLayer {
-                            val pageOffset = (
-                                    (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
-                                    ).absoluteValue
-
-                            // Smoother scaling and alpha effects
-                            val easingFraction =
-                                CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f).transform(
-                                    1f - pageOffset.coerceIn(0f, 1f)
-                                )
-
-                            alpha = lerp(start = 0.8f, stop = 1f, fraction = easingFraction)
-                            scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
-                            scaleX = scaleY
-                        }
-
                         .padding(
                             vertical = 5.dp
                         ), // Add vertical padding for spacing between cards
@@ -132,19 +115,43 @@ fun SharedTransitionScope.Carousel(
                     shape = RoundedCornerShape(8.dp) // Rounded corners
                 ) {
                     val isGainer = if (currency.get(page).quotes[0].percentChange1h > 0.0) true else false
-                    PriceLineChart(
-                        currencyCM = currency.get(page).quotes[0],
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight()
-                            .clickable {
+
+                    Box {
+                        PriceLineChart(
+                            currencyCM = currency.get(page).quotes[0],
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .padding(horizontal = 10.dp, vertical = 16.dp),
+                            labelName = currency.get(page).symbol,
+                            color1 = if (isGainer) green else red,
+                            color2 = if (isGainer) lightGreen else lightRed
+                        )
+                        Box(modifier = Modifier.fillMaxSize()
+                            .clickable(
+                                indication = null, // 🔹 Removes the ripple effect
+                                interactionSource = remember { MutableInteractionSource() } // 🔹 Prevents highlight on touch
+                            ) {
                                 onClick(currency.get(page))
                             }
-                            .padding(horizontal = 10.dp, vertical = 16.dp),
-                        labelName = currency.get(page).symbol,
-                        color1 = if(isGainer) green else red,
-                        color2 = if(isGainer) lightGreen else lightRed
-                    )
+                            .graphicsLayer {
+                                val pageOffset = (
+                                        (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                                        ).absoluteValue
+
+                                // Smoother scaling and alpha effects
+                                val easingFraction =
+                                    CubicBezierEasing(0.25f, 0.8f, 0.25f, 1f).transform(
+                                        1f - pageOffset.coerceIn(0f, 1f)
+                                    )
+
+                                alpha = lerp(start = 0.8f, stop = 1f, fraction = easingFraction)
+                                scaleY = lerp(start = 0.9f, stop = 1f, fraction = easingFraction)
+                                scaleX = scaleY
+                            }
+                        )
+                    }
+
                 }
             }
         }

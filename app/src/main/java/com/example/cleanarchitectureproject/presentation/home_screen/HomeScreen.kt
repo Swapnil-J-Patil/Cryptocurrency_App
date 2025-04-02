@@ -28,6 +28,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -107,6 +109,15 @@ fun SharedTransitionScope.HomeScreen(
     val topGainers by viewModel.topGainers.collectAsState()
     val topLosers by viewModel.topLosers.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.startFetchingCoinStats()
+
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopFetchingCoinStats()
+        }
+    }
     Box(
         modifier = Modifier.fillMaxSize()
     ) {

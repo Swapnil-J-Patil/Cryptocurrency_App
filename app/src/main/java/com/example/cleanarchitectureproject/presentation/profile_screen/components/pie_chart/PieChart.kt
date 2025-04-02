@@ -92,7 +92,7 @@ fun PieChart(
     imageUrls: List<String?> // New parameter for images
 ) {
     val totalSum = data.values.sum()
-    Log.d("PiechartValues", "totalSum: $totalSum and values: ${data.values} ")
+    //Log.d("PiechartValues", "totalSum: $totalSum and values: ${data.values} ")
     val floatValue = mutableListOf<Float>()
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)

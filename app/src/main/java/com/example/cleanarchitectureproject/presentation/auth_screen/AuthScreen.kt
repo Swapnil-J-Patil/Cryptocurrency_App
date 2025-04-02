@@ -157,7 +157,7 @@ fun SharedTransitionScope.AuthScreen(
                 }
 
                 is BiometricResult.AuthenticationError -> {
-                    Log.d("biometricAuth", "AuthScreen: $result")
+                   // Log.d("biometricAuth", "AuthScreen: $result")
                     showToast = false // Dismiss current toast
                     coroutineScope.launch { // Ensure state updates properly
                         delay(100) // Small delay to allow recomposition
@@ -168,7 +168,7 @@ fun SharedTransitionScope.AuthScreen(
                 }
 
                 is BiometricResult.AuthenticationFailed -> {
-                    Log.d("biometricAuth", "AuthScreen: $result")
+                    //Log.d("biometricAuth", "AuthScreen: $result")
                     showToast = false // Dismiss current toast
                     coroutineScope.launch { // Ensure state updates properly
                         delay(100) // Small delay to allow recomposition
@@ -240,7 +240,7 @@ fun SharedTransitionScope.AuthScreen(
                 is AuthState.SignedOut -> "Signed Out successfully!"
                 is AuthState.Loading -> "Signing in..."
             }
-            Log.d("AuthScreen", "User: $userName and $userEmail")
+            //Log.d("AuthScreen", "User: $userName and $userEmail")
         }
     }
 

@@ -86,13 +86,7 @@ class PortfolioViewModel @Inject constructor(
         fetchJob?.cancel()  // Ensure previous job is canceled before starting a new one
         fetchJob = viewModelScope.launch {
             while (isActive) { // Ensures cancellation if ViewModel is cleared
-               /* val coins = _coinListState.value?.cryptocurrency
-                val filteredPrices=_filteredCurrencyList.value
-                if (filteredPrices != null) {
-                    if (!coins.isNullOrEmpty() && filteredPrices.isNotEmpty()) {
-                        processCoins(coins, filteredPrices)
-                    }
-                }*/
+
                 getCoinStats()
                 delay(2000)
             }

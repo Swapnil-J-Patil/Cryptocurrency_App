@@ -22,7 +22,7 @@ class BiometricViewModel(
     fun fingerprintAuth(title: String, description: String) {
         viewModelScope.launch {
             authenticateBiometricUseCase(title, description).collect { result ->
-                Log.d("biometricAuth", "AuthViewmodel: $result")
+               // Log.d("biometricAuth", "AuthViewmodel: $result")
                 _biometricState.value = result
             }
         }
