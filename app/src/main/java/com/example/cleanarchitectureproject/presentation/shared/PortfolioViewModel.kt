@@ -227,14 +227,14 @@ class PortfolioViewModel @Inject constructor(
         val cryptocurrencyCoins = coins.mapIndexed { index, coin ->
            // Log.d("portfolioViewmodelPVM", "Processing coins...")
 
-            if(coin.id== 35509 || coin.id== 35702)
+            /*if(coin.id== 35509 || coin.id== 35702)
             {
-               /* val livePrice=filteredPrices.getOrNull(index) ?: coin.quotes?.firstOrNull()?.price
+               *//* val livePrice=filteredPrices.getOrNull(index) ?: coin.quotes?.firstOrNull()?.price
                 val currentPrice = livePrice?.times((coin.quantity!!))
                 Log.d("coinIssue", "coin: ${livePrice} and quantity:${coin.quantity} price with quantity: $currentPrice")
-*/
+*//*
                 removeCrypto(coin)
-            }
+            }*/
             val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
             val percentage = firstQuote?.percentChange1h?.toString() ?: "0.0"
             val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price
