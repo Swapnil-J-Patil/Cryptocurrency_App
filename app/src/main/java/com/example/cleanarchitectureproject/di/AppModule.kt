@@ -4,8 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.room.Room
 import com.example.cleanarchitectureproject.common.Constants
-import com.example.cleanarchitectureproject.data.local.portfolio.PortfolioDatabase
-import com.example.cleanarchitectureproject.data.local.saved_coins.CryptoDatabase
+import com.example.cleanarchitectureproject.data.local.CryptoDatabase
 import com.example.cleanarchitectureproject.data.remote.CoinMarketApi
 import com.example.cleanarchitectureproject.data.repository.AuthRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CoinMarketRepositoryImpl
@@ -67,8 +66,12 @@ object AppModule {
     fun provideCryptoRepository(db: CryptoDatabase): CryptoRepository {
         return CryptoRepositoryImpl(db.cryptoDao)
     }
-
     @Provides
+    @Singleton
+    fun providePortfolioRepository(db: CryptoDatabase): PortfolioRepository {
+        return PortfolioRepositoryImpl(db.portfolioDao)
+    }
+    /*@Provides
     @Singleton
     fun providePortfolioDatabase(app: Application): PortfolioDatabase {
         return Room.databaseBuilder(
@@ -76,13 +79,9 @@ object AppModule {
             PortfolioDatabase::class.java,
             "portfolio_db"
         ).build()
-    }
+    }*/
 
-    @Provides
-    @Singleton
-    fun providePortfolioRepository(db: PortfolioDatabase): PortfolioRepository {
-        return PortfolioRepositoryImpl(db.portfolioDao)
-    }
+
 
     //Keystore
     @Provides

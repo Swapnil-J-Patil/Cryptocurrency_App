@@ -33,8 +33,7 @@ fun ProfileImageItem(
     Box(
         modifier = Modifier
             .size(size)
-            .clip(CircleShape)
-            ,
+            .clip(CircleShape),
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(
