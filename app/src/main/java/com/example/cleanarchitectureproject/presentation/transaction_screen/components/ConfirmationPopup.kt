@@ -76,7 +76,7 @@ fun ConfirmationPopup(
     var liveQuantity by remember { mutableStateOf(quantity) }
 
     LaunchedEffect(pricePerCoin) {
-        Log.d("livePrice", "Current Price of coin: $pricePerCoin usd:$liveUsd quantity:$liveQuantity")
+       // Log.d("livePrice", "Current Price of coin: $pricePerCoin usd:$liveUsd quantity:$liveQuantity")
         val availableDollars = liveUsd.replace(",", "").toDoubleOrNull() ?: 0.0
         val availableQuantity= liveQuantity.replace(",", "").toDoubleOrNull() ?: 0.0
         if (isBuy) {

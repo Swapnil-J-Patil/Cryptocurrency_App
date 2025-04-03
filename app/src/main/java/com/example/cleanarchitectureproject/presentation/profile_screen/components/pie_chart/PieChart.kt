@@ -91,12 +91,12 @@ fun PieChart(
     totalInvestment: String,
     imageUrls: List<String?> // New parameter for images
 ) {
-    val totalSum = data.values.sum()
-    //Log.d("PiechartValues", "totalSum: $totalSum and values: ${data.values} ")
-    val floatValue = mutableListOf<Float>()
+
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
     }
+    var floatValue by remember { mutableStateOf(listOf<Float>()) }
+
     val isSelected = remember {
         mutableStateOf(false)
     }
@@ -109,15 +109,10 @@ fun PieChart(
         )
     )
     val isGainer= if(portfolioColor== green) true else false
-    data.values.forEachIndexed { index, values ->
-        floatValue.add(index, (360 * values.toFloat() / totalSum.toFloat()) - arcSpacing)
-    }
+
     val context = LocalContext.current
     val imageLoader = ImageLoader(context)
-    val imageRequest = ImageRequest.Builder(context)
-        .data("https://s2.coinmarketcap.com/static/img/coins/64x64/1.png") // Replace with your actual image URL
-        .size(50, 50) // Set the size as needed
-        .build()
+
 
 // Load the image asynchronously
     val imageBitmaps = remember { mutableStateListOf<ImageBitmap?>(null, null, null, null, null) }
@@ -170,11 +165,20 @@ fun PieChart(
         }
     }
 
+
+    LaunchedEffect(data) {
+        val totalSum = data.values.sum()
+        //Log.d("PiechartValues", "totalSum: $totalSum and values: ${data.values} ")
+        floatValue = data.values.map { values ->
+            (360 * values.toFloat() / totalSum.toFloat()) - arcSpacing
+        }
+    }
     LaunchedEffect(Unit) {
        /* val result = imageLoader.execute(imageRequest)
         if (result is SuccessResult) {
             imageBitmap = result.drawable.toBitmap().asImageBitmap()
         }*/
+
         animationPlayed = true
 
         delay(2000L) // Delay for 1 second (1000 milliseconds)
