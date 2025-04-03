@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1560a1213db2977d95ab3de3999e2f11",
+    "identityHash": "9d567a419cb1861c03b1f7b6d637c730",
     "entities": [
       {
         "tableName": "saved_coins",
@@ -247,12 +247,68 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "transactions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `coinName` TEXT NOT NULL, `date` TEXT NOT NULL, `quantity` REAL NOT NULL, `usd` REAL NOT NULL, `transaction` TEXT NOT NULL, `image` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coinName",
+            "columnName": "coinName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "quantity",
+            "columnName": "quantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "usd",
+            "columnName": "usd",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "transaction",
+            "columnName": "transaction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "image",
+            "columnName": "image",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1560a1213db2977d95ab3de3999e2f11')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9d567a419cb1861c03b1f7b6d637c730')"
     ]
   }
 }

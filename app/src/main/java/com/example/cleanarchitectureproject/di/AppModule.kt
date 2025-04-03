@@ -10,11 +10,13 @@ import com.example.cleanarchitectureproject.data.repository.AuthRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CoinMarketRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CryptoRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.PortfolioRepositoryImpl
+import com.example.cleanarchitectureproject.data.repository.TransactionRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.UserDetailsRepositoryImpl
 import com.example.cleanarchitectureproject.domain.repository.AuthRepository
 import com.example.cleanarchitectureproject.domain.repository.CoinMarketRepository
 import com.example.cleanarchitectureproject.domain.repository.CryptoRepository
 import com.example.cleanarchitectureproject.domain.repository.PortfolioRepository
+import com.example.cleanarchitectureproject.domain.repository.TransactionRepository
 import com.example.cleanarchitectureproject.domain.repository.UserDetailsRepository
 import com.example.cleanarchitectureproject.domain.use_case.keystore.ClearTokensUseCase
 import com.example.cleanarchitectureproject.domain.use_case.keystore.GetTokensUseCase
@@ -71,17 +73,12 @@ object AppModule {
     fun providePortfolioRepository(db: CryptoDatabase): PortfolioRepository {
         return PortfolioRepositoryImpl(db.portfolioDao)
     }
-    /*@Provides
+
+    @Provides
     @Singleton
-    fun providePortfolioDatabase(app: Application): PortfolioDatabase {
-        return Room.databaseBuilder(
-            app,
-            PortfolioDatabase::class.java,
-            "portfolio_db"
-        ).build()
-    }*/
-
-
+    fun provideTransactionsRepository(db: CryptoDatabase): TransactionRepository {
+        return TransactionRepositoryImpl(db.transactionsDao)
+    }
 
     //Keystore
     @Provides
