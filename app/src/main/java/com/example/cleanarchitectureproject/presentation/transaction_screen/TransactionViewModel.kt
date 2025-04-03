@@ -16,7 +16,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
+import com.example.cleanarchitectureproject.domain.model.TransactionData
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
+import com.example.cleanarchitectureproject.domain.use_case.transactions.DeleteAllTransactionsUseCase
+import com.example.cleanarchitectureproject.domain.use_case.transactions.DeleteTransactionUseCase
+import com.example.cleanarchitectureproject.domain.use_case.transactions.GetAllTransactionsUseCase
+import com.example.cleanarchitectureproject.domain.use_case.transactions.InsertTransactionUseCase
 import com.example.cleanarchitectureproject.presentation.home_screen.CoinStatsState
 import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioCoinState
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
@@ -39,7 +44,10 @@ import javax.inject.Inject
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
     private val getCurrencyStatsUseCase: GetCurrencyStatsUseCase,
-
+    private val getAllTransactionUseCase: GetAllTransactionsUseCase,
+    private val insertTransactionUseCase: InsertTransactionUseCase,
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val deleteAllTransactionUseCase: DeleteAllTransactionsUseCase,
     ) : ViewModel() {
 
 
@@ -48,6 +56,9 @@ class TransactionViewModel @Inject constructor(
 
     private val _statsState = mutableStateOf(CoinStatsState())
     val statsState: State<CoinStatsState> = _statsState
+
+    private val _transactionState = mutableStateOf(TransactionState())
+    val transactionState: State<TransactionState> = _transactionState
 
     private var fetchJob: Job? = null
 
@@ -93,5 +104,65 @@ class TransactionViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun loadTransactions() {
+        viewModelScope.launch {
+            getAllTransactionUseCase().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _transactionState.value = TransactionState(isLoading = true)
+                        Log.d("SavedCoinViewModel", "Loading data...")
+                    }
+
+                    is Resource.Success -> {
+                        _transactionState.value = TransactionState(transaction = result.data)
+                        //Log.d("SavedCoinViewModel", "Successfully loaded: ${result.data}")
+                    }
+
+                    is Resource.Error -> {
+                        _transactionState.value = TransactionState(error = result.message ?: "Unknown error")
+                        Log.e("SavedCoinViewModel", "Error loading data: ${result.message}")
+                    }
+                }
+            }
+        }
+    }
+
+
+    fun addTransaction(transaction: TransactionData) {
+        viewModelScope.launch {
+            insertTransactionUseCase(transaction).collect { result ->
+                when (result) {
+                    is Resource.Loading -> Log.d("SavedCoinViewModel", "Inserting transaction...")
+                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully inserted: ${transaction.coinName}")
+                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error inserting transaction: ${result.message}")
+                }
+            }
+        }
+    }
+
+    suspend fun deleteAllTransactions() {
+        viewModelScope.launch {
+            deleteAllTransactionUseCase().collect { result ->
+                when (result) {
+                    is Resource.Loading -> Log.d("SavedCoinViewModel", "Inserting crypto...")
+                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully Deleted All transactions:")
+                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error inserting transaction: ${result.message}")
+                }
+            }
+        }
+    }
+
+    fun deleteTransaction(id: Int) {
+        viewModelScope.launch {
+            deleteTransactionUseCase(id).collect { result ->
+                when (result) {
+                    is Resource.Loading -> Log.d("SavedCoinViewModel", "Deleting crypto...")
+                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully deleted: ${id}")
+                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error deleting transaction: ${result.message}")
+                }
+            }
+        }
     }
 }

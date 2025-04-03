@@ -34,10 +34,9 @@ class TransactionRepositoryImpl @Inject constructor(
 
     override suspend fun insertTransaction(transaction: TransactionData) {
         val entity = TransactionsEntity(
-            id = transaction.id,
             coinName = transaction.coinName,
             quantity = transaction.quantity,
-            usd = transaction.usd,
+            usd = transaction.usd?:0.0,
             transaction = transaction.transaction,
             date = transaction.date,
             image = transaction.image

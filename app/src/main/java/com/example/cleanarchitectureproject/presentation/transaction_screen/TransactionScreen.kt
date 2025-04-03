@@ -39,6 +39,7 @@ import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.domain.model.SweetToastProperty
+import com.example.cleanarchitectureproject.domain.model.TransactionData
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.auth_screen.Error
 import com.example.cleanarchitectureproject.presentation.common_components.CustomSweetToast
@@ -50,6 +51,8 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -206,6 +209,7 @@ fun SharedTransitionScope.TransactionScreen(
                             // Log.d("portfolioSaved", "TransactionScreen After: ${currentPrice.value} ")
                             val availableDollars = dollars?.replace(",", "")?.toDouble()?: 0.0
                             val availableQuantity =savedQuantity?: 0.0
+                            val currentDate: String = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
                             if (isBuyClicked) {
                                 val remainingUsd = (availableDollars - cleanDollars)
@@ -242,6 +246,16 @@ fun SharedTransitionScope.TransactionScreen(
                                         purchasedAt = currentPrice.value.toDouble()
                                     )
 
+                                    val transaction=TransactionData(
+                                        coinName = coin.name,
+                                        quantity = sum?:0.0,
+                                        usd = currentPrice.value.toDouble(),
+                                        transaction = "Buy",
+                                        date = currentDate,
+                                        image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png"
+                                    )
+
+                                    transactionViewModel.addTransaction(transaction)
                                     portfolioViewModel.addCrypto(coinData)
                                     prefsManager.setDollarAmount(remainingUsd.toString())
 
@@ -294,9 +308,19 @@ fun SharedTransitionScope.TransactionScreen(
                                         isAudited = coin.isAudited,
                                         badges = coin.badges ?: emptyList(),
                                         quantity = diff,
-                                        purchasedAt = coin.quotes?.get(0)?.price //Replace this later
+                                        purchasedAt = livePrice //Replace this later
                                     )
 
+                                    val transaction=TransactionData(
+                                        coinName = coin.name,
+                                        quantity = diff?:0.0,
+                                        usd = livePrice,
+                                        transaction = "Sell",
+                                        date = currentDate,
+                                        image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png"
+                                    )
+
+                                    transactionViewModel.addTransaction(transaction)
                                     portfolioViewModel.addCrypto(coinData)
                                     prefsManager.setDollarAmount(remainingUsd.toString())
 

@@ -89,12 +89,13 @@ fun PieChart(
     portfolioPercentage: String,
     portfolioColor: Color,
     totalInvestment: String,
-    imageUrls: List<String?> // New parameter for images
+    imageUrls: List<String?>, // New parameter for images
 ) {
 
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
     }
+
     var floatValue by remember { mutableStateOf(listOf<Float>()) }
 
     val isSelected = remember {
@@ -147,7 +148,6 @@ fun PieChart(
         )
     )
     var isFlipped by remember { mutableStateOf(false) }
-
 
     LaunchedEffect(imageUrls) {
         imageUrls.forEachIndexed { index, url ->
