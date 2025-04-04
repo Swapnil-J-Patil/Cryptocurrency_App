@@ -62,8 +62,6 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
-import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
-import com.example.cleanarchitectureproject.presentation.market_screen.MarketViewModel
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.components.SquareCoinCardItem
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
@@ -74,10 +72,10 @@ import java.text.DecimalFormat
 @Composable
 fun SharedTransitionScope.SavedCoinsScreen(
     navController: NavController,
-    viewModel: SavedCoinViewModel = hiltViewModel(),
+    savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val state = viewModel.coinListState.value
+    val state = savedCoinViewModel.coinListState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
     val progress by animateLottieCompositionAsState(
         composition, iterations = LottieConstants.IterateForever // Infinite repeat mode
@@ -98,8 +96,8 @@ fun SharedTransitionScope.SavedCoinsScreen(
     val listState = rememberLazyGridState()
     val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
 
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val filteredCoins by viewModel.filteredCoins.collectAsState() // Observe filtered coins
+    val searchQuery by savedCoinViewModel.searchQuery.collectAsState()
+    val filteredCoins by savedCoinViewModel.filteredCoins.collectAsState() // Observe filtered coins
 
     // Precompute visible indices
     Box(
@@ -141,7 +139,7 @@ fun SharedTransitionScope.SavedCoinsScreen(
                     ) {
                         OutlinedTextField(
                             value = searchQuery,
-                            onValueChange = { viewModel.updateSearchQuery(it) },
+                            onValueChange = { savedCoinViewModel.updateSearchQuery(it) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 10.dp)
@@ -229,7 +227,7 @@ fun SharedTransitionScope.SavedCoinsScreen(
                                                 //onItemClick(coin, true)
 
                                                 coroutineScope.launch {
-                                                    isSaved = viewModel.isCoinSaved(coin.id.toString())
+                                                    isSaved = savedCoinViewModel.isCoinSaved(coin.id.toString())
 
                                                     val coinData = coin.toCryptoCoin()
                                                     val gson = Gson() // Or use kotlinx.serialization

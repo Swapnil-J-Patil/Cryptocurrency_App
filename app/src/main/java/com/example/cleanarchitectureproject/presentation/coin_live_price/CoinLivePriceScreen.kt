@@ -1,6 +1,5 @@
 package com.example.cleanarchitectureproject.presentation.coin_live_price
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -28,8 +27,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -48,29 +45,21 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -104,7 +93,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     coinData: CryptoCoin,
     navController: NavController,
     listType: String,
-    viewModel: SavedCoinViewModel = hiltViewModel(),
+    savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
@@ -112,10 +101,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coinId}.png"
     val configuration = LocalConfiguration.current
     val isSavedState = remember { mutableStateOf(isSaved) }
-    val isLowLiquidity = viewModel.checkLiquidity(crypto = coinData)
+    val isLowLiquidity = savedCoinViewModel.checkLiquidity(crypto = coinData)
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
-    val coinValue by viewModel.coinLivePrice.observeAsState()
+    val coinValue by savedCoinViewModel.coinLivePrice.observeAsState()
     var livePrice by remember {
         mutableStateOf(coinPrice)
     }
@@ -147,12 +136,12 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     )
 
     LaunchedEffect(Unit) {
-        viewModel.startFetchingCoinStats(coinId.toInt())
+        savedCoinViewModel.startFetchingCoinStats(coinId.toInt())
         delay(1000L) // Delay for 1 second (1000 milliseconds)
         isSelected.value = true
     }
     LaunchedEffect(coinValue) {
-        val formattedPrice= coinValue?.let { viewModel.formatPrice(it) }
+        val formattedPrice= coinValue?.let { savedCoinViewModel.formatPrice(it) }
         if (formattedPrice != null) {
             //Log.d("FormattedPrice", "Price: $formattedPrice")
             livePrice=formattedPrice
@@ -161,7 +150,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.stopFetchingCoinStats()
+            savedCoinViewModel.stopFetchingCoinStats()
         }
     }
     Column(
@@ -195,9 +184,9 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     .size(iconSize)
                     .clickable {
                         if (!isSavedState.value) {
-                            viewModel.addCrypto(coinData) // Save the coin
+                            savedCoinViewModel.addCrypto(coinData) // Save the coin
                         } else {
-                            viewModel.removeCrypto(coinData) // Remove the coin
+                            savedCoinViewModel.removeCrypto(coinData) // Remove the coin
                         }
                         isSavedState.value = !isSavedState.value // Toggle state
                     }

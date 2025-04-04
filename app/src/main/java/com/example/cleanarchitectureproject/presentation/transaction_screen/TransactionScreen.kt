@@ -2,6 +2,8 @@ package com.example.cleanarchitectureproject.presentation.transaction_screen
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.animation.AnimatedVisibility
@@ -54,6 +56,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -203,9 +206,11 @@ fun SharedTransitionScope.TransactionScreen(
             livePrice?.let {
                     ConfirmationPopup(
                         onCancel = { isTransaction = false },
-                        onConfirm = {
-                            val cleanQuantity = cryptoQuantity.value.replace(",", "").toDouble()
-                            val cleanDollars = amountOfDollars.value.replace(",", "").toDouble()
+                        onConfirm = {liveUsd, liveQuantity->
+                            val cleanQuantity = liveQuantity.replace(",", "").toDouble()
+                            val cleanDollars = liveUsd.replace(",", "").toDouble()
+
+
                             // Log.d("portfolioSaved", "TransactionScreen After: ${currentPrice.value} ")
                             val availableDollars = dollars?.replace(",", "")?.toDouble()?: 0.0
                             val availableQuantity =savedQuantity?: 0.0

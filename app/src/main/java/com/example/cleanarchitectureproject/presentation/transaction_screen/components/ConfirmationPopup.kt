@@ -60,7 +60,7 @@ import com.example.cleanarchitectureproject.R
 fun ConfirmationPopup(
     modifier: Modifier = Modifier,
     onCancel: () -> Unit,
-    onConfirm: () -> Unit,
+    onConfirm: (String,String) -> Unit,
     color: Color,
     usd: String,
     quantity: String,
@@ -78,11 +78,12 @@ fun ConfirmationPopup(
     LaunchedEffect(pricePerCoin) {
        // Log.d("livePrice", "Current Price of coin: $pricePerCoin usd:$liveUsd quantity:$liveQuantity")
         val availableDollars = liveUsd.replace(",", "").toDoubleOrNull() ?: 0.0
-        val availableQuantity= liveQuantity.replace(",", "").toDoubleOrNull() ?: 0.0
+        //val availableQuantity= liveQuantity.replace(",", "").toDoubleOrNull() ?: 0.0
         if (isBuy) {
             val usdValue = availableDollars
-            val amountOfCoin = if (availableQuantity > 0.0) usdValue / pricePerCoin else 0.0
-            liveUsd = "%,.2f".format(usdValue)
+            val amountOfCoin = if (pricePerCoin > 0.0) usdValue / pricePerCoin else 0.0
+            val amountOfDollars= amountOfCoin * pricePerCoin
+            liveUsd = "%,.2f".format(amountOfDollars)
             liveQuantity = "%,.2f".format(amountOfCoin)
         } else {
             val amountOfCoin = (availableDollars / 100.0) * availableCoins
@@ -338,7 +339,7 @@ fun ConfirmationPopup(
                             RoundedCornerShape(8.dp)
                         ),
                     onClick = {
-                        onConfirm()
+                        onConfirm(liveUsd,liveQuantity)
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isChecked) color else Color.Gray

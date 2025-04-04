@@ -191,8 +191,7 @@ fun CircularSlider(
 
                             if (isBuy) {
                                 val usdValue = positionValue.toDouble()
-                                val amountOfCoin =
-                                    if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
+                                val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
                                 formattedUsdValue = "%,.2f".format(usdValue)
                                 formattedAmount = "%,.2f".format(amountOfCoin)
                             } else {

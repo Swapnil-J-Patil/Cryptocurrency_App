@@ -1,9 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen
 
 import android.content.Context
-import android.util.Log
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -25,33 +22,23 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -69,34 +56,22 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.domain.model.ProfileData
-import com.example.cleanarchitectureproject.presentation.Screen
-import com.example.cleanarchitectureproject.presentation.auth_screen.Error
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.FiltersPopup
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
-import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioCoinState
-import com.example.cleanarchitectureproject.presentation.transaction_screen.components.ConfirmationPopup
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
-import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
-import com.example.cleanarchitectureproject.presentation.ui.theme.red
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -104,13 +79,13 @@ fun SharedTransitionScope.ProfileScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
     keyStoreViewModel: KeyStoreViewModel = hiltViewModel(),
-    viewModel: PortfolioViewModel = hiltViewModel(),
-    context:Context
+    portfolioViewModel: PortfolioViewModel = hiltViewModel(),
+    context: Context
 ) {
     //viewModel.loadCrypto()
-    val portfolioCoinList by viewModel.currencyList.observeAsState()
-    val portfolioValue by viewModel.portfolioValue.observeAsState()
-    val totalInvestment by viewModel.totalInvestment.observeAsState()
+    val portfolioCoinList by portfolioViewModel.currencyList.observeAsState()
+    val portfolioValue by portfolioViewModel.portfolioValue.observeAsState()
+    val totalInvestment by portfolioViewModel.totalInvestment.observeAsState()
     val prefsManager = remember { PrefsManager(context) }
     val dollars = prefsManager.getDollarAmount()
     var isFilterClicked by remember {
@@ -128,7 +103,9 @@ fun SharedTransitionScope.ProfileScreen(
 
     val comparators = mutableListOf<Comparator<PortfolioCoin>>()
 
-    if (currentFilters[0]) comparators.add(compareByDescending<PortfolioCoin> { it.currentPrice ?: 0.0 }) // Sort by currentValue
+    if (currentFilters[0]) comparators.add(compareByDescending<PortfolioCoin> {
+        it.currentPrice ?: 0.0
+    }) // Sort by currentValue
     if (currentFilters[1]) comparators.add(compareByDescending<PortfolioCoin> { it.returns }) // Sort by returns
     if (currentFilters[2]) comparators.add(compareByDescending<PortfolioCoin> { it.returnPercentage }) // Sort by percentChange
     if (currentFilters[3]) comparators.add(compareBy<PortfolioCoin> { it.name }) // Sort by name (A-Z)
@@ -140,7 +117,6 @@ fun SharedTransitionScope.ProfileScreen(
     val sortedCoins = portfolioCoinList?.let { list ->
         finalComparator?.let { list.sortedWith(it) } ?: list
     } ?: listOf()
-
 
 
     val brushColors = listOf(Color(0xFF23af92), Color(0xFF0E5C4C))
@@ -167,18 +143,12 @@ fun SharedTransitionScope.ProfileScreen(
         }
     }
     LaunchedEffect(Unit) {
-        visibility=!visibility
-       /* while (true)
-        {
-            delay(2000)
-            viewModel.getCoinStats()
-        }*/
-        viewModel.startFetchingCoinStats()
-
+        visibility = !visibility
+        portfolioViewModel.startFetchingCoinStats()
     }
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.stopFetchingCoinStats()
+            portfolioViewModel.stopFetchingCoinStats()
         }
     }
     SharedTransitionLayout(modifier = Modifier.fillMaxSize()) {
@@ -228,12 +198,9 @@ fun SharedTransitionScope.ProfileScreen(
                                 state = rememberSharedContentState(key = "profile-image"),
                                 animatedVisibilityScope = this@AnimatedVisibility
                             ),
-
-                            )
+                        )
                     }
                 }
-                // Spacer(modifier = Modifier.width(15.dp))
-
             }
 
             Column(
@@ -300,7 +267,10 @@ fun SharedTransitionScope.ProfileScreen(
                         shape = RoundedCornerShape(20.dp)
                     ) {
                         sortedCoins.let {
-                            val portfolioPercentage= ((portfolioValue?.minus(totalInvestment!!))?.div(totalInvestment!!))?.times(100)
+                            val portfolioPercentage =
+                                ((portfolioValue?.minus(totalInvestment!!))?.div(totalInvestment!!))?.times(
+                                    100
+                                )
 
                             if (dollars != null) {
                                 Tabs(
@@ -319,7 +289,7 @@ fun SharedTransitionScope.ProfileScreen(
                                     dollars = dollars.toDouble(),
                                     totalInvestment = totalInvestment,
                                     onFilter = {
-                                        isFilterClicked=true
+                                        isFilterClicked = true
                                     },
                                 )
                             }
@@ -328,6 +298,7 @@ fun SharedTransitionScope.ProfileScreen(
                     }
                 }
             }
+
             AnimatedVisibility(
                 visible = isFilterClicked,
                 enter = scaleIn(
@@ -341,7 +312,8 @@ fun SharedTransitionScope.ProfileScreen(
                     isTab = false,
                     currentFilters = remember { mutableStateOf(currentFilters) }, // Pass the current filters
                     onFilters = {
-                        currentFilters = it // Update the current filters when onFilters is triggered
+                        currentFilters =
+                            it // Update the current filters when onFilters is triggered
                     }
                 )
             }

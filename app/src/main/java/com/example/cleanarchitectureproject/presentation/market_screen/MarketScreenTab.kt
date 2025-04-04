@@ -72,11 +72,11 @@ import java.text.DecimalFormat
 @Composable
 fun SharedTransitionScope.MarketScreenTab(
     navController: NavController,
-    viewModel: MarketViewModel = hiltViewModel(),
+    marketViewModel: MarketViewModel = hiltViewModel(),
     savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val state = viewModel.coinListState.value
+    val state = marketViewModel.coinListState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
     val progress by animateLottieCompositionAsState(
         composition, iterations = LottieConstants.IterateForever // Infinite repeat mode
@@ -97,16 +97,16 @@ fun SharedTransitionScope.MarketScreenTab(
     val listState = rememberLazyGridState()
     val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
 
-    val searchQuery by viewModel.searchQuery.collectAsState()
-    val filteredCoins by viewModel.filteredCoins.collectAsState() // Observe filtered coins
+    val searchQuery by marketViewModel.searchQuery.collectAsState()
+    val filteredCoins by marketViewModel.filteredCoins.collectAsState() // Observe filtered coins
 
     LaunchedEffect(Unit) {
-        viewModel.startFetchingCoinStats()
+        marketViewModel.startFetchingCoinStats()
 
     }
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.stopFetchingCoinStats()
+            marketViewModel.stopFetchingCoinStats()
         }
     }
     // Precompute visible indices
@@ -152,7 +152,7 @@ fun SharedTransitionScope.MarketScreenTab(
                     ) {
                         OutlinedTextField(
                             value = searchQuery,
-                            onValueChange = { viewModel.updateSearchQuery(it) },
+                            onValueChange = { marketViewModel.updateSearchQuery(it) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(8.dp)), // Apply rounded corners

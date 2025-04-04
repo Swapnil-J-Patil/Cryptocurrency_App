@@ -2,7 +2,6 @@ package com.example.cleanarchitectureproject.presentation.auth_screen
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -65,11 +64,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.R
-import com.example.cleanarchitectureproject.data.local.keystore.UserDetailsSerializer
 import com.example.cleanarchitectureproject.domain.model.BiometricResult
 import com.example.cleanarchitectureproject.domain.model.SweetToastProperty
 import com.example.cleanarchitectureproject.presentation.Screen
@@ -88,7 +85,7 @@ fun SharedTransitionScope.AuthScreen(
     navController: NavController,
     animatedVisibilityScope: AnimatedVisibilityScope,
     context: Context,
-    viewModel: AuthViewModel = hiltViewModel(),
+    authViewModel: AuthViewModel = hiltViewModel(),
     keyStoreViewModel: KeyStoreViewModel= hiltViewModel(),
     biometricViewModel: BiometricViewModel
 ) {
@@ -100,7 +97,7 @@ fun SharedTransitionScope.AuthScreen(
     val coroutineScope = rememberCoroutineScope()
     var toastType by remember { mutableStateOf<SweetToastProperty>(Error()) }
 
-    val authState by viewModel.authState.collectAsState()
+    val authState by authViewModel.authState.collectAsState()
     val biometricState by biometricViewModel.biometricState.collectAsState()
     val prefsManager = remember { PrefsManager(context) } // Initialize SharedPreferences
     val context = LocalContext.current
@@ -109,7 +106,7 @@ fun SharedTransitionScope.AuthScreen(
         contract = ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            viewModel.handleSignInResult(result.data)
+            authViewModel.handleSignInResult(result.data)
         }
     }
 
@@ -361,11 +358,11 @@ fun SharedTransitionScope.AuthScreen(
                                 "signIn" -> {
                                     when (method) {
                                         "email" -> {
-                                            viewModel.signIn(email, password)
+                                            authViewModel.signIn(email, password)
                                         }
 
                                         "gmail" -> {
-                                            viewModel.signInWithGoogle(context, signInLauncher)
+                                            authViewModel.signInWithGoogle(context, signInLauncher)
                                         }
 
                                         "fingerprint" -> {
@@ -386,7 +383,7 @@ fun SharedTransitionScope.AuthScreen(
 
                                 "signUp" -> {
                                     if (method == "email") {
-                                        viewModel.signUp(email, password)
+                                        authViewModel.signUp(email, password)
                                     }
                                 }
                             }

@@ -5,18 +5,13 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,37 +22,27 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.Navbar
 import com.example.cleanarchitectureproject.presentation.main_screen.components.navbar.BottomNavAnimation
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
-import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
-import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SharedTransitionScope.MainScreen(
     navController: NavController,
-    viewModel: MainScreenViewModel = hiltViewModel(),
+    mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val screen = listOf(
@@ -75,7 +60,7 @@ fun SharedTransitionScope.MainScreen(
         restore = { it }
     )) { mutableStateOf(0) }
     var bottomBarVisibility by remember { mutableStateOf(true) }
-    val isMarketScreen by viewModel.currentTab.collectAsState()
+    val isMarketScreen by mainScreenViewModel.currentTab.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -140,10 +125,10 @@ fun SharedTransitionScope.MainScreen(
                         onClick = { tab ->
                             selectedTab = tab
                             when (tab) {
-                                0 -> viewModel.toggleTab("home")
-                                1 -> viewModel.toggleTab("market")
-                                2 -> viewModel.toggleTab("saved")
-                                3 -> viewModel.toggleTab("profile")
+                                0 -> mainScreenViewModel.toggleTab("home")
+                                1 -> mainScreenViewModel.toggleTab("market")
+                                2 -> mainScreenViewModel.toggleTab("saved")
+                                3 -> mainScreenViewModel.toggleTab("profile")
                             }
                         }
                     )
@@ -209,10 +194,10 @@ fun SharedTransitionScope.MainScreen(
                         onClick = { tab ->
                             selectedTab = tab
                             when (tab) {
-                                0 -> viewModel.toggleTab("home")
-                                1 -> viewModel.toggleTab("market")
-                                2 -> viewModel.toggleTab("saved")
-                                3 -> viewModel.toggleTab("profile")
+                                0 -> mainScreenViewModel.toggleTab("home")
+                                1 -> mainScreenViewModel.toggleTab("market")
+                                2 -> mainScreenViewModel.toggleTab("saved")
+                                3 -> mainScreenViewModel.toggleTab("profile")
                             }
                         }
                     )

@@ -66,11 +66,11 @@ import java.text.DecimalFormat
 @Composable
 fun SharedTransitionScope.HomeScreenTab(
     navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val state = viewModel.statsState.value
+    val state = homeViewModel.statsState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
     var isPlaying by remember { mutableStateOf(true) } // Control animation state
     val coroutineScope = rememberCoroutineScope()
@@ -94,24 +94,24 @@ fun SharedTransitionScope.HomeScreenTab(
     val dotsPadding = if (isTab) 8.dp else 4.dp
     val tabTitles = listOf("Top Gainers", "Top Losers")
 
-    val gainerPercentageList by viewModel.gainerPercentageList.collectAsState()
-    val gainerPriceList by viewModel.gainerPriceList.collectAsState()
-    val gainerLogoList by viewModel.gainerLogoList.collectAsState()
-    val gainerGraphList by viewModel.gainerGraphList.collectAsState()
+    val gainerPercentageList by homeViewModel.gainerPercentageList.collectAsState()
+    val gainerPriceList by homeViewModel.gainerPriceList.collectAsState()
+    val gainerLogoList by homeViewModel.gainerLogoList.collectAsState()
+    val gainerGraphList by homeViewModel.gainerGraphList.collectAsState()
 
-    val loserPercentageList by viewModel.loserPercentageList.collectAsState()
-    val loserPriceList by viewModel.loserPriceList.collectAsState()
-    val loserLogoList by viewModel.loserLogoList.collectAsState()
-    val loserGraphList by viewModel.loserGraphList.collectAsState()
-    val topGainers by viewModel.topGainers.collectAsState()
-    val topLosers by viewModel.topLosers.collectAsState()
+    val loserPercentageList by homeViewModel.loserPercentageList.collectAsState()
+    val loserPriceList by homeViewModel.loserPriceList.collectAsState()
+    val loserLogoList by homeViewModel.loserLogoList.collectAsState()
+    val loserGraphList by homeViewModel.loserGraphList.collectAsState()
+    val topGainers by homeViewModel.topGainers.collectAsState()
+    val topLosers by homeViewModel.topLosers.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.startFetchingCoinStats()
+        homeViewModel.startFetchingCoinStats()
     }
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.stopFetchingCoinStats()
+            homeViewModel.stopFetchingCoinStats()
         }
     }
     Box(
@@ -196,7 +196,7 @@ fun SharedTransitionScope.HomeScreenTab(
                                         items = it.cryptoCurrencyList,
                                         onCardClicked = { item ->
 
-                                            val price = "$ " + viewModel.formatPrice(item.quotes[0].price)
+                                            val price = "$ " + homeViewModel.formatPrice(item.quotes[0].price)
 
 
                                             val percentage =
@@ -232,7 +232,7 @@ fun SharedTransitionScope.HomeScreenTab(
                                 onItemClick = { item, isGainer ->
 
                                     val dfSmall = DecimalFormat("0.########")  // Small numbers (avoids scientific notation)
-                                    val price = "$ " + viewModel.formatPrice(item.quotes[0].price)
+                                    val price = "$ " + homeViewModel.formatPrice(item.quotes[0].price)
 
                                     val percentage =
                                         item.quotes[0].percentChange1h.toString()
