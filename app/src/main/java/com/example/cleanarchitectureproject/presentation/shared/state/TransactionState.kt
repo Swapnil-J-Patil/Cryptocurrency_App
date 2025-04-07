@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.presentation.transaction_screen
+package com.example.cleanarchitectureproject.presentation.shared.state
 
 import com.example.cleanarchitectureproject.domain.model.TransactionData
 

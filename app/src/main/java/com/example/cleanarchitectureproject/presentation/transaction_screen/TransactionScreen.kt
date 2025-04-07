@@ -46,6 +46,7 @@ import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.auth_screen.Error
 import com.example.cleanarchitectureproject.presentation.common_components.CustomSweetToast
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
+import com.example.cleanarchitectureproject.presentation.shared.TransactionViewModel
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.ConfirmationPopup
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CurrencyCard
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.DraggableCards
@@ -66,7 +67,7 @@ fun SharedTransitionScope.TransactionScreen(
     coin: CryptoCoin,
     context: Context,
     portfolioViewModel: PortfolioViewModel = hiltViewModel(),
-    transactionViewModel: TransactionViewModel= hiltViewModel(),
+    transactionViewModel: TransactionViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val configuration = LocalConfiguration.current

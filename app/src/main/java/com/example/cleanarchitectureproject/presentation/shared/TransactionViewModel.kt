@@ -1,21 +1,13 @@
-package com.example.cleanarchitectureproject.presentation.transaction_screen
+package com.example.cleanarchitectureproject.presentation.shared
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.common.Resource
-import com.example.cleanarchitectureproject.domain.model.CryptoCoin
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.DeleteCryptoUseCase
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.GetAllCryptoUseCase
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.InsertCryptoUseCase
-import com.example.cleanarchitectureproject.domain.use_case.saved_crypto_coins.IsCoinSavedUseCase
-import com.example.cleanarchitectureproject.presentation.shared.state.SavedCoinsState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
-import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.domain.model.TransactionData
 import com.example.cleanarchitectureproject.domain.use_case.get_currency_stats.GetCurrencyStatsUseCase
 import com.example.cleanarchitectureproject.domain.use_case.transactions.DeleteAllTransactionsUseCase
@@ -23,20 +15,13 @@ import com.example.cleanarchitectureproject.domain.use_case.transactions.DeleteT
 import com.example.cleanarchitectureproject.domain.use_case.transactions.GetAllTransactionsUseCase
 import com.example.cleanarchitectureproject.domain.use_case.transactions.InsertTransactionUseCase
 import com.example.cleanarchitectureproject.presentation.home_screen.CoinStatsState
-import com.example.cleanarchitectureproject.presentation.shared.state.PortfolioCoinState
-import com.example.cleanarchitectureproject.presentation.ui.theme.green
-import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
+import com.example.cleanarchitectureproject.presentation.shared.state.TransactionState
 
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
