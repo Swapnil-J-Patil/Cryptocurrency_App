@@ -339,7 +339,10 @@ fun ConfirmationPopup(
                             RoundedCornerShape(8.dp)
                         ),
                     onClick = {
-                        onConfirm(liveUsd,liveQuantity)
+                        if(isChecked)
+                        {
+                            onConfirm(liveUsd,liveQuantity)
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isChecked) color else Color.Gray

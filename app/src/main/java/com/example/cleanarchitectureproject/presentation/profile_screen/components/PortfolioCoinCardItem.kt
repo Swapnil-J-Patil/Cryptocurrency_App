@@ -145,7 +145,6 @@ fun PortfolioCoinCardItem(
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }
-
         }
     }
 }

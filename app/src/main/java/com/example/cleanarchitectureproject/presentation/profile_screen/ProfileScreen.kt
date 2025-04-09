@@ -108,7 +108,7 @@ fun SharedTransitionScope.ProfileScreen(
     }) // Sort by currentValue
     if (currentFilters[1]) comparators.add(compareByDescending<PortfolioCoin> { it.returns }) // Sort by returns
     if (currentFilters[2]) comparators.add(compareByDescending<PortfolioCoin> { it.returnPercentage }) // Sort by percentChange
-    if (currentFilters[3]) comparators.add(compareBy<PortfolioCoin> { it.name }) // Sort by name (A-Z)
+    if (currentFilters[3]) comparators.add(compareBy<PortfolioCoin> { it.symbol }) // Sort by name (A-Z)
 
 // Combine all selected comparators correctly
     val finalComparator = comparators.reduceOrNull { acc, comparator -> acc.then(comparator) }

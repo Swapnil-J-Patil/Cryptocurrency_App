@@ -189,7 +189,8 @@ fun PieChart(
 
     Column(
         modifier = Modifier.fillMaxWidth()
-            .height(300.dp),
+            .height(300.dp)
+            .offset(y=20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(

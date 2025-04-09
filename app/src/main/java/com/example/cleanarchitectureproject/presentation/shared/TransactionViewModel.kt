@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -91,37 +92,36 @@ class TransactionViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    private fun loadTransactions() {
+    fun getAllTransactions() {
         viewModelScope.launch {
             getAllTransactionUseCase().collect { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _transactionState.value = TransactionState(isLoading = true)
-                        Log.d("SavedCoinViewModel", "Loading data...")
+                        Log.d("transactionViewModel", "Loading data...")
                     }
 
                     is Resource.Success -> {
                         _transactionState.value = TransactionState(transaction = result.data)
-                        //Log.d("SavedCoinViewModel", "Successfully loaded: ${result.data}")
+                        Log.d("transactionViewModel", "Successfully loaded: ${result.data}")
                     }
 
                     is Resource.Error -> {
                         _transactionState.value = TransactionState(error = result.message ?: "Unknown error")
-                        Log.e("SavedCoinViewModel", "Error loading data: ${result.message}")
+                        Log.e("transactionViewModel", "Error loading data: ${result.message}")
                     }
                 }
             }
         }
     }
 
-
     fun addTransaction(transaction: TransactionData) {
         viewModelScope.launch {
             insertTransactionUseCase(transaction).collect { result ->
                 when (result) {
-                    is Resource.Loading -> Log.d("SavedCoinViewModel", "Inserting transaction...")
-                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully inserted: ${transaction.coinName}")
-                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error inserting transaction: ${result.message}")
+                    is Resource.Loading -> Log.d("transactionViewModel", "Inserting transaction...")
+                    is Resource.Success -> Log.d("transactionViewModel", "Successfully inserted: ${transaction.coinName}")
+                    is Resource.Error -> Log.e("transactionViewModel", "Error inserting transaction: ${result.message}")
                 }
             }
         }
@@ -131,9 +131,9 @@ class TransactionViewModel @Inject constructor(
         viewModelScope.launch {
             deleteAllTransactionUseCase().collect { result ->
                 when (result) {
-                    is Resource.Loading -> Log.d("SavedCoinViewModel", "Inserting crypto...")
-                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully Deleted All transactions:")
-                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error inserting transaction: ${result.message}")
+                    is Resource.Loading -> Log.d("transactionViewModel", "Inserting crypto...")
+                    is Resource.Success -> Log.d("transactionViewModel", "Successfully Deleted All transactions:")
+                    is Resource.Error -> Log.e("transactionViewModel", "Error inserting transaction: ${result.message}")
                 }
             }
         }
@@ -143,9 +143,9 @@ class TransactionViewModel @Inject constructor(
         viewModelScope.launch {
             deleteTransactionUseCase(id).collect { result ->
                 when (result) {
-                    is Resource.Loading -> Log.d("SavedCoinViewModel", "Deleting crypto...")
-                    is Resource.Success -> Log.d("SavedCoinViewModel", "Successfully deleted: ${id}")
-                    is Resource.Error -> Log.e("SavedCoinViewModel", "Error deleting transaction: ${result.message}")
+                    is Resource.Loading -> Log.d("transactionViewModel", "Deleting crypto...")
+                    is Resource.Success -> Log.d("transactionViewModel", "Successfully deleted: ${id}")
+                    is Resource.Error -> Log.e("transactionViewModel", "Error deleting transaction: ${result.message}")
                 }
             }
         }
