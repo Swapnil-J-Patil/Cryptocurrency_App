@@ -124,7 +124,6 @@ fun TransactionsCard(
             ) {
                 transactionState.transaction?.let { transactions ->
                     if (transactions.isNotEmpty()) {
-
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -253,6 +252,7 @@ fun TransactionsCard(
                         }
                     }
                 }
+
             }
         }
 

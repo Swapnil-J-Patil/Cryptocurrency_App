@@ -329,15 +329,15 @@ fun ConfirmationPopup(
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
+                       /* .background(
                             color = if (isChecked) color else Color.Gray,
                             RoundedCornerShape(8.dp)
-                        )
-                        .border(
+                        )*/
+                       /* .border(
                             1.dp,
                             if (isChecked) color else Color.Gray,
                             RoundedCornerShape(8.dp)
-                        ),
+                        )*/,
                     onClick = {
                         if(isChecked)
                         {
@@ -345,9 +345,9 @@ fun ConfirmationPopup(
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isChecked) color else Color.Gray
-                    ),
-                    contentPadding = PaddingValues(vertical = 10.dp),
+                        containerColor = if (isChecked) color else Color.Gray,
+                    ), shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(vertical = 12.dp),
                 ) {
                     Text(
                         text = "Confirm",
