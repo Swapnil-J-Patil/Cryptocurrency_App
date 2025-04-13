@@ -320,20 +320,29 @@ fun SharedTransitionScope.TransactionScreen(
 
                                     val transaction=TransactionData(
                                         coinName = coin.name,
-                                        quantity = diff?:0.0,
+                                        quantity = cleanQuantity,
                                         usd = livePricePerCoin,
                                         transaction = "Sell",
                                         date = currentDate,
                                         image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png"
                                     )
 
-                                    transactionViewModel.addTransaction(transaction)
-                                    portfolioViewModel.addCrypto(coinData)
+
                                     prefsManager.setDollarAmount(remainingUsd.toString())
 
                                     portfolioViewModel.getSavedCoinQuantity(coin.id.toString()) { quantity ->
                                         //Log.d("savedQuantity", "TransactionScreen: $quantity")
                                         savedQuantity = quantity  // Update state to trigger recomposition
+                                    }
+                                    if(diff == 0.0)
+                                    {
+                                        transactionViewModel.addTransaction(transaction)
+                                        portfolioViewModel.removeCrypto(coinData)
+                                    }
+                                    else
+                                    {
+                                        portfolioViewModel.addCrypto(coinData)
+                                        transactionViewModel.addTransaction(transaction)
                                     }
                                     isTransaction = false
                                     navController.navigate(Screen.SuccessScreen.route)
