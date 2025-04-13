@@ -207,7 +207,7 @@ fun SharedTransitionScope.TransactionScreen(
             livePrice?.let {
                     ConfirmationPopup(
                         onCancel = { isTransaction = false },
-                        onConfirm = {liveUsd, liveQuantity->
+                        onConfirm = {liveUsd, liveQuantity,livePricePerCoin->
                             val cleanQuantity = liveQuantity.replace(",", "").toDouble()
                             val cleanDollars = liveUsd.replace(",", "").toDouble()
 
@@ -249,13 +249,13 @@ fun SharedTransitionScope.TransactionScreen(
                                         isAudited = coin.isAudited,
                                         badges = coin.badges ?: emptyList(),
                                         quantity = sum,
-                                        purchasedAt = currentPrice.value.toDouble()
+                                        purchasedAt = livePricePerCoin
                                     )
 
                                     val transaction=TransactionData(
                                         coinName = coin.name,
                                         quantity = sum?:0.0,
-                                        usd = currentPrice.value.toDouble(),
+                                        usd = livePricePerCoin,
                                         transaction = "Buy",
                                         date = currentDate,
                                         image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png"
@@ -314,13 +314,13 @@ fun SharedTransitionScope.TransactionScreen(
                                         isAudited = coin.isAudited,
                                         badges = coin.badges ?: emptyList(),
                                         quantity = diff,
-                                        purchasedAt = livePrice //Replace this later
+                                        purchasedAt = livePricePerCoin //Replace this later
                                     )
 
                                     val transaction=TransactionData(
                                         coinName = coin.name,
                                         quantity = diff?:0.0,
-                                        usd = livePrice,
+                                        usd = livePricePerCoin,
                                         transaction = "Sell",
                                         date = currentDate,
                                         image = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png"
@@ -350,7 +350,6 @@ fun SharedTransitionScope.TransactionScreen(
                         pricePerCoin = it,
                         availableCoins = savedQuantity?:0.0
                     )
-
             }
         }
         CustomSweetToast(
