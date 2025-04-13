@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
     object AuthScreen: Screen("auth_screen")
     object OnboardingScreen: Screen("onboarding_screen")
     object SuccessScreen: Screen("success_screen")
+    object RewardedAdScreen: Screen("rewarded_ad_screen")
 
     object HomeScreenTab: Screen("home_screen_tab")
     object HomeScreen: Screen("home_screen")
@@ -21,5 +22,6 @@ sealed class Screen(val route: String) {
 
     object ProfileScreen: Screen("profile_screen")
     object ProfileScreenTab: Screen("profile_screen_tab")
+
 
 }

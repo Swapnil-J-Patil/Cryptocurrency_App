@@ -1,9 +1,11 @@
 package com.example.cleanarchitectureproject.presentation
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -30,6 +32,7 @@ import com.example.cleanarchitectureproject.presentation.market_screen.MarketScr
 import com.example.cleanarchitectureproject.presentation.onboarding_screen.BubblePagerContent
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
+import com.example.cleanarchitectureproject.presentation.profile_screen.RewardedAdScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
 import com.example.cleanarchitectureproject.presentation.splash_screen.SplashScreen
@@ -38,6 +41,7 @@ import com.example.cleanarchitectureproject.presentation.transaction_screen.Tran
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.rememberPagerState
+import com.google.android.gms.ads.MobileAds
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,12 +52,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appContainer: AppContainer
     private lateinit var biometricViewModel: BiometricViewModel
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalPagerApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         FirebaseApp.initializeApp(this)
+
         appContainer = AppContainer(this)
         biometricViewModel = appContainer.biometricViewModel
         setContent {
@@ -86,6 +92,11 @@ class MainActivity : AppCompatActivity() {
                             route = Screen.SuccessScreen.route
                         ) {
                             SuccessScreen(navController = navController)
+                        }
+                        composable(
+                            route = Screen.RewardedAdScreen.route
+                        ) {
+                            RewardedAdScreen(this@MainActivity)
                         }
                         composable(
                             route = Screen.MainScreen.route,

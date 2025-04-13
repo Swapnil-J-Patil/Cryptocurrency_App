@@ -150,6 +150,10 @@ dependencies {
     //datastore
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.serialization.json)
+
+    //admob
+    implementation(libs.play.services.ads)
+
 }
 kapt{
     correctErrorTypes = true

@@ -10,12 +10,14 @@ import com.example.cleanarchitectureproject.data.repository.AuthRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CoinMarketRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CryptoRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.PortfolioRepositoryImpl
+import com.example.cleanarchitectureproject.data.repository.RewardedAdRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.TransactionRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.UserDetailsRepositoryImpl
 import com.example.cleanarchitectureproject.domain.repository.AuthRepository
 import com.example.cleanarchitectureproject.domain.repository.CoinMarketRepository
 import com.example.cleanarchitectureproject.domain.repository.CryptoRepository
 import com.example.cleanarchitectureproject.domain.repository.PortfolioRepository
+import com.example.cleanarchitectureproject.domain.repository.RewardedAdRepository
 import com.example.cleanarchitectureproject.domain.repository.TransactionRepository
 import com.example.cleanarchitectureproject.domain.repository.UserDetailsRepository
 import com.example.cleanarchitectureproject.domain.use_case.keystore.ClearTokensUseCase
@@ -105,5 +107,14 @@ object AppModule {
     @Singleton
     fun provideAuthRepository(auth: FirebaseAuth, @ApplicationContext context: Context): AuthRepository {
         return AuthRepositoryImpl(auth, context)
+    }
+
+    //Admob
+    @Provides
+    @Singleton
+    fun provideRewardedAdRepository(
+        @ApplicationContext context: Context
+    ): RewardedAdRepository {
+        return RewardedAdRepositoryImpl(context)
     }
 }
