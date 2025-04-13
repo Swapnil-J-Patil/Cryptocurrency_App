@@ -75,11 +75,14 @@ fun ConfirmationPopup(
     var liveUsd by remember { mutableStateOf(usd) }
     var liveQuantity by remember { mutableStateOf(quantity) }
     var livePrice by remember { mutableStateOf(pricePerCoin) }
+    Log.d("portfolioSaved", "TransactionScreen sell Before price: ${livePrice} quantity: ${liveQuantity} usd: ${liveUsd}")
 
     LaunchedEffect(pricePerCoin) {
        // Log.d("livePrice", "Current Price of coin: $pricePerCoin usd:$liveUsd quantity:$liveQuantity")
         val availableDollars = liveUsd.replace(",", "").toDoubleOrNull() ?: 0.0
-        //val availableQuantity= liveQuantity.replace(",", "").toDoubleOrNull() ?: 0.0
+        val availableQuantity= liveQuantity.replace(",", "").toDoubleOrNull() ?: 0.0
+        Log.d("portfolioSaved", "TransactionScreen sell price: ${livePrice} quantity: ${liveQuantity} usd: ${liveUsd}")
+
         if (isBuy) {
             val usdValue = availableDollars
             val amountOfCoin = if (pricePerCoin > 0.0) usdValue / pricePerCoin else 0.0
@@ -88,10 +91,10 @@ fun ConfirmationPopup(
             liveQuantity = "%,.2f".format(amountOfCoin)
             livePrice=pricePerCoin
         } else {
-            val amountOfCoin = (availableDollars / 100.0) * availableCoins
-            val usdValue = amountOfCoin * pricePerCoin
+            //val amountOfCoin = (availableDollars / 100.0) * availableQuantity
+            val usdValue = availableQuantity * pricePerCoin
             liveUsd = "%,.2f".format(usdValue)
-            liveQuantity = "%,.2f".format(amountOfCoin)
+            liveQuantity = "%,.2f".format(availableQuantity)
             livePrice=pricePerCoin
         }
     }

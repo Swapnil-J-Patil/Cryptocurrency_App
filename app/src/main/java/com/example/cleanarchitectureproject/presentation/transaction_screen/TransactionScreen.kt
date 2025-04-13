@@ -3,6 +3,7 @@ package com.example.cleanarchitectureproject.presentation.transaction_screen
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
@@ -177,7 +178,7 @@ fun SharedTransitionScope.TransactionScreen(
                                 context = context,
                                 transaction = transaction,
                                 isBuyClicked = { flag, quantity, usd,coinPrice ->
-                                    //Log.d("portfolioSaved", "TransactionScreen Before: ${coinPrice} ")
+                                   // Log.d("portfolioSaved", "TransactionScreen sell price: ${coinPrice} quantity: ${quantity} usd: ${usd}")
 
                                     isBuyClicked = flag
                                     isTransaction = true
