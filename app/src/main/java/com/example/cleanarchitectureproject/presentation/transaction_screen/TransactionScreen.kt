@@ -255,7 +255,7 @@ fun SharedTransitionScope.TransactionScreen(
 
                                     val transaction=TransactionData(
                                         coinName = coin.name,
-                                        quantity = sum?:0.0,
+                                        quantity = cleanQuantity,
                                         usd = livePricePerCoin,
                                         transaction = "Buy",
                                         date = currentDate,
