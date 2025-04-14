@@ -367,7 +367,6 @@ fun SharedTransitionScope.ProfileScreen(
                                 )
                             }
                         }
-
                     }
                 }
             }

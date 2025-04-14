@@ -102,8 +102,9 @@ class TransactionViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        _transactionState.value = TransactionState(transaction = result.data)
-                        Log.d("transactionViewModel", "Successfully loaded: ${result.data}")
+                        val sortedTransactions = result.data?.sortedByDescending { it.id }
+                        _transactionState.value = TransactionState(transaction = sortedTransactions)
+                        Log.d("transactionViewModel", "Successfully loaded: $sortedTransactions")
                     }
 
                     is Resource.Error -> {

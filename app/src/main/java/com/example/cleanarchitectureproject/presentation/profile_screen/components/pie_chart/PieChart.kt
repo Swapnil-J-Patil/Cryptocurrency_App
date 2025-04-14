@@ -168,11 +168,15 @@ fun PieChart(
 
     LaunchedEffect(data) {
         val totalSum = data.values.sum()
-        //Log.d("PiechartValues", "totalSum: $totalSum and values: ${data.values} ")
-        floatValue = data.values.map { values ->
-            (360 * values.toFloat() / totalSum.toFloat()) - arcSpacing
+        val gapCount = data.size  // one gap per slice, or adjust as needed
+        val totalGapDegrees = gapCount * arcSpacing
+        val sliceDegrees = 360f - totalGapDegrees
+
+        floatValue = data.values.map { value ->
+            (sliceDegrees * value.toFloat() / totalSum.toFloat())
         }
     }
+
     LaunchedEffect(Unit) {
        /* val result = imageLoader.execute(imageRequest)
         if (result is SuccessResult) {
@@ -420,12 +424,3 @@ fun PieChart(
         }
     }
 }
-
-
-
-
-
-
-
-
-
