@@ -22,6 +22,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -60,11 +61,15 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.domain.model.ProfileData
@@ -77,6 +82,7 @@ import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewMode
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -147,8 +153,18 @@ fun SharedTransitionScope.ProfileScreen(
             }
         }
     }
+    LaunchedEffect(sortedCoins) {
+
+        if (!sortedCoins.isNullOrEmpty()) {
+            visibility = true
+        }
+        else
+        {
+            delay(1000)
+            visibility = true
+        }
+    }
     LaunchedEffect(Unit) {
-        visibility = !visibility
         portfolioViewModel.startFetchingCoinStats()
     }
     DisposableEffect(Unit) {
@@ -250,6 +266,8 @@ fun SharedTransitionScope.ProfileScreen(
                     )
                 }
             }
+
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -292,31 +310,60 @@ fun SharedTransitionScope.ProfileScreen(
                         elevation = CardDefaults.cardElevation(16.dp),
                         shape = RoundedCornerShape(20.dp)
                     ) {
-                        sortedCoins.let {
-                            val portfolioPercentage =
-                                ((portfolioValue?.minus(totalInvestment!!))?.div(totalInvestment!!))?.times(
-                                    100
+                        if(!sortedCoins.isNullOrEmpty())
+                        {
+                            sortedCoins.let {
+                                val portfolioPercentage =
+                                    ((portfolioValue?.minus(totalInvestment!!))?.div(totalInvestment!!))?.times(
+                                        100
+                                    )
+
+                                if (dollars != null) {
+                                    Tabs(
+                                        screen = "profile",
+                                        tabTitles = tabTitles,
+                                        onItemClick = { item, flag ->
+
+                                        },
+                                        animatedVisibilityScope = animatedVisibilityScope,
+                                        onAuthClick = { type, method, email, password ->
+
+                                        },
+                                        portfolioCoins = it,
+                                        portfolioValue = portfolioValue,
+                                        portfolioPercentage = portfolioPercentage,
+                                        dollars = dollars.toDouble(),
+                                        totalInvestment = totalInvestment,
+                                        onFilter = {
+                                            isFilterClicked = true
+                                        },
+                                    )
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.wallet),
+                                    contentDescription = "wallet",
+                                    modifier = Modifier
+                                        .size(200.dp) // Ensure image is smaller than the border container
+                                        .padding(6.dp)
+                                        .background(Color.Transparent),
+                                    contentScale = ContentScale.Fit
                                 )
-
-                            if (dollars != null) {
-                                Tabs(
-                                    screen = "profile",
-                                    tabTitles = tabTitles,
-                                    onItemClick = { item, flag ->
-
-                                    },
-                                    animatedVisibilityScope = animatedVisibilityScope,
-                                    onAuthClick = { type, method, email, password ->
-
-                                    },
-                                    portfolioCoins = it,
-                                    portfolioValue = portfolioValue,
-                                    portfolioPercentage = portfolioPercentage,
-                                    dollars = dollars.toDouble(),
-                                    totalInvestment = totalInvestment,
-                                    onFilter = {
-                                        isFilterClicked = true
-                                    },
+                                Text(
+                                    text = "Your portfolio is empty!",
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 20.dp, vertical = 10.dp)
                                 )
                             }
                         }
@@ -324,6 +371,8 @@ fun SharedTransitionScope.ProfileScreen(
                     }
                 }
             }
+
+
 
             AnimatedVisibility(
                 visible = isFilterClicked,

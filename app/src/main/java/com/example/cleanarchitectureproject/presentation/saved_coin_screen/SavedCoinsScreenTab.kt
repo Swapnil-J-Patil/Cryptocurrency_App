@@ -264,7 +264,7 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                         .size(200.dp) // Ensure image is smaller than the border container
                         .padding(6.dp)
                         .background(Color.Transparent),
-                    contentScale = ContentScale.FillBounds
+                    contentScale = ContentScale.Fit
                 )
                 Text(
                     text = state.error,
@@ -272,7 +272,7 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
                 )
             }
         }
