@@ -233,6 +233,7 @@ fun PriceSelector(
                         focusedLabelColor = alternateColor, // Change label color when focused
                         unfocusedLabelColor = Color.Gray, // Default label color
                         cursorColor = primaryColor,
+                        textColor = MaterialTheme.colorScheme.secondary
                     ),
                 )
             }
