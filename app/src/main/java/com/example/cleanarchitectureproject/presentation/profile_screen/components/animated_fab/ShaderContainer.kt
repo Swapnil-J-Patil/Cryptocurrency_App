@@ -29,25 +29,28 @@ const val ShaderSource = """
     }
 """
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun ShaderContainer(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val runtimeShader = remember {
-        RuntimeShader(ShaderSource)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            RuntimeShader(ShaderSource)
+        } else {
+            TODO("VERSION.SDK_INT < TIRAMISU")
+        }
     }
     Box(
         modifier
-            /*.graphicsLayer {
+            .graphicsLayer {
                 runtimeShader.setFloatUniform("visibility", 0.2f)
                 renderEffect = RenderEffect
                     .createRuntimeShaderEffect(
                         runtimeShader, "composable"
                     )
                     .asComposeRenderEffect()
-            }*/
+            }
     ) {
         content()
     }

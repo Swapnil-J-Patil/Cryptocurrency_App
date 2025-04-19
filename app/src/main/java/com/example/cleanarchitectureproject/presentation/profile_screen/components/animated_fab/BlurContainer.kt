@@ -21,29 +21,22 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BlurContainer(
     modifier: Modifier = Modifier,
-    blur: Float = 60f,
+    blur: Float = 30f,
     component: @Composable BoxScope.() -> Unit,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
-    Box(
-        modifier
-        , contentAlignment = Alignment.Center) {
+    Box(modifier, contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
-                .background(shape = CircleShape, color = Color(0xFF0E5C4C))
                 .customBlur(blur)
-
             ,
             content = component,
         )
         Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-
+            contentAlignment = Alignment.Center
         ) {
             content()
         }
@@ -51,16 +44,17 @@ fun BlurContainer(
 }
 
 @SuppressLint("SuspiciousModifierThen")
-@RequiresApi(Build.VERSION_CODES.S)
 fun Modifier.customBlur(blur: Float) = this.then(
     graphicsLayer {
         if (blur > 0f)
-            renderEffect = RenderEffect
-                .createBlurEffect(
-                    blur,
-                    blur,
-                    Shader.TileMode.DECAL,
-                )
-                .asComposeRenderEffect()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                renderEffect = RenderEffect
+                    .createBlurEffect(
+                        blur,
+                        blur,
+                        Shader.TileMode.DECAL,
+                    )
+                    .asComposeRenderEffect()
+            }
     }
 )

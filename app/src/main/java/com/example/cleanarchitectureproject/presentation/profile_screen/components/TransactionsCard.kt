@@ -303,7 +303,7 @@ fun TransactionsCard(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(end = 15.dp), // Ensures text doesn't shift
+                .padding(end = 15.dp,bottom=25.dp), // Ensures text doesn't shift
             contentAlignment = Alignment.BottomEnd
 
         ) {

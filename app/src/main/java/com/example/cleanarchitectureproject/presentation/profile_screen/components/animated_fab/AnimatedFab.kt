@@ -55,6 +55,7 @@ fun AnimatedFab() {
     var expanded: Boolean by remember {
         mutableStateOf(false)
     }
+
     val offset = remember { mutableStateOf(Offset(0f, 0f)) }
 
     val alpha by animateFloatAsState(
@@ -134,10 +135,10 @@ fun AnimatedFab() {
         }
 
         ButtonComponent(
-            modifier = Modifier.align(Alignment.BottomEnd),
+            Modifier.align(Alignment.BottomEnd),
             onClick = {
                 expanded = !expanded
-            }
+            },
         ) {
             val rotation by animateFloatAsState(
                 targetValue = if (expanded) 45f else 0f,
@@ -151,15 +152,13 @@ fun AnimatedFab() {
                 tint = Color.White
             )
         }
-
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
 fun BoxScope.ButtonComponent(
     modifier: Modifier = Modifier,
-    background: Color = Color.Black,
+    background: Color = green,
     onClick: () -> Unit,
     content: @Composable BoxScope.() -> Unit
 ) {
@@ -176,14 +175,13 @@ fun BoxScope.ButtonComponent(
         component = {
             Box(
                 Modifier
-                    .size(60.dp)
-                    .background(shape = CircleShape, color = green)
+                    .size(40.dp)
+                    .background(color = background, CircleShape)
             )
         }
     ) {
         Box(
-            Modifier.size(100.dp)
-                .background(shape = CircleShape, color = Color.Transparent),
+            Modifier.size(80.dp),
             content = content,
             contentAlignment = Alignment.Center,
         )
