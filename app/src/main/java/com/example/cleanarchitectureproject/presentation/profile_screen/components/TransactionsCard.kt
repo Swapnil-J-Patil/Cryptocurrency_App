@@ -1,5 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -28,7 +30,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +65,8 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.TransactionData
+import com.example.cleanarchitectureproject.presentation.Screen
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.animated_fab.AnimatedFab
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.pie_chart.PieChart
 import com.example.cleanarchitectureproject.presentation.shared.TransactionViewModel
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CoinDisplay
@@ -68,6 +74,7 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import java.text.DecimalFormat
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun TransactionsCard(
     modifier: Modifier = Modifier,
@@ -291,6 +298,16 @@ fun TransactionsCard(
                     .align(Alignment.Center)
                     .size(250.dp)
             )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(end = 15.dp), // Ensures text doesn't shift
+            contentAlignment = Alignment.BottomEnd
+
+        ) {
+            AnimatedFab()
         }
     }
 }
