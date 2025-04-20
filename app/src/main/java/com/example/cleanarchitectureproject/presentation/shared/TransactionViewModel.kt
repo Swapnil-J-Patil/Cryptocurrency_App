@@ -92,7 +92,7 @@ class TransactionViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    fun getAllTransactions() {
+    fun getAllTransactions(index: Int) {
         viewModelScope.launch {
             getAllTransactionUseCase().collect { result ->
                 when (result) {
@@ -102,7 +102,14 @@ class TransactionViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        val sortedTransactions = result.data?.sortedByDescending { it.id }
+                        _transactionState.value = TransactionState(isLoading = true)
+                        val sortedTransactions=when (index) {
+                            1 -> result.data?.sortedByDescending { it.quantity }
+                            2 -> result.data?.sortedByDescending { it.usd }
+                            else -> result.data?.sortedByDescending { it.id }
+                        }
+                       // val sortedTransactions = result.data?.sortedByDescending { it.id }
+                        _transactionState.value = TransactionState(isLoading = false)
                         _transactionState.value = TransactionState(transaction = sortedTransactions)
                         Log.d("transactionViewModel", "Successfully loaded: $sortedTransactions")
                     }

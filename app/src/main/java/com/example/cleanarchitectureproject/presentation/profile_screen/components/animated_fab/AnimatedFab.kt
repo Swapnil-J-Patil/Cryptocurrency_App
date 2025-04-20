@@ -24,9 +24,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CurrencyBitcoin
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material.icons.filled.SettingsBackupRestore
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,13 +55,15 @@ import kotlin.math.roundToInt
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun AnimatedFab() {
+fun AnimatedFab(
+    onFilterClicked: (Int) -> Unit = {},
+) {
 
     var expanded: Boolean by remember {
         mutableStateOf(false)
     }
 
-    val offset = remember { mutableStateOf(Offset(0f, 0f)) }
+    //val offset = remember { mutableStateOf(Offset(0f, 0f)) }
 
     val alpha by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
@@ -68,7 +75,7 @@ fun AnimatedFab() {
         modifier = Modifier
             .width(120.dp)
             .fillMaxHeight()
-            .offset {
+            /*.offset {
                 IntOffset(offset.value.x.roundToInt(), offset.value.y.roundToInt())
             }
             .pointerInput(Unit) {
@@ -76,7 +83,7 @@ fun AnimatedFab() {
                     change.consume() // consume the gesture
                     offset.value += dragAmount
                 }
-            }
+            }*/
     ) {
 
         ButtonComponent(
@@ -87,11 +94,12 @@ fun AnimatedFab() {
                     .transform((alpha))
             ),
             onClick = {
+                onFilterClicked(1)
                 expanded = !expanded
             }
         ) {
             Icon(
-                imageVector = Icons.Default.Edit,
+                imageVector = Icons.Default.CurrencyBitcoin,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.alpha(alpha)
@@ -105,11 +113,12 @@ fun AnimatedFab() {
                 ) * FastOutSlowInEasing.transform(alpha)
             ),
             onClick = {
+                onFilterClicked(2)
                 expanded = !expanded
             }
         ) {
             Icon(
-                imageVector = Icons.Default.LocationOn,
+                imageVector = Icons.Default.AttachMoney,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.alpha(alpha)
@@ -123,11 +132,12 @@ fun AnimatedFab() {
                 ) * FastOutSlowInEasing.transform(alpha)
             ),
             onClick = {
+                onFilterClicked(3)
                 expanded = !expanded
             }
         ) {
             Icon(
-                imageVector = Icons.Default.Delete,
+                imageVector = Icons.Default.SettingsBackupRestore,
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.alpha(alpha)

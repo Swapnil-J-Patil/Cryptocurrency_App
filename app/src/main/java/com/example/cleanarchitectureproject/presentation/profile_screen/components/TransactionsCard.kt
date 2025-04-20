@@ -83,15 +83,20 @@ fun TransactionsCard(
 
     val transactionState = transactionViewModel.transactionState.value
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loader))
-    LaunchedEffect(Unit) {
+    /*LaunchedEffect(Unit) {
         transactionViewModel.getAllTransactions()
-    }
+    }*/
     var isPlaying by remember { mutableStateOf(true) } // Control animation state
     val progress by animateLottieCompositionAsState(
         composition,
         iterations = LottieConstants.IterateForever,
         isPlaying = isPlaying // Infinite repeat mode
     )
+
+    var isFilterClicked by remember { mutableStateOf(0) }
+    LaunchedEffect(isFilterClicked) {
+        transactionViewModel.getAllTransactions(isFilterClicked)
+    }
 
     val scale by animateFloatAsState(
         targetValue = if (!(transactionState.error.isNotBlank() || transactionState.isLoading)) 1f else 0f,
@@ -212,7 +217,7 @@ fun TransactionsCard(
                                 state = listState,
                             ) {
                                 itemsIndexed(
-                                    transactions,
+                                    transactionState.transaction,
                                     key = { _, coin -> coin.id }
                                 ) { index, transaction ->
                                     val isVisible = remember {
@@ -307,7 +312,9 @@ fun TransactionsCard(
             contentAlignment = Alignment.BottomEnd
 
         ) {
-            AnimatedFab()
+            AnimatedFab(onFilterClicked = {index->
+                isFilterClicked=index
+            })
         }
     }
 }
