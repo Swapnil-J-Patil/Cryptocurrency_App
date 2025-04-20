@@ -24,7 +24,7 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.green
 @Composable
 fun BlurContainer(
     modifier: Modifier = Modifier,
-    blur: Float = 30f,
+    blur: Float = 40f,
     component: @Composable BoxScope.() -> Unit,
     content: @Composable BoxScope.() -> Unit = {},
 ) {

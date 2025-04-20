@@ -7,6 +7,7 @@ import com.example.cleanarchitectureproject.common.Constants
 import com.example.cleanarchitectureproject.data.local.CryptoDatabase
 import com.example.cleanarchitectureproject.data.remote.CoinMarketApi
 import com.example.cleanarchitectureproject.data.repository.AuthRepositoryImpl
+import com.example.cleanarchitectureproject.data.repository.BannerAdRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CoinMarketRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CryptoRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.PortfolioRepositoryImpl
@@ -14,6 +15,7 @@ import com.example.cleanarchitectureproject.data.repository.RewardedAdRepository
 import com.example.cleanarchitectureproject.data.repository.TransactionRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.UserDetailsRepositoryImpl
 import com.example.cleanarchitectureproject.domain.repository.AuthRepository
+import com.example.cleanarchitectureproject.domain.repository.BannerAdRepository
 import com.example.cleanarchitectureproject.domain.repository.CoinMarketRepository
 import com.example.cleanarchitectureproject.domain.repository.CryptoRepository
 import com.example.cleanarchitectureproject.domain.repository.PortfolioRepository
@@ -116,5 +118,13 @@ object AppModule {
         @ApplicationContext context: Context
     ): RewardedAdRepository {
         return RewardedAdRepositoryImpl(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBannerAdRepository(
+        @ApplicationContext context: Context
+    ): BannerAdRepository {
+        return BannerAdRepositoryImpl()
     }
 }
