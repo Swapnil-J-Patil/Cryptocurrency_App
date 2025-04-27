@@ -93,9 +93,9 @@ fun TransactionsCard(
         isPlaying = isPlaying // Infinite repeat mode
     )
 
-    var isFilterClicked by remember { mutableStateOf(0) }
-    LaunchedEffect(isFilterClicked) {
-        transactionViewModel.getAllTransactions(isFilterClicked)
+   // var isFilterClicked by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        transactionViewModel.getAllTransactions(0)
     }
 
     val scale by animateFloatAsState(
@@ -305,7 +305,7 @@ fun TransactionsCard(
             )
         }
 
-        Box(
+        /*Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(end = 15.dp,bottom=25.dp), // Ensures text doesn't shift
@@ -315,6 +315,6 @@ fun TransactionsCard(
             AnimatedFab(onFilterClicked = {index->
                 isFilterClicked=index
             })
-        }
+        }*/
     }
 }
