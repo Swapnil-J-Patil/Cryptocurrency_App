@@ -58,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
@@ -78,6 +79,7 @@ import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.FiltersPopup
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.SettingsView
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
@@ -110,6 +112,8 @@ fun SharedTransitionScope.ProfileScreen(
     var visibility by remember {
         mutableStateOf(false)
     }
+    var settingsTab by remember { mutableStateOf<Boolean?>(null) }
+
     var currentFilters by remember { mutableStateOf(listOf(false, false, false, false)) }
 
     val comparators = mutableListOf<Comparator<PortfolioCoin>>()
@@ -252,18 +256,32 @@ fun SharedTransitionScope.ProfileScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.End
             ) {
-                IconButton(
-                    onClick = {
-                        navController.navigate(Screen.RewardedAdScreen.route)
-                    },
-                    modifier = Modifier.size(50.dp)
+                AnimatedVisibility(
+                    visible = settingsTab == null,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
-                        modifier = Modifier.fillMaxSize(),
-                        tint = Color.White
-                    )
+                    IconButton(
+                        onClick = {
+                            settingsTab=true
+                        },
+                        modifier = Modifier.size(50.dp)
+                            .sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "settings-bounds"),
+                                animatedVisibilityScope = this
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            modifier = Modifier.fillMaxSize()
+                                .sharedElement(
+                                    state = rememberSharedContentState(key = "settings-image"),
+                                    animatedVisibilityScope = this@AnimatedVisibility
+                                ),
+                            tint = Color.White
+                        )
+                    }
                 }
             }
 
@@ -413,6 +431,13 @@ fun SharedTransitionScope.ProfileScreen(
             },
             userName = currentName,
             profileList = ProfileDataList.characters.filter { it != currentProfile }
+        )
+
+        SettingsView(
+            settings = settingsTab,
+            onDisMiss = {
+                settingsTab = null
+            }
         )
     }
 }
