@@ -85,6 +85,18 @@ fun SharedTransitionScope.SettingsView(
     LaunchedEffect(settings) {
         selectedImage = settings
     }*/
+    var isChecked by remember { mutableStateOf(false) }
+    var currentMode by remember { mutableStateOf("Light Mode") }
+    LaunchedEffect(isChecked) {
+        if(!isChecked)
+        {
+            currentMode="Light Mode"
+        }
+        else
+        {
+            currentMode="Dark Mode"
+        }
+    }
     AnimatedContent(
         targetState = settings,
         transitionSpec = { fadeIn() togetherWith fadeOut() },
@@ -148,7 +160,7 @@ fun SharedTransitionScope.SettingsView(
                                         )
                                         .clip(CircleShape)
                                         .padding(end = 5.dp)
-                                        .size(40.dp),
+                                        .size(35.dp),
                                     tint = Color.White
                                 )
                                 Text(
@@ -159,6 +171,35 @@ fun SharedTransitionScope.SettingsView(
                                     fontFamily = Poppins
                                 )
                             }
+
+
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 50.dp, start = 16.dp), // Ensures text doesn't shift
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Spacer(Modifier.height(15.dp))
+                            Text(
+                                text = currentMode,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = lightBackground,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = Poppins
+                            )
+                            Spacer(Modifier.height(5.dp))
+                            DarkModeSwitch(
+                                checked = isChecked,
+                                modifier = Modifier,
+                                onCheckedChanged = {flag->
+                                    isChecked=flag
+                                }
+                            )
+
+                            Spacer(Modifier.height(10.dp))
+
                         }
                     }
                 }

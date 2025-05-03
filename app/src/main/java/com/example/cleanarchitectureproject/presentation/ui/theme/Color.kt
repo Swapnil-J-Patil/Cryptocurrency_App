@@ -35,5 +35,7 @@ val NightGray = Color(0xFF9098A3)
 val Blue = Color(0xFF12b8ff)
 val NavyBlue = Color(0xFF17173c)
 
-
+val BlueSky= Color(0xFF4478a9)
+val NightSky =  Color(0xFF333333)
+val BorderColor = Color(0x40000000)
 
