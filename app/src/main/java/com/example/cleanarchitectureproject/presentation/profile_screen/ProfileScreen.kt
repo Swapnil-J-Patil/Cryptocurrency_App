@@ -93,7 +93,9 @@ fun SharedTransitionScope.ProfileScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     keyStoreViewModel: KeyStoreViewModel = hiltViewModel(),
     portfolioViewModel: PortfolioViewModel = hiltViewModel(),
-    context: Context
+    context: Context,
+    isDarkTheme:Boolean,
+    onToggle:()->Unit
 ) {
     //viewModel.loadCrypto()
     val portfolioCoinList by portfolioViewModel.currencyList.observeAsState()
@@ -437,6 +439,10 @@ fun SharedTransitionScope.ProfileScreen(
             settings = settingsTab,
             onDisMiss = {
                 settingsTab = null
+            },
+            isDarkTheme = isDarkTheme,
+            onThemeChange = {
+                onToggle()
             }
         )
     }

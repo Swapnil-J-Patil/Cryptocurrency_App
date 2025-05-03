@@ -11,7 +11,9 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.runtime.collectAsState
 import androidx.datastore.dataStore
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +32,7 @@ import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.onboarding_screen.BubblePagerContent
+import com.example.cleanarchitectureproject.presentation.profile_screen.AppThemeViewModel
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
 import com.example.cleanarchitectureproject.presentation.profile_screen.RewardedAdScreen
@@ -65,7 +68,8 @@ class MainActivity : AppCompatActivity() {
         setContent {
             CleanArchitectureProjectTheme {
                 val navController = rememberNavController()
-
+                val appThemeViewModel: AppThemeViewModel = hiltViewModel()
+                val isDark = appThemeViewModel.isDark.collectAsState()
                 SharedTransitionLayout {
 
                     NavHost(
@@ -105,7 +109,10 @@ class MainActivity : AppCompatActivity() {
                             popEnterTransition = { EnterTransition.None },
                             popExitTransition = { ExitTransition.None }
                         ) {
-                            MainScreen(navController, animatedVisibilityScope = this)
+                            MainScreen(navController, animatedVisibilityScope = this,
+                                isDarkTheme = isDark.value, onToggle = {
+                                    appThemeViewModel.toggleTheme()
+                                })
                         }
 
                         //Home Screen
@@ -160,7 +167,9 @@ class MainActivity : AppCompatActivity() {
                         composable(
                             route = Screen.ProfileScreen.route
                         ) {
-                            ProfileScreen(navController, animatedVisibilityScope = this, context = this@MainActivity)
+                            ProfileScreen(navController, animatedVisibilityScope = this, context = this@MainActivity, isDarkTheme = isDark.value, onToggle = {
+                                appThemeViewModel.toggleTheme()
+                            })
                         }
                         composable(
                             route = Screen.ProfileScreenTab.route

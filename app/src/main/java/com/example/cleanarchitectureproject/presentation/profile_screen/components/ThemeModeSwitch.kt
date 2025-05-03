@@ -48,20 +48,23 @@ import androidx.compose.ui.util.lerp
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.presentation.ui.theme.BlueSky
 import com.example.cleanarchitectureproject.presentation.ui.theme.BorderColor
+import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.example.cleanarchitectureproject.presentation.ui.theme.NightSky
 import kotlinx.coroutines.launch
+
 @Composable
 fun DarkModeSwitch(
     checked: Boolean, modifier: Modifier, onCheckedChanged: (Boolean) -> Unit,
-    switchWidth: Dp =50.dp,
+    switchWidth: Dp = 50.dp,
     switchHeight: Dp = 30.dp,
-    handleSize: Dp = 15.dp,
-    handlePadding: Dp = 4.dp,) {
+    handleSize: Dp = 20.dp,
+    handlePadding: Dp = 4.dp,
+) {
 
-   /* val switchWidth = 160.dp
-    val switchHeight = 64.dp
-    val handleSize = 52.dp
-    val handlePadding = 10.dp*/
+    /* val switchWidth = 160.dp
+     val switchHeight = 64.dp
+     val handleSize = 52.dp
+     val handlePadding = 10.dp*/
 
     val valueToOffset = if (checked) 1f else 0f
     val offset = remember { Animatable(valueToOffset) }
@@ -137,6 +140,23 @@ fun DarkModeSwitch(
                         translationX = size.width * (1f - offset.value)
                     }
             )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DarkModeSwitchPreview() {
+    CleanArchitectureProjectTheme {
+        Column {
+            var value by remember { mutableStateOf(false) }
+            DarkModeSwitch(
+                value, Modifier.padding(24.dp),
+                switchWidth = 65.dp,
+                switchHeight = 30.dp,
+                handleSize = 20.dp,
+                handlePadding = 4.dp,
+                onCheckedChanged = { value = it })
         }
     }
 }

@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
@@ -64,11 +65,11 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.cleanarchitectureproject.domain.model.ProfileData
-import com.example.cleanarchitectureproject.presentation.common_components.Divider
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileDataList
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -76,7 +77,9 @@ import kotlin.math.roundToInt
 @Composable
 fun SharedTransitionScope.SettingsView(
     settings: Boolean?,
-    onDisMiss:()-> Unit
+    onDisMiss:()-> Unit,
+    isDarkTheme: Boolean,
+    onThemeChange:()-> Unit
 ) {
 
    /* var selectedImage by remember {
@@ -85,15 +88,17 @@ fun SharedTransitionScope.SettingsView(
     LaunchedEffect(settings) {
         selectedImage = settings
     }*/
-    var isChecked by remember { mutableStateOf(false) }
+    var isChecked by remember { mutableStateOf(isDarkTheme) }
     var currentMode by remember { mutableStateOf("Light Mode") }
     LaunchedEffect(isChecked) {
         if(!isChecked)
         {
+            delay(1000)
             currentMode="Light Mode"
         }
         else
         {
+            delay(1000)
             currentMode="Dark Mode"
         }
     }
@@ -108,7 +113,7 @@ fun SharedTransitionScope.SettingsView(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.Transparent)
-                    .padding(16.dp),
+                    .padding(top=16.dp, start = 16.dp,end=16.dp, bottom = 40.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Card(
@@ -177,7 +182,7 @@ fun SharedTransitionScope.SettingsView(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 50.dp, start = 16.dp), // Ensures text doesn't shift
+                                .padding(top = 50.dp, start = 16.dp,end=16.dp), // Ensures text doesn't shift
                             verticalArrangement = Arrangement.Top,
                             horizontalAlignment = Alignment.Start
                         ) {
@@ -193,13 +198,88 @@ fun SharedTransitionScope.SettingsView(
                             DarkModeSwitch(
                                 checked = isChecked,
                                 modifier = Modifier,
+                                switchWidth = 68.dp,
+                                switchHeight = 30.dp,
+                                handleSize = 20.dp,
+                                handlePadding = 4.dp,
                                 onCheckedChanged = {flag->
                                     isChecked=flag
+                                    onThemeChange()
                                 }
                             )
 
                             Spacer(Modifier.height(10.dp))
 
+                            Divider(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                thickness = 2.dp
+                            )
+
+                            Spacer(Modifier.height(30.dp))
+                            Text(
+                                text = "Earn More Coins",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = lightBackground,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = Poppins
+                            )
+                            Spacer(Modifier.height(10.dp))
+
+                            Divider(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                thickness = 2.dp
+                            )
+                            Spacer(Modifier.height(25.dp))
+
+                            Text(
+                                text = "About Us",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = lightBackground,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = Poppins
+                            )
+                            Spacer(Modifier.height(10.dp))
+
+                            Divider(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                thickness = 2.dp
+                            )
+                            Spacer(Modifier.height(25.dp))
+
+                            Text(
+                                text = "Help",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = lightBackground,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = Poppins
+                            )
+                            Spacer(Modifier.height(10.dp))
+
+                            Divider(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                thickness = 2.dp
+                            )
+                            Spacer(Modifier.height(25.dp))
+
+                            Text(
+                                text = "Logout",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = lightBackground,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = Poppins
+                            )
+                            Spacer(Modifier.height(10.dp))
+
+                            Divider(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                thickness = 2.dp
+                            )
+                            Spacer(Modifier.height(25.dp))
                         }
                     }
                 }

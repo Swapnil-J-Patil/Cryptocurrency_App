@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.cleanarchitectureproject.common.Constants
 import com.example.cleanarchitectureproject.data.local.CryptoDatabase
+import com.example.cleanarchitectureproject.data.local.keystore.ThemePreferenceManager
 import com.example.cleanarchitectureproject.data.remote.CoinMarketApi
 import com.example.cleanarchitectureproject.data.repository.AuthRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.BannerAdRepositoryImpl
@@ -12,6 +13,7 @@ import com.example.cleanarchitectureproject.data.repository.CoinMarketRepository
 import com.example.cleanarchitectureproject.data.repository.CryptoRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.PortfolioRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.RewardedAdRepositoryImpl
+import com.example.cleanarchitectureproject.data.repository.ThemeRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.TransactionRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.UserDetailsRepositoryImpl
 import com.example.cleanarchitectureproject.domain.repository.AuthRepository
@@ -20,6 +22,7 @@ import com.example.cleanarchitectureproject.domain.repository.CoinMarketReposito
 import com.example.cleanarchitectureproject.domain.repository.CryptoRepository
 import com.example.cleanarchitectureproject.domain.repository.PortfolioRepository
 import com.example.cleanarchitectureproject.domain.repository.RewardedAdRepository
+import com.example.cleanarchitectureproject.domain.repository.ThemeRepository
 import com.example.cleanarchitectureproject.domain.repository.TransactionRepository
 import com.example.cleanarchitectureproject.domain.repository.UserDetailsRepository
 import com.example.cleanarchitectureproject.domain.use_case.keystore.ClearTokensUseCase
@@ -126,5 +129,20 @@ object AppModule {
         @ApplicationContext context: Context
     ): BannerAdRepository {
         return BannerAdRepositoryImpl()
+    }
+
+    @Provides
+    @Singleton
+    fun provideThemePreferenceManager(
+        @ApplicationContext context: Context
+    ): ThemePreferenceManager = ThemePreferenceManager(context)
+
+    @Provides
+    @Singleton
+    fun provideThemeRepository(
+        manager: ThemePreferenceManager
+    ): ThemeRepository
+    {
+        return ThemeRepositoryImpl(manager)
     }
 }

@@ -43,7 +43,9 @@ import com.example.cleanarchitectureproject.presentation.saved_coin_screen.Saved
 fun SharedTransitionScope.MainScreen(
     navController: NavController,
     mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    isDarkTheme: Boolean,
+    onToggle:()->Unit
 ) {
     val screen = listOf(
         Navbar.Home,
@@ -157,7 +159,10 @@ fun SharedTransitionScope.MainScreen(
                     ProfileScreen(
                         navController,
                         animatedVisibilityScope = animatedVisibilityScope,
-                        context = LocalContext.current
+                        context = LocalContext.current,
+                        isDarkTheme = isDarkTheme, onToggle = {
+                            onToggle()
+                        }
                     )
                 }
                 else -> {
