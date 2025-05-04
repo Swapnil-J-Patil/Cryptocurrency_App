@@ -79,6 +79,7 @@ import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.FiltersPopup
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.SettingsIconItem
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.SettingsView
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
@@ -271,24 +272,18 @@ fun SharedTransitionScope.ProfileScreen(
                                 animatedVisibilityScope = this
                             )
                             .size(50.dp)
-                            .background(shape = CircleShape, color = Color.Transparent)
                             .clip(CircleShape)
                             .clickable {
                                 settingsTab=true
                             }
                     )
                     {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "settings-image",
-                            modifier = Modifier.size(50.dp)
-                                .background(shape = CircleShape, color = Color.Transparent)
-                                .clip(CircleShape)
+                        SettingsIconItem(
+                            modifier = Modifier
                                 .sharedElement(
                                     state = rememberSharedContentState(key = "settings-image"),
                                     animatedVisibilityScope = this@AnimatedVisibility
-                                ),
-                            tint = Color.White
+                                )
                         )
                     }
                 }

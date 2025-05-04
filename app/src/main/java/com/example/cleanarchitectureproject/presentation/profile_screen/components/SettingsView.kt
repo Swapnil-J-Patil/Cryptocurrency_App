@@ -80,30 +80,28 @@ import kotlin.math.roundToInt
 @Composable
 fun SharedTransitionScope.SettingsView(
     settings: Boolean?,
-    onDisMiss:()-> Unit,
+    onDisMiss: () -> Unit,
     isDarkTheme: Boolean,
-    onThemeChange:()-> Unit
+    onThemeChange: () -> Unit
 ) {
 
-   /* var selectedImage by remember {
-        mutableStateOf(settings)
-    }
-    LaunchedEffect(settings) {
-        selectedImage = settings
-    }*/
+    /* var selectedImage by remember {
+         mutableStateOf(settings)
+     }
+     LaunchedEffect(settings) {
+         selectedImage = settings
+     }*/
     var isChecked by remember { mutableStateOf(isDarkTheme) }
     var currentMode by remember { mutableStateOf("Light Mode") }
-    val color=if(isDarkTheme) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+    val color =
+        if (isDarkTheme) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
     LaunchedEffect(isChecked) {
-        if(!isChecked)
-        {
+        if (!isChecked) {
             //delay(1000)
-            currentMode="Light Mode"
-        }
-        else
-        {
+            currentMode = "Light Mode"
+        } else {
             //delay(1000)
-            currentMode="Dark Mode"
+            currentMode = "Dark Mode"
         }
     }
     AnimatedContent(
@@ -131,120 +129,115 @@ fun SharedTransitionScope.SettingsView(
                     elevation = CardDefaults.cardElevation(8.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Box(
+
+                    Row(
                         modifier = Modifier
-                            .background(Color.Transparent)
                             .fillMaxWidth()
-                            .height(500.dp)
-                            .padding(bottom = 40.dp),
-                        ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 5.dp),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            IconButton(onClick = { onDisMiss() }) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Close",
-                                    tint = MaterialTheme.colorScheme.secondary
-                                )
-                            }
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp), // Ensures text doesn't shift
-                            verticalArrangement = Arrangement.Top,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(top=25.dp),
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = "Settings",
-                                    modifier = Modifier
-                                        .clip(CircleShape)
-                                        .size(35.dp)
-                                        .sharedElement(
-                                            state = rememberSharedContentState(key = "settings-image"),
-                                            animatedVisibilityScope = this@AnimatedContent
-                                        ),
-                                    tint = color
-                                )
-                                Text(
-                                    text = "Settings",
-                                    modifier = Modifier.padding(start = 5.dp),
-                                    style = MaterialTheme.typography.headlineSmall,
-                                    color = color,
-                                    fontWeight = FontWeight.Bold,
-                                    fontFamily = Poppins
-                                )
-                            }
-
-
-                        }
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 80.dp, start = 16.dp, end = 16.dp), // Ensures text doesn't shift
-                            verticalArrangement = Arrangement.Top,
-                            horizontalAlignment = Alignment.Start
-                        ) {
-                            Spacer(Modifier.height(15.dp))
-                            Text(
-                                text = currentMode,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = Poppins
+                            .padding(top = 5.dp, end = 5.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(onClick = { onDisMiss() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = MaterialTheme.colorScheme.secondary
                             )
-                            Spacer(Modifier.height(5.dp))
-                            DarkModeSwitch(
-                                checked = isChecked,
-                                modifier = Modifier,
-                                switchWidth = 68.dp,
-                                switchHeight = 30.dp,
-                                handleSize = 20.dp,
-                                handlePadding = 4.dp,
-                                onCheckedChanged = {flag->
-                                    isChecked=flag
-                                    onThemeChange()
-                                }
-                            )
-
-                            Spacer(Modifier.height(10.dp))
-
-                           /* Divider(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.tertiaryContainer,
-                                thickness = 2.dp
-                            )*/
-                            Spacer(Modifier.height(30.dp))
-
-                            ItemSettings(text = "Earn More Coins", onClick = {},
-                                tint = color,
-                                icon = Icons.Default.MonetizationOn)
-
-                            ItemSettings(text = "About Us", onClick = {},
-                                tint = color,
-                                icon = Icons.Default.Person)
-
-                            ItemSettings(text = "Help", onClick = {},
-                                tint = color,
-                                icon = Icons.Default.Help)
-
-                            ItemSettings(text = "Logout", onClick = {},
-                                tint = color,
-                                icon = Icons.Default.Logout)
-
-
                         }
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                            .offset(y=-15.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        SettingsIconItem(
+                            modifier = Modifier
+                                .sharedElement(
+                                    state = rememberSharedContentState(key = "settings-image"),
+                                    animatedVisibilityScope = this@AnimatedContent
+                                ),
+                            size = 35.dp,
+                            tint = color
+                        )
+                        Text(
+                            text = "Settings",
+                            modifier = Modifier.padding(start = 5.dp),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = color,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Poppins
+                        )
+                    }
+
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 16.dp,
+                                end = 16.dp
+                            ), // Ensures text doesn't shift
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            text = currentMode,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Poppins
+                        )
+                        Spacer(Modifier.height(5.dp))
+                        DarkModeSwitch(
+                            checked = isChecked,
+                            modifier = Modifier,
+                            switchWidth = 68.dp,
+                            switchHeight = 30.dp,
+                            handleSize = 20.dp,
+                            handlePadding = 4.dp,
+                            onCheckedChanged = { flag ->
+                                isChecked = flag
+                                onThemeChange()
+                            }
+                        )
+
+                        Spacer(Modifier.height(5.dp))
+
+                        /* Divider(
+                             modifier = Modifier.fillMaxWidth(),
+                             color = MaterialTheme.colorScheme.tertiaryContainer,
+                             thickness = 2.dp
+                         )*/
+                        Spacer(Modifier.height(30.dp))
+
+                        ItemSettings(
+                            text = "Earn More Coins", onClick = {},
+                            tint = color,
+                            icon = Icons.Default.MonetizationOn
+                        )
+
+                        ItemSettings(
+                            text = "About Us", onClick = {},
+                            tint = color,
+                            icon = Icons.Default.Person
+                        )
+
+                        ItemSettings(
+                            text = "Help", onClick = {},
+                            tint = color,
+                            icon = Icons.Default.Help
+                        )
+
+                        ItemSettings(
+                            text = "Logout", onClick = {},
+                            tint = color,
+                            icon = Icons.Default.Logout
+                        )
+                        Spacer(Modifier.height(30.dp))
+
                     }
                 }
             }
