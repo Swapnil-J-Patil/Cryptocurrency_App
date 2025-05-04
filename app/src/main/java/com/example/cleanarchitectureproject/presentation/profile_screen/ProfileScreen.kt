@@ -62,6 +62,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -115,7 +116,7 @@ fun SharedTransitionScope.ProfileScreen(
     var visibility by remember {
         mutableStateOf(false)
     }
-    var settingsTab by remember { mutableStateOf<Boolean?>(null) }
+    var settingsTab by remember { mutableStateOf<ImageVector?>(null) }
 
     var currentFilters by remember { mutableStateOf(listOf(false, false, false, false)) }
 
@@ -274,7 +275,7 @@ fun SharedTransitionScope.ProfileScreen(
                             .size(50.dp)
                             .clip(CircleShape)
                             .clickable {
-                                settingsTab=true
+                                settingsTab=Icons.Default.Settings
                             }
                     )
                     {

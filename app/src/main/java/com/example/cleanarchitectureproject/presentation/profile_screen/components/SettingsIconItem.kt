@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
@@ -25,7 +26,8 @@ import coil.size.Size
 fun SettingsIconItem(
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
-    tint: Color =Color.White
+    tint: Color =Color.White,
+    icon: ImageVector = Icons.Default.Settings
     ) {
 
     Box(

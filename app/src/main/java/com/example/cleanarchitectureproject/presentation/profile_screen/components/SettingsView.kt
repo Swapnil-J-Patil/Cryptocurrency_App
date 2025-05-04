@@ -57,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -79,18 +80,18 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun SharedTransitionScope.SettingsView(
-    settings: Boolean?,
+    settings: ImageVector?,
     onDisMiss: () -> Unit,
     isDarkTheme: Boolean,
     onThemeChange: () -> Unit
 ) {
 
-    /* var selectedImage by remember {
+     var selectedImage by remember {
          mutableStateOf(settings)
      }
      LaunchedEffect(settings) {
          selectedImage = settings
-     }*/
+     }
     var isChecked by remember { mutableStateOf(isDarkTheme) }
     var currentMode by remember { mutableStateOf("Light Mode") }
     val color =
@@ -108,8 +109,8 @@ fun SharedTransitionScope.SettingsView(
         targetState = settings,
         transitionSpec = { fadeIn() togetherWith fadeOut() },
         label = "SettingsView"
-    ) { profile ->
-        if (profile != null) {
+    ) { image ->
+        if (image != null && selectedImage != null) {
 
             Box(
                 modifier = Modifier
@@ -153,6 +154,7 @@ fun SharedTransitionScope.SettingsView(
                     ) {
 
                         SettingsIconItem(
+                            icon = selectedImage!!,
                             modifier = Modifier
                                 .sharedElement(
                                     state = rememberSharedContentState(key = "settings-image"),
