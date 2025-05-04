@@ -33,6 +33,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -90,6 +93,7 @@ fun SharedTransitionScope.SettingsView(
     }*/
     var isChecked by remember { mutableStateOf(isDarkTheme) }
     var currentMode by remember { mutableStateOf("Light Mode") }
+    val color=if(isDarkTheme) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
     LaunchedEffect(isChecked) {
         if(!isChecked)
         {
@@ -171,13 +175,13 @@ fun SharedTransitionScope.SettingsView(
                                             state = rememberSharedContentState(key = "settings-image"),
                                             animatedVisibilityScope = this@AnimatedContent
                                         ),
-                                    tint = if(isDarkTheme) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    tint = color
                                 )
                                 Text(
                                     text = "Settings",
                                     modifier = Modifier.padding(start = 5.dp),
                                     style = MaterialTheme.typography.headlineSmall,
-                                    color = if(isDarkTheme) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                    color = color,
                                     fontWeight = FontWeight.Bold,
                                     fontFamily = Poppins
                                 )
@@ -216,19 +220,28 @@ fun SharedTransitionScope.SettingsView(
 
                             Spacer(Modifier.height(10.dp))
 
-                            Divider(
+                           /* Divider(
                                 modifier = Modifier.fillMaxWidth(),
                                 color = MaterialTheme.colorScheme.tertiaryContainer,
                                 thickness = 2.dp
-                            )
+                            )*/
+                            Spacer(Modifier.height(30.dp))
 
-                            ItemSettings(text = "Earn More Coins", onClick = {})
+                            ItemSettings(text = "Earn More Coins", onClick = {},
+                                tint = color,
+                                icon = Icons.Default.MonetizationOn)
 
-                            ItemSettings(text = "About Us", onClick = {})
+                            ItemSettings(text = "About Us", onClick = {},
+                                tint = color,
+                                icon = Icons.Default.Person)
 
-                            ItemSettings(text = "Help", onClick = {})
+                            ItemSettings(text = "Help", onClick = {},
+                                tint = color,
+                                icon = Icons.Default.Help)
 
-                            ItemSettings(text = "Logout", onClick = {})
+                            ItemSettings(text = "Logout", onClick = {},
+                                tint = color,
+                                icon = Icons.Default.Logout)
 
 
                         }
