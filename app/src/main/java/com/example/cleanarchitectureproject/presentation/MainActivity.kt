@@ -11,6 +11,9 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
@@ -114,7 +117,22 @@ class MainActivity : AppCompatActivity() {
                             RewardedAdScreen(this@MainActivity)
                         }
                         composable(
-                            route = Screen.LuckyWheelScreen.route
+                            route = Screen.LuckyWheelScreen.route,
+                            enterTransition = {
+                                slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
+                            },
+                            exitTransition = {
+                                slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+                            },
+                            popEnterTransition = {
+                                slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(500))
+                            },
+                            popExitTransition = {
+                                slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = tween(500)
+                                )
+                            }
                         ) {
                             LuckyWheelScreen()
                         }

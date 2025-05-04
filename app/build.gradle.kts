@@ -143,7 +143,7 @@ dependencies {
 
     implementation("androidx.biometric:biometric:1.1.0")
 
-    //pager animtion
+    //pager animation
     implementation (libs.google.accompanist.pager)
     implementation (libs.accompanist.systemuicontroller)
 
