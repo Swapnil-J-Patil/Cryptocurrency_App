@@ -65,11 +65,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.cleanarchitectureproject.domain.model.ProfileData
+import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileDataList
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
@@ -83,7 +85,8 @@ fun SharedTransitionScope.SettingsView(
     settings: ImageVector?,
     onDisMiss: () -> Unit,
     isDarkTheme: Boolean,
-    onThemeChange: () -> Unit
+    onThemeChange: () -> Unit,
+    navController: NavController
 ) {
 
      var selectedImage by remember {
@@ -216,7 +219,9 @@ fun SharedTransitionScope.SettingsView(
                         Spacer(Modifier.height(30.dp))
 
                         ItemSettings(
-                            text = "Earn More Coins", onClick = {},
+                            text = "Earn More Coins", onClick = {
+                                navController.navigate(Screen.LuckyWheelScreen.route)
+                            },
                             tint = color,
                             icon = Icons.Default.MonetizationOn
                         )

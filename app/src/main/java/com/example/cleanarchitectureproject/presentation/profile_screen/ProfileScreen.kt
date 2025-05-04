@@ -446,7 +446,8 @@ fun SharedTransitionScope.ProfileScreen(
             isDarkTheme = isDarkTheme,
             onThemeChange = {
                 onToggle()
-            }
+            },
+            navController = navController
         )
     }
 }

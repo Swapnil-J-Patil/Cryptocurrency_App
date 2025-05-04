@@ -1,9 +1,7 @@
-package com.example.cleanarchitectureproject.presentation.profile_screen.components.pie_chart
+package com.example.cleanarchitectureproject.presentation.profile_screen.components.donut_chart
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -15,24 +13,18 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -43,39 +35,25 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import coil.ImageLoader
-import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
-import com.example.cleanarchitectureproject.presentation.ui.theme.aquaMint
-import com.example.cleanarchitectureproject.presentation.ui.theme.blueBright
-import com.example.cleanarchitectureproject.presentation.ui.theme.darkCyan
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
-import com.example.cleanarchitectureproject.presentation.ui.theme.greenBright
-import com.example.cleanarchitectureproject.presentation.ui.theme.mutedLime
-import com.example.cleanarchitectureproject.presentation.ui.theme.orangeBright
-import com.example.cleanarchitectureproject.presentation.ui.theme.redBright
-import com.example.cleanarchitectureproject.presentation.ui.theme.emeraldGreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.random.Random
 
 @Composable
-fun PieChart(
+fun DonutChart(
     data: Map<String, Int>,
     radiusOuter: Dp = 120.dp,
     chartBarWidth: Dp = 25.dp,

@@ -37,7 +37,7 @@ fun SettingsIconItem(
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = Icons.Default.Settings,
+            imageVector = icon,
             contentDescription = "settings-image",
             modifier = modifier.fillMaxSize()
                 .clip(CircleShape)

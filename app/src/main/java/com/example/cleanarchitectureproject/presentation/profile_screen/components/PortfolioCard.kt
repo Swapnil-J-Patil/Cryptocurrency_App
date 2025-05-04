@@ -1,13 +1,10 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components
 
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,8 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -34,19 +29,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.CryptoCurrencyCM
-import com.example.cleanarchitectureproject.domain.model.CryptocurrencyCoin
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
-import com.example.cleanarchitectureproject.presentation.common_components.CoinCardItem
-import com.example.cleanarchitectureproject.presentation.profile_screen.components.pie_chart.PieChart
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.donut_chart.DonutChart
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CoinDisplay
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
-import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import java.text.DecimalFormat
 
 @Composable
@@ -147,7 +137,7 @@ fun PortfolioCard(
             item {
                 Spacer(modifier = Modifier.height(20.dp))
                 // Pass to PieChart
-                PieChart(
+                DonutChart(
                     data = pieChartState.value,
                     ringBorderColor = MaterialTheme.colorScheme.tertiaryContainer,
                     ringBgColor = MaterialTheme.colorScheme.tertiary,

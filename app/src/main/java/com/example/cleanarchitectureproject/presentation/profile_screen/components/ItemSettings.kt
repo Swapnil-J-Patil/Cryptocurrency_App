@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components
 
 import android.graphics.drawable.Icon
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,7 +36,10 @@ fun ItemSettings(
     icon: ImageVector
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth()
+            .clickable{
+                onClick()
+            },
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
     ) {
