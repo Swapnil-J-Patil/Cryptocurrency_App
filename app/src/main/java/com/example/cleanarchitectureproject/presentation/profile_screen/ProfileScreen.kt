@@ -254,6 +254,7 @@ fun SharedTransitionScope.ProfileScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(Color.Transparent)
                     .padding(end = 15.dp, top = 42.dp), // Ensures text doesn't shift
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.End
@@ -263,20 +264,26 @@ fun SharedTransitionScope.ProfileScreen(
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
                 ) {
-                    IconButton(
-                        onClick = {
-                            settingsTab=true
-                        },
-                        modifier = Modifier.size(50.dp)
+                    Box(
+                        modifier = Modifier
                             .sharedBounds(
                                 sharedContentState = rememberSharedContentState(key = "settings-bounds"),
                                 animatedVisibilityScope = this
                             )
-                    ) {
+                            .size(50.dp)
+                            .background(shape = CircleShape, color = Color.Transparent)
+                            .clip(CircleShape)
+                            .clickable {
+                                settingsTab=true
+                            }
+                    )
+                    {
                         Icon(
                             imageVector = Icons.Default.Settings,
-                            contentDescription = "Settings",
-                            modifier = Modifier.fillMaxSize()
+                            contentDescription = "settings-image",
+                            modifier = Modifier.size(50.dp)
+                                .background(shape = CircleShape, color = Color.Transparent)
+                                .clip(CircleShape)
                                 .sharedElement(
                                     state = rememberSharedContentState(key = "settings-image"),
                                     animatedVisibilityScope = this@AnimatedVisibility

@@ -11,6 +11,10 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.collectAsState
 import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -65,11 +69,17 @@ class MainActivity : AppCompatActivity() {
 
         appContainer = AppContainer(this)
         biometricViewModel = appContainer.biometricViewModel
+
+
         setContent {
-            CleanArchitectureProjectTheme {
+            val appThemeViewModel: AppThemeViewModel = hiltViewModel()
+            val isDark = appThemeViewModel.isDark.collectAsState()
+
+            CleanArchitectureProjectTheme(
+                darkTheme = isDark.value
+            ) {
                 val navController = rememberNavController()
-                val appThemeViewModel: AppThemeViewModel = hiltViewModel()
-                val isDark = appThemeViewModel.isDark.collectAsState()
+
                 SharedTransitionLayout {
 
                     NavHost(
