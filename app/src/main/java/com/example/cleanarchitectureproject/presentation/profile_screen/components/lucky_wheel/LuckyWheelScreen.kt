@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,19 +38,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.presentation.profile_screen.LuckyWheelViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 
 @Composable
-fun LuckyWheelScreen() {
+fun LuckyWheelScreen(
+    luckyWheelViewModel: LuckyWheelViewModel = hiltViewModel()
+) {
     val items = listOf("$ 50", "$ 150", "$ 25", "$ 1000", "$ 1", "$ 500", "$ 5", "$ 10")
+    val isButtonEnabled by luckyWheelViewModel.canSpin.collectAsState()
+    val countdown by luckyWheelViewModel.countdown.collectAsState()
+
+    val displayTime = remember(countdown) {
+        val hours = TimeUnit.MILLISECONDS.toHours(countdown)
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(countdown) % 60
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(countdown) % 60
+        String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    }
     var result by remember { mutableStateOf("") }
     var isChestAnimation by remember {
         mutableStateOf(false)
@@ -110,7 +125,9 @@ fun LuckyWheelScreen() {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            isButtonEnabled = isButtonEnabled,
+            countdownText = displayTime
         )
         AnimatedVisibility(
             visible = isChestAnimation,

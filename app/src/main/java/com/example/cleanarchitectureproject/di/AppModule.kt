@@ -11,6 +11,7 @@ import com.example.cleanarchitectureproject.data.repository.AuthRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.BannerAdRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CoinMarketRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.CryptoRepositoryImpl
+import com.example.cleanarchitectureproject.data.repository.LuckyWheelRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.PortfolioRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.RewardedAdRepositoryImpl
 import com.example.cleanarchitectureproject.data.repository.ThemeRepositoryImpl
@@ -20,6 +21,7 @@ import com.example.cleanarchitectureproject.domain.repository.AuthRepository
 import com.example.cleanarchitectureproject.domain.repository.BannerAdRepository
 import com.example.cleanarchitectureproject.domain.repository.CoinMarketRepository
 import com.example.cleanarchitectureproject.domain.repository.CryptoRepository
+import com.example.cleanarchitectureproject.domain.repository.LuckyWheelRepository
 import com.example.cleanarchitectureproject.domain.repository.PortfolioRepository
 import com.example.cleanarchitectureproject.domain.repository.RewardedAdRepository
 import com.example.cleanarchitectureproject.domain.repository.ThemeRepository
@@ -131,6 +133,7 @@ object AppModule {
         return BannerAdRepositoryImpl()
     }
 
+    //Theme
     @Provides
     @Singleton
     fun provideThemePreferenceManager(
@@ -145,4 +148,11 @@ object AppModule {
     {
         return ThemeRepositoryImpl(manager)
     }
+
+    //LuckyWheel
+    @Provides
+    @Singleton
+    fun provideCooldownRepository(@ApplicationContext context: Context): LuckyWheelRepository =
+        LuckyWheelRepositoryImpl(context)
+
 }

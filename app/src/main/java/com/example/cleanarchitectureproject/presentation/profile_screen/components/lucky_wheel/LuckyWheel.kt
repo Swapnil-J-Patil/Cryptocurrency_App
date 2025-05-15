@@ -62,7 +62,9 @@ import kotlin.math.sin
 fun LuckyWheel(
     items: List<String>,
     modifier: Modifier = Modifier,
-    onSpinEnd: (Int) -> Unit
+    onSpinEnd: (Int) -> Unit,
+    isButtonEnabled: Boolean,
+    countdownText: String
 ) {
     val sweepAngle = 360f / items.size
     val rotation = remember { Animatable(0f) }
@@ -80,7 +82,7 @@ fun LuckyWheel(
         Color(0xFFFFA500) to Color(0xFFFFFF00), // Orange to Yellow
     )
     val scaleAnim = remember { Animatable(1f) }
-    var isButtonEnabled by remember { mutableStateOf(true) }
+    /*var isButtonEnabled by remember { mutableStateOf(true) }
     var countdownTime by remember { mutableStateOf(0L) } // in millis
     val countdownDisplay by remember(countdownTime) {
         derivedStateOf {
@@ -89,7 +91,7 @@ fun LuckyWheel(
             val seconds = TimeUnit.MILLISECONDS.toSeconds(countdownTime) % 60
             String.format("%02d:%02d:%02d", hours, minutes, seconds)
         }
-    }
+    }*/
 
 
     Box(
@@ -269,7 +271,7 @@ fun LuckyWheel(
                         val selectedIndex = (adjustedRotation / sweepAngle).toInt() % items.size
                         onSpinEnd(selectedIndex)
                         // Disable button and start 3-hour countdown
-                        isButtonEnabled = false
+                       /* isButtonEnabled = false
                         countdownTime = 3 * 60 * 60 * 1000L // 3 hours in millis
 
                         while (countdownTime > 0) {
@@ -277,7 +279,7 @@ fun LuckyWheel(
                             countdownTime -= 1000L
                         }
 
-                        isButtonEnabled = true
+                        isButtonEnabled = true*/
                         spinning = false
                     }
                 }
@@ -294,7 +296,7 @@ fun LuckyWheel(
             contentPadding = PaddingValues(vertical = 12.dp),
         ) {
             Text(
-                text = if (isButtonEnabled) "Spin" else "Next spin in: $countdownDisplay",
+                text = if (isButtonEnabled) "Spin" else "Next spin in: $countdownText",
                 color = Color.White
             )
         }
