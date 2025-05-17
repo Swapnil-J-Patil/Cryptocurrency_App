@@ -31,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -82,6 +83,15 @@ fun LuckyWheel(
         Color(0xFFFFA500) to Color(0xFFFFFF00), // Orange to Yellow
     )
     val scaleAnim = remember { Animatable(1f) }
+    var isSpinButton by remember { mutableStateOf(isButtonEnabled) }
+    var countdown by remember { mutableStateOf(countdownText) }
+
+    LaunchedEffect(isButtonEnabled) {
+        isSpinButton = isButtonEnabled
+    }
+    LaunchedEffect(countdownText) {
+        countdown = countdownText
+    }
     /*var isButtonEnabled by remember { mutableStateOf(true) }
     var countdownTime by remember { mutableStateOf(0L) } // in millis
     val countdownDisplay by remember(countdownTime) {
@@ -284,7 +294,7 @@ fun LuckyWheel(
                     }
                 }
             },
-            enabled = isButtonEnabled,
+            enabled = isSpinButton,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
@@ -296,7 +306,7 @@ fun LuckyWheel(
             contentPadding = PaddingValues(vertical = 12.dp),
         ) {
             Text(
-                text = if (isButtonEnabled) "Spin" else "Next spin in: $countdownText",
+                text = if (isButtonEnabled) "Spin" else "Next spin in: $countdown",
                 color = Color.White
             )
         }

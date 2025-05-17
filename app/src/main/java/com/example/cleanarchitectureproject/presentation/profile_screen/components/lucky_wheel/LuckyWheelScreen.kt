@@ -121,7 +121,7 @@ fun LuckyWheelScreen(
                     delay(1300)
                     isCoinAnimation = true
                 }
-
+                luckyWheelViewModel.recordSpin()
             },
             modifier = Modifier
                 .fillMaxWidth()
