@@ -32,6 +32,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -45,6 +46,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
+import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.presentation.profile_screen.LuckyWheelViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import kotlinx.coroutines.delay
@@ -55,7 +57,11 @@ import java.util.concurrent.TimeUnit
 fun LuckyWheelScreen(
     luckyWheelViewModel: LuckyWheelViewModel = hiltViewModel()
 ) {
-    val items = listOf("$ 50", "$ 150", "$ 25", "$ 1000", "$ 1", "$ 500", "$ 5", "$ 10")
+    val context= LocalContext.current
+    val prefsManager = remember { PrefsManager(context) }
+    val dollars = prefsManager.getDollarAmount()
+
+    val items = listOf("50", "150", "25", "1000", "1", "500", "5", "10")
     val isButtonEnabled by luckyWheelViewModel.canSpin.collectAsState()
     val countdown by luckyWheelViewModel.countdown.collectAsState()
 
@@ -116,7 +122,9 @@ fun LuckyWheelScreen(
             items = items,
             onSpinEnd = { index ->
                 coroutineScope.launch {
-                    result = "You got: ${items[index]}"
+                    val total= dollars?.toDouble()?.plus(items[index].toDouble())
+                    prefsManager.setDollarAmount(total.toString())
+                    result = "You got: $ ${items[index]}"
                     isChestAnimation = true
                     delay(1300)
                     isCoinAnimation = true

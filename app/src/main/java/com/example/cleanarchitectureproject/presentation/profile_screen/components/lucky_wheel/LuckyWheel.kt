@@ -210,7 +210,7 @@ fun LuckyWheel(
 
                         // Draw upright text
                         nativeCanvas.drawText(
-                            label,
+                            "$ $label",
                             textX,
                             textY,
                             paint
