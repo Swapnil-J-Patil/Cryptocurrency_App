@@ -11,6 +11,7 @@ sealed class Screen(val route: String) {
     object SuccessScreen: Screen("success_screen")
     object RewardedAdScreen: Screen("rewarded_ad_screen")
     object LuckyWheelScreen: Screen("lucky_wheel_screen")
+    object AboutUsScreen: Screen("about_us_screen")
 
     object HomeScreenTab: Screen("home_screen_tab")
     object HomeScreen: Screen("home_screen")

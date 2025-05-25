@@ -43,6 +43,7 @@ import com.example.cleanarchitectureproject.presentation.profile_screen.AppTheme
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
 import com.example.cleanarchitectureproject.presentation.profile_screen.RewardedAdScreen
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.AboutUsScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel.LuckyWheelScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
@@ -159,6 +160,28 @@ class MainActivity : AppCompatActivity() {
                             route = Screen.HomeScreen.route
                         ) {
                             HomeScreen(navController, animatedVisibilityScope = this)
+                        }
+
+                        //About Us Screen
+                        composable(
+                            route = Screen.AboutUsScreen.route,
+                            enterTransition = {
+                                slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
+                            },
+                            exitTransition = {
+                                slideOutHorizontally(targetOffsetX = { -it }, animationSpec = tween(500))
+                            },
+                            popEnterTransition = {
+                                slideInHorizontally(initialOffsetX = { -it }, animationSpec = tween(500))
+                            },
+                            popExitTransition = {
+                                slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = tween(500)
+                                )
+                            }
+                        ) {
+                            AboutUsScreen()
                         }
 
                         //Market Screen

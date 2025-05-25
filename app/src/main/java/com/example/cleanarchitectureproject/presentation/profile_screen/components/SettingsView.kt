@@ -227,7 +227,9 @@ fun SharedTransitionScope.SettingsView(
                         )
 
                         ItemSettings(
-                            text = "About Us", onClick = {},
+                            text = "About Us", onClick = {
+                                navController.navigate(Screen.AboutUsScreen.route)
+                            },
                             tint = color,
                             icon = Icons.Default.Person
                         )
