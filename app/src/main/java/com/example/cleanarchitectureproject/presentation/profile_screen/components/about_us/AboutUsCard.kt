@@ -32,6 +32,7 @@ import coil.compose.AsyncImage
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.grey
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightGrey
+import com.example.cleanarchitectureproject.presentation.ui.theme.white
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
@@ -62,7 +63,8 @@ fun AboutUsCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(500.dp)
+            .height(520.dp)
+            .padding(bottom = 20.dp)
             .offset(
                 x = (xOffset.value).dp,
                 y = (getInitialOffset).dp
@@ -138,13 +140,13 @@ fun AboutUsCard(
             style = MaterialTheme.typography.titleLarge,
             fontFamily = Poppins,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.secondary
+            color = white
         )
         Spacer(Modifier.height(15.dp))
         Divider(
             modifier = Modifier.fillMaxWidth()
                 .padding(horizontal = 10.dp),
-            color = MaterialTheme.colorScheme.tertiaryContainer,
+            color = lightGrey,
             thickness = 2.dp
         )
         Spacer(Modifier.height(15.dp))
@@ -153,7 +155,7 @@ fun AboutUsCard(
             modifier = Modifier.padding(start = 16.dp, end = 10.dp),
             style = MaterialTheme.typography.bodyLarge,
             fontFamily = Poppins,
-            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f)
+            color = white.copy(alpha = 0.8f)
         )
     }
 }
