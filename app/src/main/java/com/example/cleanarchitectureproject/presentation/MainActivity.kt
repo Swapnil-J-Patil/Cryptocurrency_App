@@ -34,6 +34,7 @@ import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileS
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.ads.RewardedAdScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.about_us.AboutUs
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.help.HelpScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel.LuckyWheelScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
@@ -104,6 +105,11 @@ class MainActivity : AppCompatActivity() {
                             route = Screen.RewardedAdScreen.route
                         ) {
                             RewardedAdScreen(this@MainActivity)
+                        }
+                        composable(
+                            route= Screen.HelpScreen.route
+                        ) {
+                            HelpScreen()
                         }
                         composable(
                             route = Screen.LuckyWheelScreen.route,

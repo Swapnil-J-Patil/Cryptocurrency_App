@@ -205,7 +205,9 @@ fun SharedTransitionScope.SettingsView(
                         )
 
                         ItemSettings(
-                            text = "Help", onClick = {},
+                            text = "Help", onClick = {
+                                navController.navigate(Screen.HelpScreen.route)
+                            },
                             tint = color,
                             icon = Icons.Default.Help
                         )
