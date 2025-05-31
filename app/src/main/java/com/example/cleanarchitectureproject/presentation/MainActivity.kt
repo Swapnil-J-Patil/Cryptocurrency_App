@@ -43,7 +43,7 @@ import com.example.cleanarchitectureproject.presentation.profile_screen.AppTheme
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
 import com.example.cleanarchitectureproject.presentation.profile_screen.RewardedAdScreen
-import com.example.cleanarchitectureproject.presentation.profile_screen.components.AboutUsScreen
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.about_us.AboutUs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel.LuckyWheelScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreenTab
@@ -119,7 +119,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         composable(
                             route = Screen.LuckyWheelScreen.route,
-                            enterTransition = {
+                            /*enterTransition = {
                                 slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
                             },
                             exitTransition = {
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                                     targetOffsetX = { it },
                                     animationSpec = tween(500)
                                 )
-                            }
+                            }*/
                         ) {
                             LuckyWheelScreen()
                         }
@@ -165,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                         //About Us Screen
                         composable(
                             route = Screen.AboutUsScreen.route,
-                            enterTransition = {
+                           /* enterTransition = {
                                 slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500))
                             },
                             exitTransition = {
@@ -179,9 +179,9 @@ class MainActivity : AppCompatActivity() {
                                     targetOffsetX = { it },
                                     animationSpec = tween(500)
                                 )
-                            }
+                            }*/
                         ) {
-                            AboutUsScreen()
+                            AboutUs()
                         }
 
                         //Market Screen
