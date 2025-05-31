@@ -1,4 +1,4 @@
-package com.example.cleanarchitectureproject.presentation.profile_screen
+package com.example.cleanarchitectureproject.presentation.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

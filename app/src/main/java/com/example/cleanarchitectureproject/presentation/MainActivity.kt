@@ -1,6 +1,5 @@
 package com.example.cleanarchitectureproject.presentation
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -11,22 +10,13 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Shapes
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.collectAsState
-import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.cleanarchitectureproject.data.local.keystore.UserDetailsSerializer
 import com.example.cleanarchitectureproject.di.AppContainer
 import com.example.cleanarchitectureproject.domain.model.CryptoCoin
 import com.example.cleanarchitectureproject.presentation.coin_live_price.CoinLivePriceScreen
@@ -39,10 +29,10 @@ import com.example.cleanarchitectureproject.presentation.main_screen.MainScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreen
 import com.example.cleanarchitectureproject.presentation.market_screen.MarketScreenTab
 import com.example.cleanarchitectureproject.presentation.onboarding_screen.BubblePagerContent
-import com.example.cleanarchitectureproject.presentation.profile_screen.AppThemeViewModel
+import com.example.cleanarchitectureproject.presentation.shared.AppThemeViewModel
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.ProfileScreenTab
-import com.example.cleanarchitectureproject.presentation.profile_screen.RewardedAdScreen
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.ads.RewardedAdScreen
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.about_us.AboutUs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel.LuckyWheelScreen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.SavedCoinsScreen
@@ -52,8 +42,6 @@ import com.example.cleanarchitectureproject.presentation.success_screen.SuccessS
 import com.example.cleanarchitectureproject.presentation.transaction_screen.TransactionScreen
 import com.example.cleanarchitectureproject.presentation.ui.theme.CleanArchitectureProjectTheme
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.rememberPagerState
-import com.google.android.gms.ads.MobileAds
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint

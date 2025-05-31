@@ -47,7 +47,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
-import com.example.cleanarchitectureproject.presentation.profile_screen.LuckyWheelViewModel
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel.LuckyWheelViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

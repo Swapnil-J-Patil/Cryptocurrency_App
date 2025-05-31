@@ -1,14 +1,12 @@
-package com.example.cleanarchitectureproject.presentation.shared
+package com.example.cleanarchitectureproject.presentation.profile_screen.components.ads
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.cleanarchitectureproject.domain.use_case.rewarded_ad.RewardedAdUseCase
 import com.google.android.gms.ads.rewarded.RewardItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel

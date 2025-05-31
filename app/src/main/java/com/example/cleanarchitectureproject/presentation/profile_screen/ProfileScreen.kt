@@ -40,8 +40,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,7 +56,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
@@ -75,13 +72,12 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.domain.model.ProfileData
-import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.FiltersPopup
-import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileDetailView
-import com.example.cleanarchitectureproject.presentation.profile_screen.components.ProfileImageItem
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.profile.ProfileDetailView
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.profile.ProfileImageItem
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.SettingsIconItem
-import com.example.cleanarchitectureproject.presentation.profile_screen.components.SettingsView
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.settings.SettingsView
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
