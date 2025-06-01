@@ -153,7 +153,7 @@ fun AboutUsCard(
         Text(
             text = text,
             modifier = Modifier.padding(start = 16.dp, end = 10.dp),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             fontFamily = Poppins,
             color = white.copy(alpha = 0.8f)
         )
