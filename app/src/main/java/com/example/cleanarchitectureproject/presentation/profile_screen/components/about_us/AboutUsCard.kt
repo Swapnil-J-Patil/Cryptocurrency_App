@@ -5,6 +5,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +30,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.cleanarchitectureproject.domain.model.AboutUsData
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.grey
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightGrey
@@ -40,9 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AboutUsCard(
     modifier: Modifier = Modifier,
-    imageUrl: String,
-    text: String,
-    title: String,
+    data: AboutUsData,
     priority: Float,
     index: Int,
     onMoveToBack: () -> Unit
@@ -127,7 +127,7 @@ fun AboutUsCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         AsyncImage(
-            model = imageUrl,
+            model = data.imageUrl,
             contentDescription = "Card Image",
             contentScale = ContentScale.FillBounds,
             modifier= Modifier.fillMaxWidth()
@@ -135,7 +135,7 @@ fun AboutUsCard(
         )
         Spacer(Modifier.height(20.dp))
         Text(
-            text = title,
+            text = data.title,
             modifier = Modifier.padding(horizontal = 10.dp),
             style = MaterialTheme.typography.titleLarge,
             fontFamily = Poppins,
@@ -150,12 +150,15 @@ fun AboutUsCard(
             thickness = 2.dp
         )
         Spacer(Modifier.height(15.dp))
-        Text(
-            text = text,
-            modifier = Modifier.padding(start = 16.dp, end = 10.dp),
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = Poppins,
-            color = white.copy(alpha = 0.8f)
-        )
+        Column() {
+            data.text.forEach { text ->
+                Text(
+                    text = "• $text",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(start = 16.dp, end = 10.dp, bottom = 12.dp)
+                )
+            }
+        }
     }
 }
