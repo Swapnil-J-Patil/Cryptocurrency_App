@@ -28,12 +28,12 @@ import com.example.cleanarchitectureproject.domain.model.HelpItemData
 
 @Composable
 fun ExpandableHelpItem(item: HelpItemData) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 12.dp)
             .animateContentSize() // animates height changes smoothly
             .clickable(
                 indication = null,
@@ -48,11 +48,12 @@ fun ExpandableHelpItem(item: HelpItemData) {
             Text(
                 text = item.question,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.SemiBold
             )
             Icon(
                 imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                tint = MaterialTheme.colorScheme.secondary,
                 contentDescription = if (expanded) "Collapse" else "Expand"
             )
         }
@@ -63,6 +64,7 @@ fun ExpandableHelpItem(item: HelpItemData) {
                     Text(
                         text = "• $answer",
                         style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
                         modifier = Modifier.padding(start = 8.dp, bottom = 4.dp)
                     )
                 }
