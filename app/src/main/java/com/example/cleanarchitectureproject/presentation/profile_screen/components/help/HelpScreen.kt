@@ -3,62 +3,39 @@ package com.example.cleanarchitectureproject.presentation.profile_screen.compone
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.getValue //
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import com.example.cleanarchitectureproject.domain.model.HelpItemData
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 
 
 @Composable
 fun HelpScreen() {
-    val helpItems = listOf(
-        HelpItem(
+    val helpItemData = listOf(
+        HelpItemData(
             question = "🔐 How do I log in?",
             answers = listOf(
                 "Email & password",
@@ -66,14 +43,14 @@ fun HelpScreen() {
                 "Fingerprint or Pattern Lock (for quick access)"
             )
         ),
-        HelpItem(
+        HelpItemData(
             question = "💵 What is Paper Money?",
             answers = listOf(
                 "DreamTrade gives you virtual USD to simulate real trades.",
                 "This isn’t real money, so you can learn and experiment with no risk."
             )
         ),
-        HelpItem(
+        HelpItemData(
             question = "📈 How does trading work?",
             answers = listOf(
                 "1. Go to the Market screen",
@@ -83,7 +60,7 @@ fun HelpScreen() {
                 "5. Confirm the transaction"
             )
         ),
-        HelpItem(
+        HelpItemData(
             question = "💼 What’s in my Portfolio?",
             answers = listOf(
                 "All your purchased coins",
@@ -91,20 +68,20 @@ fun HelpScreen() {
                 "Real-time value updates based on market price"
             )
         ),
-        HelpItem(
+        HelpItemData(
             question = "🎡 What is Lucky Wheel?",
             answers = listOf(
                 "Spin the Lucky Wheel every 3 hours to earn bonus paper money 💰",
                 "Use it to boost your virtual wallet and trade more!"
             )
         ),
-        HelpItem(
+        HelpItemData(
             question = "🌙 How to switch to Dark Mode?",
             answers = listOf(
                 "Go to Settings and toggle between Light and Dark Mode."
             )
         ),
-        HelpItem(
+        HelpItemData(
             question = "🧑‍💼 Who built DreamTrade?",
             answers = listOf(
                 "DreamTrade is a Proof of Concept, built by a solo developer — Swapnil Patil.",
@@ -112,7 +89,7 @@ fun HelpScreen() {
                 "Just how Harvey Specter would approve. 😉"
             )
         ),
-        HelpItem(
+        HelpItemData(
             question = "📩 Need help?",
             answers = listOf(
                 "Got feedback or questions?",
@@ -144,7 +121,7 @@ fun HelpScreen() {
                 )
             }
 
-            items(helpItems) { item ->
+            items(helpItemData) { item ->
                 ExpandableHelpItem(item)
             }
         }

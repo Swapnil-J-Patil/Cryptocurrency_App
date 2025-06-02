@@ -3,6 +3,7 @@ package com.example.cleanarchitectureproject.presentation.profile_screen.compone
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,9 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.cleanarchitectureproject.domain.model.HelpItemData
 
 @Composable
-fun ExpandableHelpItem(item: HelpItem) {
+fun ExpandableHelpItem(item: HelpItemData) {
     var expanded by remember { mutableStateOf(false) }
 
     Column(
@@ -33,7 +35,10 @@ fun ExpandableHelpItem(item: HelpItem) {
             .fillMaxWidth()
             .padding(vertical = 8.dp)
             .animateContentSize() // animates height changes smoothly
-            .clickable { expanded = !expanded }
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { expanded = !expanded }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
