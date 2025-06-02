@@ -93,7 +93,8 @@ fun SharedTransitionScope.ProfileScreen(
     portfolioViewModel: PortfolioViewModel = hiltViewModel(),
     context: Context,
     isDarkTheme:Boolean,
-    onToggle:()->Unit
+    onToggle:()->Unit,
+    onLogout:() ->Unit
 ) {
     //viewModel.loadCrypto()
     val portfolioCoinList by portfolioViewModel.currencyList.observeAsState()
@@ -443,7 +444,10 @@ fun SharedTransitionScope.ProfileScreen(
             onThemeChange = {
                 onToggle()
             },
-            navController = navController
+            navController = navController,
+            onLogout = {
+                onLogout()
+            }
         )
     }
 }

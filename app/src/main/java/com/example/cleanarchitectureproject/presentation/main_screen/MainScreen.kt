@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.cleanarchitectureproject.presentation.Navbar
+import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.main_screen.components.navbar.BottomNavAnimation
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreen
 import com.example.cleanarchitectureproject.presentation.home_screen.HomeScreenTab
@@ -45,7 +46,8 @@ fun SharedTransitionScope.MainScreen(
     mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
     animatedVisibilityScope: AnimatedVisibilityScope,
     isDarkTheme: Boolean,
-    onToggle:()->Unit
+    onToggle:()->Unit,
+    onLogout:() -> Unit
 ) {
     val screen = listOf(
         Navbar.Home,
@@ -162,6 +164,12 @@ fun SharedTransitionScope.MainScreen(
                         context = LocalContext.current,
                         isDarkTheme = isDarkTheme, onToggle = {
                             onToggle()
+                        },
+                        onLogout = {
+                           /* navController.navigate(Screen.AuthScreen.route) {
+                                   popUpTo(Screen.MainScreen.route) { inclusive = true }
+                               }*/
+                            onLogout()
                         }
                     )
                 }

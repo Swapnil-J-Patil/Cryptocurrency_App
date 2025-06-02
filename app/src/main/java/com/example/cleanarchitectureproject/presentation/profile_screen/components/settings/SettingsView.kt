@@ -42,11 +42,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.presentation.Screen
+import com.example.cleanarchitectureproject.presentation.auth_screen.AuthViewModel
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.SettingsIconItem
+import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalLayoutApi::class)
@@ -56,8 +61,13 @@ fun SharedTransitionScope.SettingsView(
     onDisMiss: () -> Unit,
     isDarkTheme: Boolean,
     onThemeChange: () -> Unit,
-    navController: NavController
-) {
+    navController: NavController,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    keyStoreViewModel: KeyStoreViewModel = hiltViewModel(),
+    onLogout:()->Unit
+    ) {
+    val context= LocalContext.current
+    val prefsManager = PrefsManager(context)
 
      var selectedImage by remember {
          mutableStateOf(settings)
@@ -213,7 +223,20 @@ fun SharedTransitionScope.SettingsView(
                         )
 
                         ItemSettings(
-                            text = "Logout", onClick = {},
+                            text = "Logout", onClick = {
+
+                                prefsManager.setBiometricAuthCompleted(false)
+                                keyStoreViewModel.clearTokens()
+
+                                if(prefsManager.isFirebaseAuthCompleted())
+                                {
+                                    authViewModel.signOut()
+                                    prefsManager.setFirebaseAuthCompleted(false)
+                                }
+                               onLogout()
+
+
+                            },
                             tint = color,
                             icon = Icons.Default.Logout
                         )

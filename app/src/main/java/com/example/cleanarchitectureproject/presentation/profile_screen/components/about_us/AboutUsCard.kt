@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components.about_us
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -18,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +40,9 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.white
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun AboutUsCard(
     modifier: Modifier = Modifier,
@@ -48,6 +52,7 @@ fun AboutUsCard(
     onMoveToBack: () -> Unit
     ) {
     val xOffset = remember { Animatable(0f) }
+
     val rotation = remember { Animatable(0f) }
     val scale = remember { Animatable(priority) }
     var isRightFlick by remember { mutableStateOf(true) }
@@ -60,14 +65,16 @@ fun AboutUsCard(
         3 -> -75f
         else -> 0f
     }
+    val yOffset = derivedStateOf { getInitialOffset + (-abs(xOffset.value) * 0.2f) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(520.dp)
             .padding(bottom = 20.dp)
             .offset(
-                x = (xOffset.value).dp,
-                y = (getInitialOffset).dp
+                x = xOffset.value.dp,
+                y = yOffset.value.dp
             )
             .graphicsLayer(
                 rotationZ = rotation.value,
@@ -95,6 +102,8 @@ fun AboutUsCard(
                                         targetValue = direction,
                                         animationSpec = tween(400, easing = FastOutSlowInEasing)
                                     )
+
+
                                 }
                                 val rotationJob = launch {
                                     rotation.animateTo(

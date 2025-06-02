@@ -1,5 +1,7 @@
 package com.example.cleanarchitectureproject.presentation
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -11,6 +13,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -64,6 +67,7 @@ class MainActivity : AppCompatActivity() {
         appContainer = AppContainer(this)
         biometricViewModel = appContainer.biometricViewModel
 
+        val intent = Intent(this, MainActivity::class.java)
 
         setContent {
             val appThemeViewModel: AppThemeViewModel = hiltViewModel()
@@ -141,7 +145,18 @@ class MainActivity : AppCompatActivity() {
                             MainScreen(navController, animatedVisibilityScope = this,
                                 isDarkTheme = isDark.value, onToggle = {
                                     appThemeViewModel.toggleTheme()
+                                },
+                                onLogout = {
+                                    /*navController.navigate(Screen.AuthScreen.route) {
+                                        popUpTo(Screen.MainScreen.route) { inclusive = true }
+                                    }*/
+                                    //val context = LocalContext.current
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    finish()
+                                    startActivity(intent)
+
                                 })
+
                         }
 
                         //Home Screen
@@ -220,7 +235,10 @@ class MainActivity : AppCompatActivity() {
                         ) {
                             ProfileScreen(navController, animatedVisibilityScope = this, context = this@MainActivity, isDarkTheme = isDark.value, onToggle = {
                                 appThemeViewModel.toggleTheme()
-                            })
+                            },
+                                onLogout = {
+
+                                })
                         }
                         composable(
                             route = Screen.ProfileScreenTab.route
