@@ -271,7 +271,8 @@ fun SharedTransitionScope.HomeScreenTab(
         }
         if (state.error.isNotBlank()) {
             Column(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize()
+                    .padding(start=140.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {

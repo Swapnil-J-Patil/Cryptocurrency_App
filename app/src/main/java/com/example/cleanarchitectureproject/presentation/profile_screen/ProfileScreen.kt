@@ -328,7 +328,7 @@ fun SharedTransitionScope.ProfileScreen(
                             .padding(bottom = 16.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiary),
                         elevation = CardDefaults.cardElevation(16.dp),
-                        shape = RoundedCornerShape(20.dp)
+                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
                     ) {
                         if(!sortedCoins.isNullOrEmpty())
                         {
