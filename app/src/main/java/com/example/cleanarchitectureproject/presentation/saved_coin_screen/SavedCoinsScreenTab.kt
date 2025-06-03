@@ -282,6 +282,7 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                 composition = composition,
                 progress = { progress },
                 modifier = Modifier
+                    .padding(start=140.dp)
                     .align(Alignment.Center)
                     .size(250.dp)
             )

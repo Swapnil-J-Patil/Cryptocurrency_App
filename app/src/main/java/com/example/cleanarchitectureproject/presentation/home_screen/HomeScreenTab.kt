@@ -88,10 +88,9 @@ fun SharedTransitionScope.HomeScreenTab(
             easing = FastOutSlowInEasing
         )
     )
-    val configuration = LocalConfiguration.current
-    val isTab = configuration.screenWidthDp.dp > 600.dp
-    val carouselHeight = if (isTab) 350.dp else 320.dp
-    val dotsPadding = if (isTab) 8.dp else 4.dp
+
+    val carouselHeight =  400.dp
+    val dotsPadding = 8.dp
     val tabTitles = listOf("Top Gainers", "Top Losers")
 
     val gainerPercentageList by homeViewModel.gainerPercentageList.collectAsState()
@@ -301,6 +300,7 @@ fun SharedTransitionScope.HomeScreenTab(
                 composition = composition,
                 progress = { progress },
                 modifier = Modifier
+                    .padding(start=140.dp)
                     .align(Alignment.Center)
                     .size(250.dp)
             )
