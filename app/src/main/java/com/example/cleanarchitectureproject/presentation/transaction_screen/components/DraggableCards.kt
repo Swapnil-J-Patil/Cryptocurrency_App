@@ -62,7 +62,8 @@ fun DraggableCards(
     isBuyClicked:(Boolean,String,String,String)->Unit,
     savedQuantity: Double?,
     dollars: Double,
-    livePrice: Double
+    livePrice: Double,
+    isTab: Boolean
 ) {
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
@@ -75,7 +76,7 @@ fun DraggableCards(
         mutableStateOf(0.0)
     }
 
-    val cardHeight= if(isTab) 800.dp else screenHeight
+    val cardHeight= if(isTab) 900.dp else screenHeight
     val topCardOffset = remember { Animatable(0f) }
     val coroutineScope = rememberCoroutineScope()
     val instructionBuy="Tap the amount in USD to enter exact amount, use slider to adjust the amount or enter custom amount manually."
@@ -154,7 +155,8 @@ fun DraggableCards(
                         availableCoins = cryptoQuantity.value,
                         isBuyClicked = {flag, quantity, usd,currentPrice->
                             isBuyClicked(flag,quantity,usd,currentPrice)
-                        }
+                        },
+                        isTab=isTab
                     )
                 }
             }
@@ -253,7 +255,8 @@ fun DraggableCards(
                         alternateColor = green,
                         isBuyClicked = {flag, quantity, usd,currentPrice->
                             isBuyClicked(flag,quantity,usd,currentPrice)
-                        }
+                        },
+                        isTab = isTab
                     )
                 }
             }

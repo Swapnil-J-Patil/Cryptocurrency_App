@@ -40,7 +40,8 @@ fun CircularSlider(
     flag: Boolean,
     isBuy: Boolean,
     availableCoins: Double?=0.0,
-    onBuyOrSell:(String,String)->Unit
+    onBuyOrSell:(String,String)->Unit,
+    isTab: Boolean
 ) {
     var circleCenter by remember {
         mutableStateOf(Offset.Zero)
@@ -231,6 +232,7 @@ fun CircularSlider(
                 center = circleCenter
             )
 
+            val arcRadius=if(isTab) circleRadius  else circleRadius;
             drawIntoCanvas { canvas ->
                 val sweepGradient = android.graphics.SweepGradient(
                     circleCenter.x,
@@ -251,10 +253,10 @@ fun CircularSlider(
                 canvas.nativeCanvas.save()
                 canvas.nativeCanvas.rotate(90f, circleCenter.x, circleCenter.y) // Align gradient with arc start
                 canvas.nativeCanvas.drawArc(
-                    (width - circleRadius * 2f) / 2f,
-                    (height - circleRadius * 2f) / 2f,
-                    (width + circleRadius * 2f) / 2f,
-                    (height + circleRadius * 2f) / 2f,
+                    (width - arcRadius * 2f) / 2f,
+                    (height - arcRadius * 2f) / 2f,
+                    (width + arcRadius * 2f) / 2f,
+                    (height + arcRadius * 2f) / 2f,
                     0f,  // Start from 0 to ensure uniform gradient
                     (360f / maxValue) * positionValue.toFloat(),
                     false,
@@ -265,7 +267,7 @@ fun CircularSlider(
 
 
 
-            val outerRadius = circleRadius + circleThickness/2f
+            val outerRadius = if(isTab)circleRadius + circleThickness -20f/2f else circleRadius + circleThickness/2f
             val gap = 15f
             for (i in 0 .. (maxValue-minValue)){
                 val color = if(i < positionValue-minValue) primaryColor else primaryColor.copy(alpha = 0.3f)

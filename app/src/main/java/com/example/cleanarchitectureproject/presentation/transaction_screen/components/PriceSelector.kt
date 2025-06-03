@@ -62,7 +62,8 @@ fun PriceSelector(
     isBuy: Boolean,
     alternateColor: Color,
     availableCoins: Double?=0.0,
-    isBuyClicked:(Boolean,String,String,String)-> Unit
+    isBuyClicked:(Boolean,String,String,String)-> Unit,
+    isTab: Boolean
 ) {
     val prices = listOf(25, 50, 75, 100)
     var selectedPrice by remember { mutableStateOf(25) } // Holds the slider progress
@@ -141,11 +142,14 @@ fun PriceSelector(
         ) {
             if (isBuy) {
                 CircularSlider(
-                    modifier = Modifier.size(300.dp),
+                    modifier = Modifier.size(
+                        if(isTab) 200.dp else 300.dp)
+                        .offset(y=if(isTab) 40.dp else 0.dp)
+                    ,
                     initialValue = selectedPrice,
                     primaryColor = primaryColor,
                     secondaryColor = secondaryColor,
-                    circleRadius = 280f,
+                    circleRadius = if(isTab) 160f else 280f,
                     onPositionChange = { position ->
                         selectedPrice = position
                     },
@@ -157,16 +161,18 @@ fun PriceSelector(
                     onBuyOrSell = {crypto,usd->
                         cryptoQuantity.value=crypto
                         amountOfDollars.value=usd
-                    }
+                    },
+                    isTab = isTab
                 )
             } else {
                 CircularSlider(
-                    modifier = Modifier.size(300.dp)
-                        .offset(y=-20.dp),
+                    modifier = Modifier.size(
+                        if(isTab) 200.dp else 300.dp)
+                        .offset(y=if(isTab)30.dp else -20.dp),
                     initialValue = selectedPrice,
                     primaryColor = primaryColor,
                     secondaryColor = secondaryColor,
-                    circleRadius = 280f,
+                    circleRadius = if(isTab) 160f else 280f,
                     onPositionChange = { position ->
                         selectedPrice = position
                     },
@@ -179,12 +185,13 @@ fun PriceSelector(
                     onBuyOrSell = {crypto,usd->
                         cryptoQuantity.value=crypto
                         amountOfDollars.value=usd
-                    }
+                    },
+                    isTab = isTab
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(3.dp))
+        Spacer(modifier = Modifier.height(if(isTab) 90.dp else 3.dp))
         Divider(isBuy)
 
         Row(
