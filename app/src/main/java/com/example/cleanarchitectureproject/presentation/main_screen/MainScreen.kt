@@ -90,7 +90,17 @@ fun SharedTransitionScope.MainScreen(
                 "profile" -> {
                     ProfileScreenTab(
                         navController,
-                        animatedVisibilityScope = animatedVisibilityScope
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        context = LocalContext.current,
+                        isDarkTheme = isDarkTheme, onToggle = {
+                            onToggle()
+                        },
+                        onLogout = {
+                            /* navController.navigate(Screen.AuthScreen.route) {
+                                    popUpTo(Screen.MainScreen.route) { inclusive = true }
+                                }*/
+                            onLogout()
+                        }
                     )
                 }
 

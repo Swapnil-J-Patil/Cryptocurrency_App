@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,8 @@ fun SplashScreen(navController: NavController,context: Context) {
     val circleScale = remember { Animatable(1f) }
     var flag by remember { mutableStateOf(false) }
     var showText by remember { mutableStateOf(false) }
+    val configuration = LocalConfiguration.current
+    val isTab = configuration.screenWidthDp.dp > 600.dp
 
     LaunchedEffect(key1 = true) {
         val prefsManager = PrefsManager(context)
@@ -47,7 +50,7 @@ fun SplashScreen(navController: NavController,context: Context) {
         )
         flag = true
         circleScale.animateTo(
-            targetValue = 5f,
+            targetValue = if(isTab) 10f else 5f,
             animationSpec = tween(
                 durationMillis = 1000,
                 easing = { it } // Linear interpolation

@@ -243,7 +243,12 @@ class MainActivity : AppCompatActivity() {
                         composable(
                             route = Screen.ProfileScreenTab.route
                         ) {
-                            ProfileScreenTab(navController, animatedVisibilityScope = this)
+                            ProfileScreenTab(navController, animatedVisibilityScope = this, context = this@MainActivity, isDarkTheme = isDark.value, onToggle = {
+                                appThemeViewModel.toggleTheme()
+                            },
+                                onLogout = {
+
+                                })
                         }
                         //Transaction Screen
                         composable(
