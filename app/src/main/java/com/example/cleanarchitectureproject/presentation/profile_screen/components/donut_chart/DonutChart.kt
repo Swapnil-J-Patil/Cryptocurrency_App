@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -127,21 +128,35 @@ fun DonutChart(
     )
     var isFlipped by remember { mutableStateOf(false) }
 
+    val imageSizePx = with(LocalDensity.current) { 20.dp.toPx().toInt() }
+
     LaunchedEffect(imageUrls) {
         imageUrls.forEachIndexed { index, url ->
             if (url != null) {
                 val request = ImageRequest.Builder(context)
                     .data(url)
-                    .size(50, 50)
-                    .allowHardware(false) // Disable hardware bitmaps
+                    .size(imageSizePx) // Enforce exact pixel size
+                    .allowHardware(false)
                     .build()
+
                 val result = imageLoader.execute(request)
                 if (result is SuccessResult) {
-                    imageBitmaps[index] = result.drawable.toBitmap().copy(Bitmap.Config.ARGB_8888, true).asImageBitmap()
+                    val originalBitmap = result.drawable.toBitmap()
+
+                    // Resize manually to guarantee imageSize
+                    val scaledBitmap = Bitmap.createScaledBitmap(
+                        originalBitmap,
+                        imageSizePx,
+                        imageSizePx,
+                        true
+                    )
+
+                    imageBitmaps[index] = scaledBitmap.asImageBitmap()
                 }
             }
         }
     }
+
 
 
     LaunchedEffect(data) {
@@ -291,19 +306,20 @@ fun DonutChart(
                         strokeWidth = 4.dp.toPx(), // Slightly thicker for visibility
                         cap = StrokeCap.Round
                     )
-                    drawCircle(
-                        color = arcColors[index].first(), // Same color as the highlighted line
-                        radius = 12.dp.toPx(), // Adjust size as needed
-                        center = lineEnd // Place it at the end of the line
-                    )
+                    val circleRadius = 12.dp.toPx()
+                    val imageSize = 20.dp.toPx() // Slightly smaller for padding effect
 
+                    drawCircle(
+                        color = arcColors[index].first(),
+                        radius = circleRadius,
+                        center = lineEnd
+                    )
 
                     drawIntoCanvas { canvas ->
                         imageBitmaps.getOrNull(index)?.let { bitmap ->
-                            val imageSize = 28.dp.toPx() // Adjust size as needed
                             val imageOffset = Offset(
-                                x = lineEnd.x - imageSize / 2 + 18,
-                                y = lineEnd.y - imageSize / 2 + 18
+                                x = lineEnd.x - imageSize / 2,
+                                y = lineEnd.y - imageSize / 2
                             )
 
                             val roundBitmap = bitmap.asAndroidBitmap().let {
@@ -325,6 +341,8 @@ fun DonutChart(
                             )
                         }
                     }
+
+
 
                     lastValue += value + arcSpacing // Add spacing between arcs
                 }

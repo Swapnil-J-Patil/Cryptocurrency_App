@@ -200,8 +200,7 @@ fun SharedTransitionScope.TransactionScreen(
     {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 140.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
