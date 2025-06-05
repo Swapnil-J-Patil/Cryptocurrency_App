@@ -46,7 +46,7 @@ fun CryptocurrencyCoin.toCryptoCoin(): CryptoCoin {
         isActive = isActive,
         lastUpdated = lastUpdated,
         dateAdded = dateAdded,
-        quotes = quotes, // Assuming a `toQuote()` function exists
+        quotes = quotes,
         isAudited = isAudited,
         badges = badges
     )
