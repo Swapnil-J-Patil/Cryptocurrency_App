@@ -282,7 +282,7 @@ fun SharedTransitionScope.Tabs(
                 ) { page ->
                     when (page) {
                         0 -> {
-                            if (portfolioCoins != null && portfolioValue != null && portfolioPercentage != null && totalInvestment != null) {
+                            if (portfolioCoins != null && portfolioValue != null && portfolioPercentage != null && totalInvestment != null && listType!=null) {
 
                                     PortfolioCard(
                                         portfolioCoins = portfolioCoins,
@@ -295,7 +295,9 @@ fun SharedTransitionScope.Tabs(
                                         },
                                         onItemClick ={item->
                                             onPortfolioItemClick(item)
-                                        }
+                                        },
+                                        listType = listType,
+                                        animatedVisibilityScope = animatedVisibilityScope
                                     )
 
                             }

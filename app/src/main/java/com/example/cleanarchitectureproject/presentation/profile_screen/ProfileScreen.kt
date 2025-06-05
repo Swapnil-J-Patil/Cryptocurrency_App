@@ -370,6 +370,7 @@ fun SharedTransitionScope.ProfileScreen(
                                         onFilter = {
                                             isFilterClicked = true
                                         },
+                                        listType = "portfolioCard",
                                         onPortfolioItemClick = {item->
 
                                             val price = "$ " + item.quotes?.get(0)?.let { it1 ->

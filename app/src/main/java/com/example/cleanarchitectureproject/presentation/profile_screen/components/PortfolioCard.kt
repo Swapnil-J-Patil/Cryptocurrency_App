@@ -1,5 +1,8 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -40,8 +43,9 @@ import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import java.text.DecimalFormat
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun PortfolioCard(
+fun SharedTransitionScope.PortfolioCard(
     modifier: Modifier = Modifier,
     portfolioCoins: List<PortfolioCoin>,
     portfolioValue: Double,
@@ -49,7 +53,9 @@ fun PortfolioCard(
     totalInvestment: Double,
     dollars: Double,
     onFilter:()-> Unit,
-    onItemClick:(PortfolioCoin)-> Unit
+    onItemClick:(PortfolioCoin)-> Unit,
+    listType: String,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
     val listState = rememberLazyListState()
     val configuration = LocalConfiguration.current
@@ -206,10 +212,10 @@ fun PortfolioCard(
                         .clickable {
                             onItemClick(portfolioCoin)
                         }
-                       /* .sharedElement(
+                        .sharedElement(
                             state = rememberSharedContentState(key = "coinCard/${listType}_${portfolioCoin.id}"),
                             animatedVisibilityScope = animatedVisibilityScope
-                        ),*/
+                        ),
                     )
                 }
             }
