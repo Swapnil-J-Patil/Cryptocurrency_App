@@ -8,7 +8,7 @@ data class CryptoCoin(
     val name: String,
     val symbol: String?,
     val slug: String?,
-    val tags: List<String>?,
+    val tags: List<String>?= emptyList(),
     val cmcRank: Int?,
     val marketPairCount: Int?,
     val circulatingSupply: Double?,
@@ -20,7 +20,7 @@ data class CryptoCoin(
     val dateAdded: String?,
     val quotes: List<QuoteCM>?,
     val isAudited: Boolean?,
-    val badges: List<Int>?
+    val badges: List<Int>?= emptyList()
 )
 
 fun CryptoCurrencyCM.toCryptoCoin(): CryptoCoin {

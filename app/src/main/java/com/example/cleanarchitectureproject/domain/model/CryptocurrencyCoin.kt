@@ -15,7 +15,7 @@ data class CryptocurrencyCoin(
     val isGainer: Boolean,
     val id: Int,
     val slug: String,
-    val tags: List<String>,
+    val tags: List<String>?= emptyList(),
     val cmcRank: Int,
     val marketPairCount: Int,
     val circulatingSupply: Double,
@@ -27,8 +27,8 @@ data class CryptocurrencyCoin(
     val dateAdded: String,
     val quotes: List<QuoteCM>,
     val isAudited: Boolean,
-    val auditInfoList: List<Any>?,
-    val badges: List<Int>
+    val auditInfoList: List<Any>?= emptyList(),
+    val badges: List<Int>?= emptyList()
 )
 fun CryptocurrencyCoin.toCryptoCoin(): CryptoCoin {
     return CryptoCoin(

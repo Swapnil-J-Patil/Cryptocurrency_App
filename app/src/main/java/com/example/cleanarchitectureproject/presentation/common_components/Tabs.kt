@@ -62,7 +62,8 @@ fun SharedTransitionScope.Tabs(
     portfolioPercentage: Double? = 0.0,
     dollars: Double =0.0,
     totalInvestment: Double? = 0.0,
-    onFilter:() -> Unit
+    onFilter:() -> Unit,
+    onPortfolioItemClick:(PortfolioCoin)-> Unit = {}
     ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
@@ -291,6 +292,9 @@ fun SharedTransitionScope.Tabs(
                                         totalInvestment = totalInvestment,
                                         onFilter = {
                                             onFilter()
+                                        },
+                                        onItemClick ={item->
+                                            onPortfolioItemClick(item)
                                         }
                                     )
 

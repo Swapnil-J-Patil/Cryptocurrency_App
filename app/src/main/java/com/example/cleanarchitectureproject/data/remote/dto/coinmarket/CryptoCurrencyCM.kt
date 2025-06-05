@@ -8,7 +8,7 @@ data class CryptoCurrencyCM(
     val name: String,
     val symbol: String,
     val slug: String,
-    val tags: List<String>,
+    val tags: List<String>?= emptyList(),
     val cmcRank: Int,
     val marketPairCount: Int,
     val circulatingSupply: Double,
@@ -20,6 +20,6 @@ data class CryptoCurrencyCM(
     val dateAdded: String,
     val quotes: List<QuoteCM>,
     val isAudited: Boolean,
-    val auditInfoList: List<Any>, // Replace with a proper type if audit info structure is known
-    val badges: List<Int>
+    val auditInfoList: List<Any>?= emptyList(), // Replace with a proper type if audit info structure is known
+    val badges: List<Int>?= emptyList()
 )

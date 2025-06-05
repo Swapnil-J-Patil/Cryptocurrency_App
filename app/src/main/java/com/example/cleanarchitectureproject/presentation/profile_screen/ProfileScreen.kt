@@ -1,6 +1,7 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -50,6 +51,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +74,10 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.data.local.shared_prefs.PrefsManager
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
 import com.example.cleanarchitectureproject.domain.model.ProfileData
+import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
+import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.common_components.Tabs
+import com.example.cleanarchitectureproject.presentation.home_screen.HomeViewModel
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.FiltersPopup
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.profile.ProfileDetailView
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.profile.ProfileImageItem
@@ -80,9 +85,12 @@ import com.example.cleanarchitectureproject.presentation.profile_screen.componen
 import com.example.cleanarchitectureproject.presentation.profile_screen.components.settings.SettingsView
 import com.example.cleanarchitectureproject.presentation.shared.KeyStoreViewModel
 import com.example.cleanarchitectureproject.presentation.shared.PortfolioViewModel
+import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
+import com.google.gson.Gson
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -91,6 +99,8 @@ fun SharedTransitionScope.ProfileScreen(
     animatedVisibilityScope: AnimatedVisibilityScope,
     keyStoreViewModel: KeyStoreViewModel = hiltViewModel(),
     portfolioViewModel: PortfolioViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     context: Context,
     isDarkTheme:Boolean,
     onToggle:()->Unit,
@@ -105,6 +115,9 @@ fun SharedTransitionScope.ProfileScreen(
     var isFilterClicked by remember {
         mutableStateOf(false)
     }
+    var isSaved by remember { mutableStateOf(false) }
+
+    val coroutineScope= rememberCoroutineScope()
     val tokens by keyStoreViewModel.tokens.collectAsState()
     var selectedProfile by remember { mutableStateOf<ProfileData?>(null) }
     var currentProfile by remember { mutableStateOf<ProfileData>(ProfileDataList.characters.first()) }
@@ -357,6 +370,29 @@ fun SharedTransitionScope.ProfileScreen(
                                         onFilter = {
                                             isFilterClicked = true
                                         },
+                                        onPortfolioItemClick = {item->
+
+                                            val price = "$ " + item.quotes?.get(0)?.let { it1 ->
+                                                homeViewModel.formatPrice(
+                                                    it1.price)
+                                            }
+
+                                            val percentage = item.quotes?.get(0)?.percentChange1h.toString()
+
+                                            coroutineScope.launch {
+                                                isSaved = savedCoinViewModel.isCoinSaved(item.id.toString())
+                                                Log.d("isSaved", "HomeScreen isSaved value: $isSaved")
+
+                                                val coinData = item.toCryptoCoin()
+                                                val gson = Gson() // Or use kotlinx.serialization
+                                                val coinDataJson = gson.toJson(coinData)
+                                                val listType = "portfolioCard"
+
+                                                navController.navigate(
+                                                    Screen.CoinLivePriceScreen.route + "/${item.id}/${item.symbol}/${price}/${percentage}/${item.isGainer}/${isSaved}/${coinDataJson}/${listType}"
+                                                )
+                                            }
+                                        }
                                     )
                                 }
                             }

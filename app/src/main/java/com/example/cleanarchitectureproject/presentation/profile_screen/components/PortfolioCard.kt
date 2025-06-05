@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.domain.model.PortfolioCoin
@@ -47,10 +48,12 @@ fun PortfolioCard(
     portfolioPercentage: Double,
     totalInvestment: Double,
     dollars: Double,
-    onFilter:()-> Unit
+    onFilter:()-> Unit,
+    onItemClick:(PortfolioCoin)-> Unit
 ) {
     val listState = rememberLazyListState()
-
+    val configuration = LocalConfiguration.current
+    val isTab = configuration.screenWidthDp.dp > 600.dp
     val df = DecimalFormat("#,##0.00") // Ensures two decimal places
     val formattedPrice = "$ ${df.format(portfolioValue)}"
     val formattedInvestment="$ ${df.format(totalInvestment)}"
@@ -95,7 +98,7 @@ fun PortfolioCard(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 30.dp)
+            .padding(bottom = if(isTab) 0.dp else 30.dp)
     ) {
 
         LazyColumn(
@@ -200,10 +203,10 @@ fun PortfolioCard(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 15.dp)
                             .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
-                        /*.clickable {
-                            onItemClick(portfolioCoin, true)
+                        .clickable {
+                            onItemClick(portfolioCoin)
                         }
-                        .sharedElement(
+                       /* .sharedElement(
                             state = rememberSharedContentState(key = "coinCard/${listType}_${portfolioCoin.id}"),
                             animatedVisibilityScope = animatedVisibilityScope
                         ),*/
