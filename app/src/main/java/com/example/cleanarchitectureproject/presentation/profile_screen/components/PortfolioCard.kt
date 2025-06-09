@@ -52,8 +52,8 @@ fun SharedTransitionScope.PortfolioCard(
     portfolioPercentage: Double,
     totalInvestment: Double,
     dollars: Double,
-    onFilter:()-> Unit,
-    onItemClick:(PortfolioCoin)-> Unit,
+    onFilter: () -> Unit,
+    onItemClick: (PortfolioCoin) -> Unit,
     listType: String,
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
@@ -62,7 +62,7 @@ fun SharedTransitionScope.PortfolioCard(
     val isTab = configuration.screenWidthDp.dp > 600.dp
     val df = DecimalFormat("#,##0.00") // Ensures two decimal places
     val formattedPrice = "$ ${df.format(portfolioValue)}"
-    val formattedInvestment="$ ${df.format(totalInvestment)}"
+    val formattedInvestment = "$ ${df.format(totalInvestment)}"
     val formattedPercentage =
         if (portfolioPercentage >= 0.0) "+" + df.format(portfolioPercentage) + " %" else df.format(
             portfolioPercentage
@@ -104,7 +104,7 @@ fun SharedTransitionScope.PortfolioCard(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = if(isTab) 0.dp else 30.dp)
+            .padding(bottom = if (isTab) 0.dp else 30.dp)
     ) {
 
         LazyColumn(
@@ -115,7 +115,8 @@ fun SharedTransitionScope.PortfolioCard(
 
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(start = 5.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -166,7 +167,7 @@ fun SharedTransitionScope.PortfolioCard(
                 val isVisible = remember {
                     derivedStateOf {
                         val visibleItems = listState.layoutInfo.visibleItemsInfo
-                        visibleItems.any { it.index -1 == index }
+                        visibleItems.any { it.index - 1 == index }
                     }
                 }
                 val scale = remember { Animatable(0f) }
@@ -193,10 +194,10 @@ fun SharedTransitionScope.PortfolioCard(
                     val formattedCP = "$ ${df.format(portfolioCoin.currentPrice)}"
                     val formattedQuantity = "${df.format(portfolioCoin.quantity)}"
 
-                   /* if(portfolioCoin.symbol=="NIL")
-                    {
-                        Log.d("coinIssue", "coin in Portfolio Card: $portfolioCoin ")
-                    }*/
+                    /* if(portfolioCoin.symbol=="NIL")
+                     {
+                         Log.d("coinIssue", "coin in Portfolio Card: $portfolioCoin ")
+                     }*/
                     PortfolioCoinCardItem(
                         symbol = portfolioCoin.symbol!!,
                         purchasedPrice = formattedPP,
@@ -209,13 +210,13 @@ fun SharedTransitionScope.PortfolioCard(
                             .fillMaxWidth()
                             .padding(vertical = 8.dp, horizontal = 15.dp)
                             .graphicsLayer(scaleX = scale.value, scaleY = scale.value)
-                        .clickable {
-                            onItemClick(portfolioCoin)
-                        }
-                        .sharedElement(
-                            state = rememberSharedContentState(key = "coinCard/${listType}_${portfolioCoin.id}"),
-                            animatedVisibilityScope = animatedVisibilityScope
-                        ),
+                            .clickable {
+                                onItemClick(portfolioCoin)
+                            }
+                            .sharedElement(
+                                state = rememberSharedContentState(key = "coinCard/${listType}_${portfolioCoin.id}"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            ),
                     )
                 }
             }

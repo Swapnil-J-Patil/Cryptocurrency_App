@@ -104,6 +104,7 @@ fun SharedTransitionScope.ProfileScreenTab(
     portfolioViewModel: PortfolioViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
     savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
+    profileViewModel: ProfileViewModel = hiltViewModel(),
     context: Context,
     isDarkTheme: Boolean,
     onToggle: () -> Unit,
@@ -128,7 +129,7 @@ fun SharedTransitionScope.ProfileScreenTab(
     var visibility by remember {
         mutableStateOf(false)
     }
-    var settingsTab by remember { mutableStateOf<ImageVector?>(null) }
+    val settingsTab by profileViewModel.isSettings.collectAsState()
 
     var currentFilters by remember { mutableStateOf(listOf(false, false, false, false)) }
 
@@ -331,7 +332,8 @@ fun SharedTransitionScope.ProfileScreenTab(
                                 .size(50.dp)
                                 .clip(CircleShape)
                                 .clickable {
-                                    settingsTab = Icons.Default.Settings
+                                    profileViewModel.toggleSettings(Icons.Default.Settings)
+                                    // settingsTab = Icons.Default.Settings
                                 }
                         )
                         {
@@ -520,7 +522,9 @@ fun SharedTransitionScope.ProfileScreenTab(
             SettingsView(
                 settings = settingsTab,
                 onDisMiss = {
-                    settingsTab = null
+                    profileViewModel.toggleSettings(Icons.Default.Settings)
+
+                   // settingsTab = null
                 },
                 isDarkTheme = isDarkTheme,
                 onThemeChange = {
