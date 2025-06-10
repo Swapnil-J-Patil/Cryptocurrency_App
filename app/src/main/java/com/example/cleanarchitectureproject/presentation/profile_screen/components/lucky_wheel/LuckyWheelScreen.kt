@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -60,6 +61,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -80,6 +82,7 @@ import com.example.cleanarchitectureproject.presentation.transaction_screen.comp
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.CurrencyCard
 import com.example.cleanarchitectureproject.presentation.transaction_screen.components.DraggableCards
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
+import com.example.cleanarchitectureproject.presentation.ui.theme.blueBright
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.red
 import kotlinx.coroutines.delay
@@ -97,6 +100,8 @@ fun LuckyWheelScreen(
     val configuration = LocalConfiguration.current
     val dollars = prefsManager.getDollarAmount()
     val screenWidth = configuration.screenWidthDp.dp
+    val screenHeight = configuration.screenHeightDp.dp
+
     val isTab = configuration.screenWidthDp.dp > 600.dp
     val items = listOf("50", "150", "25", "1000", "1", "500", "5", "10")
     val isButtonEnabled by luckyWheelViewModel.canSpin.collectAsState()
@@ -146,6 +151,11 @@ fun LuckyWheelScreen(
         isPlaying = isChestAnimation // Infinite repeat mode
     )
     val coroutineScope = rememberCoroutineScope()
+    val boxSizeDp = remember { mutableStateOf(IntSize(0, 0)) }
+    val density = LocalDensity.current
+    val widthDp = with(density) { boxSizeDp.value.width.toDp() }
+    val heightDp = with(density) { boxSizeDp.value.height.toDp() }
+
     if(isTab)
     {
         Row(
@@ -157,12 +167,7 @@ fun LuckyWheelScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight() // Optional, if you want full height
-                    .background(
-                        brush = Brush.radialGradient(
-                            colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
-                            radius = 1500f
-                        )
-                    ),
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -195,7 +200,14 @@ fun LuckyWheelScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .drawWithCache {
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
+                            center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
+                            radius = 1500f // Adjust based on screen size
+                        )
+                    )
+                    /*.drawWithCache {
                         val brushSize = 400f
                         val brush = Brush.linearGradient(
                             colors = brushColors,
@@ -206,15 +218,15 @@ fun LuckyWheelScreen(
                         onDrawBehind {
                             drawRect(brush)
                         }
-                    },
+                    }*/,
                     //.background(MaterialTheme.colorScheme.background),
                 contentAlignment = Alignment.Center
             ) {
 
                 WheelStand(
                     modifier = Modifier
-                        .padding(top =550.dp)
-                        .fillMaxWidth()
+                        .padding(top =(heightDp + heightDp*0.4f))
+                        .fillMaxWidth(0.7f)
                         .height(150.dp)
                 )
 
@@ -233,8 +245,12 @@ fun LuckyWheelScreen(
                         luckyWheelViewModel.recordSpin()
                     },
                     modifier = Modifier
-                        .size(450.dp)
-                        .padding(16.dp),
+                        .fillMaxWidth(0.7f)
+                        .padding(16.dp)
+                        .onGloballyPositioned { coordinates ->
+                            val sizePx = coordinates.size // size in pixels
+                            boxSizeDp.value = sizePx
+                        },
                     isButtonEnabled = isButtonEnabled,
                     countdownText = displayTime
                 )
@@ -250,18 +266,17 @@ fun LuckyWheelScreen(
                         composition = lightComposition,
                         progress = { lightProgress },
                         modifier = Modifier
-                            .size(600.dp)
+                            .fillMaxWidth(0.7f)
                             .align(Alignment.Center)
-                            .offset(y=50.dp,x=50.dp)
 
                     )
                     LottieAnimation(
                         composition = chestComposition,
                         progress = { chestProgress },
                         modifier = Modifier
-                            .size(500.dp)
+                            .fillMaxWidth(0.7f)
+                            .padding(top=200.dp)
                             .align(Alignment.Center)
-                            .offset(y=50.dp,x=50.dp)
                     )
 
 
@@ -290,10 +305,10 @@ fun LuckyWheelScreen(
                         Image(
                             painter = painterResource(id = R.drawable.green_banner),
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxWidth(0.8f)
                                 .height(250.dp)
                                 .padding(16.dp)
-                                .offset(y = -110.dp),
+                                .offset(y = -135.dp),
                             contentDescription = "price",
                             contentScale = ContentScale.FillBounds
                         )
@@ -303,6 +318,7 @@ fun LuckyWheelScreen(
                             color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .offset(y=-22.dp)
                                 .padding(top = 5.dp),
                             textAlign = TextAlign.Center,
                             fontSize = 25.sp,
@@ -331,7 +347,7 @@ fun LuckyWheelScreen(
 
             WheelStand(
                 modifier = Modifier
-                    .padding(top = 450.dp)
+                    .padding(top =(heightDp + heightDp*0.4f))
                     .fillMaxWidth()
                     .height(150.dp)
             )
@@ -352,7 +368,11 @@ fun LuckyWheelScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(16.dp)
+                    .onGloballyPositioned { coordinates ->
+                        val sizePx = coordinates.size // size in pixels
+                        boxSizeDp.value = sizePx
+                    },
                 isButtonEnabled = isButtonEnabled,
                 countdownText = displayTime
             )
