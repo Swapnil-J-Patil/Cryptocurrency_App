@@ -252,7 +252,8 @@ fun LuckyWheelScreen(
                             boxSizeDp.value = sizePx
                         },
                     isButtonEnabled = isButtonEnabled,
-                    countdownText = displayTime
+                    countdownText = displayTime,
+                    fontSize = 50f
                 )
                 this@Row.AnimatedVisibility(
                     visible = isChestAnimation,

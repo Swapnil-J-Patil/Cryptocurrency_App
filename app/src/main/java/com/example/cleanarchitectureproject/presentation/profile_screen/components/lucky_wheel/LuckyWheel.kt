@@ -65,7 +65,8 @@ fun LuckyWheel(
     modifier: Modifier = Modifier,
     onSpinEnd: (Int) -> Unit,
     isButtonEnabled: Boolean,
-    countdownText: String
+    countdownText: String,
+    fontSize: Float =65f
 ) {
     val sweepAngle = 360f / items.size
     val rotation = remember { Animatable(0f) }
@@ -87,7 +88,7 @@ fun LuckyWheel(
     var countdown by remember { mutableStateOf(countdownText) }
 
     LaunchedEffect(isButtonEnabled) {
-        isSpinButton = isButtonEnabled
+        isSpinButton = true
     }
     LaunchedEffect(countdownText) {
         countdown = countdownText
@@ -190,7 +191,7 @@ fun LuckyWheel(
                         val paint = android.graphics.Paint().apply {
                             color = android.graphics.Color.WHITE
                             textAlign = android.graphics.Paint.Align.CENTER
-                            textSize = 65f
+                            textSize = fontSize
                             isAntiAlias = true
                             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
 
