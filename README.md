@@ -33,12 +33,14 @@ DreamTrade is a **paper-money crypto trading simulator** built with **Jetpack Co
 
 <table>
   <tr>
+    <th>Home Screen</th>
     <th>Live Charts Screen</th>
     <th>Transaction Screen</th>
   </tr>
 
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/4d79d4eb-d246-4591-ae00-5969ecc7a6ea" alt="Card Animation" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/b35b9c71-99bb-4b2e-b780-5c119f9b61d2" alt="Card Animation" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/a0ee09ff-ca18-4618-9a09-a7a72703c46a" alt="Card Animation" width="250"></td>
     <td><img src="https://github.com/user-attachments/assets/927d6b7b-4e9b-42bc-a9bc-d9fca9afcec7" alt="Card Animation" width="250"></td>
   </tr>
 </table>
