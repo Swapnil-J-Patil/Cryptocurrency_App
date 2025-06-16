@@ -249,6 +249,33 @@ fun SharedTransitionScope.SavedCoinsScreen(
                 }
             }
         }
+        if(state.cryptocurrency?.isEmpty() == true)
+        {
+            Column(
+                modifier = Modifier.fillMaxSize()
+                    .padding(start=140.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.wallet),
+                    contentDescription = "saved_coins",
+                    modifier = Modifier
+                        .size(200.dp) // Ensure image is smaller than the border container
+                        .padding(6.dp)
+                        .background(Color.Transparent),
+                    contentScale = ContentScale.Fit
+                )
+                Text(
+                    text = "No saved coins!",
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 10.dp)
+                )
+            }
+        }
         // Error message or loading animation
         if (state.error.isNotBlank()) {
             Column(
