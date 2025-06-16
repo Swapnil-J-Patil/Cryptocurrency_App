@@ -8,14 +8,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun NeedlePointer(modifier: Modifier = Modifier) {
+fun NeedlePointer(
+    modifier: Modifier = Modifier,
+    width: Dp =40.dp,
+    height: Dp=60.dp,
+    offset: Dp =-30.dp) {
     Canvas(
         modifier = modifier
-            .size(40.dp, 60.dp) // Adjust size as needed
-            .offset(y=-30.dp)
+            .size(width, height) // Adjust size as needed
+            .offset(y=offset)
     ) {
         val canvasWidth = size.width
         val canvasHeight = size.height

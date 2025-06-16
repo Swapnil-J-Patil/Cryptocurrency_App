@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -99,10 +100,9 @@ fun LuckyWheelScreen(
     val prefsManager = remember { PrefsManager(context) }
     val configuration = LocalConfiguration.current
     val dollars = prefsManager.getDollarAmount()
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
 
-    val isTab = configuration.screenWidthDp.dp > 600.dp
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    val isTab = configuration.screenWidthDp >= 600 && configuration.screenHeightDp >= 600
     val items = listOf("50", "150", "25", "1000", "1", "500", "5", "10")
     val isButtonEnabled by luckyWheelViewModel.canSpin.collectAsState()
     val countdown by luckyWheelViewModel.countdown.collectAsState()
@@ -156,8 +156,7 @@ fun LuckyWheelScreen(
     val widthDp = with(density) { boxSizeDp.value.width.toDp() }
     val heightDp = with(density) { boxSizeDp.value.height.toDp() }
 
-    if(isTab)
-    {
+    if(isTab && !isPortrait) {
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -280,7 +279,7 @@ fun LuckyWheelScreen(
                             progress = { chestProgress },
                             modifier = Modifier
                                 .fillMaxWidth(0.7f)
-                               // .padding(top = screenHeight * 0.25f)
+                                // .padding(top = screenHeight * 0.25f)
                                 .align(Alignment.Center)
                         )
                     }
@@ -337,7 +336,7 @@ fun LuckyWheelScreen(
             }
         }
     }
-    else {
+    else if(!isTab && isPortrait) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -464,6 +463,379 @@ fun LuckyWheelScreen(
                  result, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier
                      .padding(top = 600.dp)
              )*/
+        }
+    }
+    else if(isTab && isPortrait) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight() // Optional, if you want full height
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Splash Image",
+                    modifier = Modifier
+                        .size(220.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
+                )
+                Text(
+                    text = "DreamTrade",
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    textAlign = TextAlign.Center,
+                    fontSize = 35.sp,
+                    fontFamily = Poppins,
+                )
+
+            }
+            Spacer(
+                Modifier
+                    .width(2.dp)
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.background)
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
+                            center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
+                            radius = 1500f // Adjust based on screen size
+                        )
+                    )
+                /*.drawWithCache {
+                    val brushSize = 400f
+                    val brush = Brush.linearGradient(
+                        colors = brushColors,
+                        start = Offset(animatedOffset, animatedOffset),
+                        end = Offset(animatedOffset + brushSize, animatedOffset + brushSize),
+                        tileMode = TileMode.Mirror
+                    )
+                    onDrawBehind {
+                        drawRect(brush)
+                    }
+                }*/,
+                //.background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center
+            ) {
+
+                WheelStand(
+                    modifier = Modifier
+                        .padding(top = (heightDp + heightDp * 0.4f))
+                        .fillMaxWidth(0.7f)
+                        .height(150.dp)
+                )
+
+
+                LuckyWheel(
+                    items = items,
+                    onSpinEnd = { index ->
+                        coroutineScope.launch {
+                            val total= dollars?.toDouble()?.plus(items[index].toDouble())
+                            prefsManager.setDollarAmount(total.toString())
+                            result = "You got: $ ${items[index]}"
+                            isChestAnimation = true
+                            delay(1300)
+                            isCoinAnimation = true
+                        }
+                        luckyWheelViewModel.recordSpin()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.4f)
+                        .padding(16.dp)
+                        .onGloballyPositioned { coordinates ->
+                            val sizePx = coordinates.size // size in pixels
+                            boxSizeDp.value = sizePx
+                        },
+                    isButtonEnabled = isButtonEnabled,
+                    countdownText = displayTime,
+                    fontSize = 50f
+                )
+                this@Column.AnimatedVisibility(
+                    visible = isChestAnimation,
+                    enter = scaleIn(
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    ),
+                    exit = scaleOut()
+                ) {
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        LottieAnimation(
+                            composition = lightComposition,
+                            progress = { lightProgress },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .align(Alignment.Center)
+
+                        )
+                        LottieAnimation(
+                            composition = chestComposition,
+                            progress = { chestProgress },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                // .padding(top = screenHeight * 0.25f)
+                                .align(Alignment.Center)
+                        )
+                    }
+
+
+
+                }
+                this@Column.AnimatedVisibility(
+                    visible = isCoinAnimation,
+                    enter = scaleIn(
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    ),
+                    exit = scaleOut()
+                ) {
+                    LottieAnimation(
+                        composition = coinComposition,
+                        progress = { coinProgress },
+                        modifier = Modifier
+                            .size(500.dp)
+                            .align(Alignment.Center)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 100.dp),
+                        contentAlignment = Alignment.TopCenter
+                    )
+                    {
+                        Image(
+                            painter = painterResource(id = R.drawable.green_banner),
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .height(250.dp)
+                                .padding(16.dp)
+                                .offset(y = -135.dp),
+                            contentDescription = "price",
+                            contentScale = ContentScale.FillBounds
+                        )
+
+                        Text(
+                            text = result,
+                            color = Color.White,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(y = -22.dp)
+                                .padding(top = 5.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = 25.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Poppins,
+                        )
+                    }
+                }
+            }
+        }
+    }
+    else {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight() // Optional, if you want full height
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Splash Image",
+                    modifier = Modifier
+                        .size(220.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
+                )
+                Text(
+                    text = "DreamTrade",
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    textAlign = TextAlign.Center,
+                    fontSize = 35.sp,
+                    fontFamily = Poppins,
+                )
+
+            }
+            Spacer(
+                Modifier
+                    .width(2.dp)
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.background)
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
+                            center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
+                            radius = 1500f // Adjust based on screen size
+                        )
+                    )
+                /*.drawWithCache {
+                    val brushSize = 400f
+                    val brush = Brush.linearGradient(
+                        colors = brushColors,
+                        start = Offset(animatedOffset, animatedOffset),
+                        end = Offset(animatedOffset + brushSize, animatedOffset + brushSize),
+                        tileMode = TileMode.Mirror
+                    )
+                    onDrawBehind {
+                        drawRect(brush)
+                    }
+                }*/,
+                //.background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.TopCenter
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top=12.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    WheelStand(
+                        modifier = Modifier
+                            .padding(top = (heightDp *0.8f))
+                            .fillMaxWidth(0.6f)
+                            .height(150.dp)
+                    )
+                    LuckyWheel(
+                        items = items,
+                        onSpinEnd = { index ->
+                            coroutineScope.launch {
+                                val total= dollars?.toDouble()?.plus(items[index].toDouble())
+                                prefsManager.setDollarAmount(total.toString())
+                                result = "You got: $ ${items[index]}"
+                                isChestAnimation = true
+                                delay(1300)
+                                isCoinAnimation = true
+                            }
+                            luckyWheelViewModel.recordSpin()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.6f)
+                            .padding(16.dp)
+                            .onGloballyPositioned { coordinates ->
+                                val sizePx = coordinates.size // size in pixels
+                                boxSizeDp.value = sizePx
+                            },
+                        isButtonEnabled = isButtonEnabled,
+                        countdownText = displayTime,
+                        fontSize = 45f,
+                        buttonPadding = 8.dp,
+                        imageSize = 45.dp,
+                        needleHeight = 40.dp,
+                        needleWidth = 30.dp,
+                        needleOffset = -18.dp
+                    )
+                }
+
+
+
+                this@Row.AnimatedVisibility(
+                    visible = isChestAnimation,
+                    enter = scaleIn(
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    ),
+                    exit = scaleOut()
+                ) {
+
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        LottieAnimation(
+                            composition = lightComposition,
+                            progress = { lightProgress },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .align(Alignment.Center)
+
+                        )
+                        LottieAnimation(
+                            composition = chestComposition,
+                            progress = { chestProgress },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                // .padding(top = screenHeight * 0.25f)
+                                .align(Alignment.Center)
+                        )
+                    }
+
+
+
+                }
+                this@Row.AnimatedVisibility(
+                    visible = isCoinAnimation,
+                    enter = scaleIn(
+                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
+                    ),
+                    exit = scaleOut()
+                ) {
+                    LottieAnimation(
+                        composition = coinComposition,
+                        progress = { coinProgress },
+                        modifier = Modifier
+                            .size(500.dp)
+                            .align(Alignment.Center)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 100.dp),
+                        contentAlignment = Alignment.TopCenter
+                    )
+                    {
+                        Image(
+                            painter = painterResource(id = R.drawable.green_banner),
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .height(250.dp)
+                                .padding(16.dp)
+                                .offset(y = -135.dp),
+                            contentDescription = "price",
+                            contentScale = ContentScale.FillBounds
+                        )
+
+                        Text(
+                            text = result,
+                            color = Color.White,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .offset(y = -22.dp)
+                                .padding(top = 5.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = 25.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Poppins,
+                        )
+                    }
+                }
+            }
         }
     }
 

@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.cleanarchitectureproject.R
 import kotlinx.coroutines.delay
@@ -66,7 +67,12 @@ fun LuckyWheel(
     onSpinEnd: (Int) -> Unit,
     isButtonEnabled: Boolean,
     countdownText: String,
-    fontSize: Float =65f
+    fontSize: Float =65f,
+    buttonPadding: Dp = 16.dp,
+    imageSize: Dp = 65.dp,
+    needleWidth: Dp = 40.dp,
+    needleHeight: Dp = 60.dp,
+    needleOffset: Dp =-30.dp
 ) {
     val sweepAngle = 360f / items.size
     val rotation = remember { Animatable(0f) }
@@ -227,7 +233,10 @@ fun LuckyWheel(
         // 🎯 Pointer
         NeedlePointer(
             modifier = Modifier
-                .align(Alignment.TopCenter)
+                .align(Alignment.TopCenter),
+            width = needleWidth,
+            height = needleHeight,
+            offset = needleOffset
         )
 
         // 🔘 Spin Button
@@ -241,7 +250,7 @@ fun LuckyWheel(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "Splash Image",
                 modifier = Modifier
-                    .size(65.dp)
+                    .size(imageSize)
                     .clip(CircleShape),
                 contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
             )
@@ -300,7 +309,7 @@ fun LuckyWheel(
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
                 .scale(scaleAnim.value)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = buttonPadding),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFFFC107) ,
             ), shape = RoundedCornerShape(8.dp),
