@@ -252,8 +252,7 @@ fun SharedTransitionScope.SavedCoinsScreen(
         if(state.cryptocurrency?.isEmpty() == true)
         {
             Column(
-                modifier = Modifier.fillMaxSize()
-                    .padding(start=140.dp),
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
