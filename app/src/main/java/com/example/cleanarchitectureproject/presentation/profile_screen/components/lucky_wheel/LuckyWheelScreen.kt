@@ -192,7 +192,8 @@ fun LuckyWheelScreen(
 
             }
             Spacer(
-                Modifier.width(2.dp)
+                Modifier
+                    .width(2.dp)
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.background)
             )
@@ -225,7 +226,7 @@ fun LuckyWheelScreen(
 
                 WheelStand(
                     modifier = Modifier
-                        .padding(top =(heightDp + heightDp*0.4f))
+                        .padding(top = (heightDp + heightDp * 0.4f))
                         .fillMaxWidth(0.7f)
                         .height(150.dp)
                 )
@@ -263,22 +264,27 @@ fun LuckyWheelScreen(
                     exit = scaleOut()
                 ) {
 
-                    LottieAnimation(
-                        composition = lightComposition,
-                        progress = { lightProgress },
-                        modifier = Modifier
-                            .fillMaxWidth(0.7f)
-                            .align(Alignment.Center)
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        LottieAnimation(
+                            composition = lightComposition,
+                            progress = { lightProgress },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .align(Alignment.Center)
 
-                    )
-                    LottieAnimation(
-                        composition = chestComposition,
-                        progress = { chestProgress },
-                        modifier = Modifier
-                            .fillMaxWidth(0.7f)
-                            .padding(top=200.dp)
-                            .align(Alignment.Center)
-                    )
+                        )
+                        LottieAnimation(
+                            composition = chestComposition,
+                            progress = { chestProgress },
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                               // .padding(top = screenHeight * 0.25f)
+                                .align(Alignment.Center)
+                        )
+                    }
+
 
 
                 }
@@ -319,7 +325,7 @@ fun LuckyWheelScreen(
                             color = Color.White,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .offset(y=-22.dp)
+                                .offset(y = -22.dp)
                                 .padding(top = 5.dp),
                             textAlign = TextAlign.Center,
                             fontSize = 25.sp,
@@ -348,7 +354,7 @@ fun LuckyWheelScreen(
 
             WheelStand(
                 modifier = Modifier
-                    .padding(top =(heightDp + heightDp*0.4f))
+                    .padding(top = (heightDp + heightDp * 0.4f))
                     .fillMaxWidth()
                     .height(150.dp)
             )
@@ -385,23 +391,26 @@ fun LuckyWheelScreen(
                 exit = scaleOut()
             ) {
 
-                LottieAnimation(
-                    composition = lightComposition,
-                    progress = { lightProgress },
-                    modifier = Modifier
-                        .size(600.dp)
-                        .align(Alignment.Center)
-                        .offset(y=50.dp)
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    LottieAnimation(
+                        composition = lightComposition,
+                        progress = { lightProgress },
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .align(Alignment.Center)
 
-                )
-                LottieAnimation(
-                    composition = chestComposition,
-                    progress = { chestProgress },
-                    modifier = Modifier
-                        .size(500.dp)
-                        .align(Alignment.Center)
-                        .offset(y=50.dp)
-                )
+                    )
+                    LottieAnimation(
+                        composition = chestComposition,
+                        progress = { chestProgress },
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            // .padding(top = screenHeight * 0.25f)
+                            .align(Alignment.Center)
+                    )
+                }
 
 
             }
