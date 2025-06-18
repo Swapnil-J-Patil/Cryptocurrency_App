@@ -283,9 +283,6 @@ fun LuckyWheelScreen(
                                 .align(Alignment.Center)
                         )
                     }
-
-
-
                 }
                 this@Row.AnimatedVisibility(
                     visible = isCoinAnimation,
@@ -298,7 +295,7 @@ fun LuckyWheelScreen(
                         composition = coinComposition,
                         progress = { coinProgress },
                         modifier = Modifier
-                            .size(500.dp)
+                            .fillMaxWidth(0.9f)
                             .align(Alignment.Center)
                     )
                     Box(
@@ -397,7 +394,7 @@ fun LuckyWheelScreen(
                         composition = lightComposition,
                         progress = { lightProgress },
                         modifier = Modifier
-                            .fillMaxWidth(0.7f)
+                            .fillMaxWidth(0.9f)
                             .align(Alignment.Center)
 
                     )
@@ -405,7 +402,7 @@ fun LuckyWheelScreen(
                         composition = chestComposition,
                         progress = { chestProgress },
                         modifier = Modifier
-                            .fillMaxWidth(0.7f)
+                            .fillMaxWidth(0.9f)
                             // .padding(top = screenHeight * 0.25f)
                             .align(Alignment.Center)
                     )
@@ -420,13 +417,18 @@ fun LuckyWheelScreen(
                 ),
                 exit = scaleOut()
             ) {
-                LottieAnimation(
-                    composition = coinComposition,
-                    progress = { coinProgress },
-                    modifier = Modifier
-                        .size(500.dp)
-                        .align(Alignment.Center)
-                )
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    LottieAnimation(
+                        composition = coinComposition,
+                        progress = { coinProgress },
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxWidth(0.9f)
+                    )
+
+                }
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -607,7 +609,7 @@ fun LuckyWheelScreen(
                         composition = coinComposition,
                         progress = { coinProgress },
                         modifier = Modifier
-                            .size(500.dp)
+                            .fillMaxWidth(0.9f)
                             .align(Alignment.Center)
                     )
                     Box(
@@ -715,12 +717,12 @@ fun LuckyWheelScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top=12.dp),
+                        .padding(top = 12.dp),
                     contentAlignment = Alignment.TopCenter
                 ) {
                     WheelStand(
                         modifier = Modifier
-                            .padding(top = (heightDp *0.8f))
+                            .padding(top = (heightDp * 0.8f))
                             .fillMaxWidth(0.6f)
                             .height(150.dp)
                     )
@@ -800,7 +802,7 @@ fun LuckyWheelScreen(
                         composition = coinComposition,
                         progress = { coinProgress },
                         modifier = Modifier
-                            .size(500.dp)
+                            .fillMaxWidth(0.9f)
                             .align(Alignment.Center)
                     )
                     Box(
