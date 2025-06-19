@@ -295,7 +295,7 @@ fun LuckyWheelScreen(
                         composition = coinComposition,
                         progress = { coinProgress },
                         modifier = Modifier
-                            .fillMaxWidth(0.9f)
+                            .fillMaxWidth()
                             .align(Alignment.Center)
                     )
                     Box(
@@ -425,7 +425,7 @@ fun LuckyWheelScreen(
                         progress = { coinProgress },
                         modifier = Modifier
                             .align(Alignment.Center)
-                            .fillMaxWidth(0.9f)
+                            .fillMaxWidth()
                     )
 
                 }
@@ -470,7 +470,7 @@ fun LuckyWheelScreen(
     else if(isTab && isPortrait) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxHeight(),
             verticalArrangement = Arrangement.Center
         ) {
             Column(
@@ -503,8 +503,8 @@ fun LuckyWheelScreen(
             }
             Spacer(
                 Modifier
-                    .width(2.dp)
-                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .height(2.dp)
                     .background(MaterialTheme.colorScheme.background)
             )
             Box(
@@ -609,7 +609,7 @@ fun LuckyWheelScreen(
                         composition = coinComposition,
                         progress = { coinProgress },
                         modifier = Modifier
-                            .fillMaxWidth(0.9f)
+                            .fillMaxWidth()
                             .align(Alignment.Center)
                     )
                     Box(
@@ -802,7 +802,7 @@ fun LuckyWheelScreen(
                         composition = coinComposition,
                         progress = { coinProgress },
                         modifier = Modifier
-                            .fillMaxWidth(0.9f)
+                            .fillMaxWidth()
                             .align(Alignment.Center)
                     )
                     Box(

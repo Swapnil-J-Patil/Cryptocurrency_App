@@ -7,11 +7,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.Card
@@ -25,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
@@ -44,15 +48,14 @@ import kotlin.math.abs
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun AboutUsCard(
+fun AboutUsCardLandscape(
     modifier: Modifier = Modifier,
     data: AboutUsData,
     priority: Float,
     index: Int,
     onMoveToBack: () -> Unit
-    ) {
+) {
     val xOffset = remember { Animatable(0f) }
-
     val rotation = remember { Animatable(0f) }
     val scale = remember { Animatable(priority) }
     var isRightFlick by remember { mutableStateOf(true) }
@@ -60,19 +63,16 @@ fun AboutUsCard(
 
     val getInitialOffset = when (index) {
         0 -> 0f
-        1 -> -25f
-        2 -> -50f
-        3 -> -75f
+        1 -> -10f
+        2 -> -20f
+        3 -> -30f
         else -> 0f
     }
     val yOffset = derivedStateOf { getInitialOffset + (-abs(xOffset.value) * 0.2f) }
 
     Card(
         modifier = modifier
-            .offset(
-                x = xOffset.value.dp,
-                y = yOffset.value.dp
-            )
+            .offset(y = (getInitialOffset + yOffset.value).dp)
             .graphicsLayer(
                 rotationZ = rotation.value,
                 scaleX = scale.value,
@@ -93,7 +93,7 @@ fun AboutUsCard(
                         scope.launch {
                             coroutineScope {
                                 // Step 1: Animate card off-screen (left/right)
-                                val direction = if (isRightFlick) 300f else -300f
+                                val direction = if (isRightFlick) 1500f else -1500f
                                 val offsetJob = launch {
                                     xOffset.animateTo(
                                         targetValue = direction,
@@ -132,38 +132,47 @@ fun AboutUsCard(
         elevation = CardDefaults.cardElevation(8.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        AsyncImage(
-            model = data.imageUrl,
-            contentDescription = "Card Image",
-            contentScale = ContentScale.FillBounds,
-            modifier= Modifier.fillMaxWidth()
-                .height(220.dp)
-        )
-        Spacer(Modifier.height(20.dp))
-        Text(
-            text = data.title,
-            modifier = Modifier.padding(horizontal = 10.dp),
-            style = MaterialTheme.typography.titleLarge,
-            fontFamily = Poppins,
-            fontWeight = FontWeight.Bold,
-            color = white
-        )
-        Spacer(Modifier.height(15.dp))
-        Divider(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 10.dp),
-            color = lightGrey,
-            thickness = 2.dp
-        )
-        Spacer(Modifier.height(15.dp))
-        Column() {
-            data.text.forEach { text ->
+        Row(
+            modifier = Modifier
+                .fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = data.imageUrl,
+                contentDescription = "Card Image",
+                contentScale = ContentScale.FillBounds,
+                modifier= Modifier.weight(0.3f)
+            )
+            Spacer(Modifier.weight(0.1f))
+            Column(
+                modifier= Modifier.weight(0.6f)
+            ) {
                 Text(
-                    text = "• $text",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
-                    modifier = Modifier.padding(start = 16.dp, end = 10.dp, bottom = 12.dp)
+                    text = data.title,
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontFamily = Poppins,
+                    fontWeight = FontWeight.Bold,
+                    color = white
                 )
+                Spacer(Modifier.height(15.dp))
+                Divider(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    color = lightGrey,
+                    thickness = 2.dp
+                )
+                Spacer(Modifier.height(15.dp))
+                Column() {
+                    data.text.forEach { text ->
+                        Text(
+                            text = "• $text",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.8f),
+                            modifier = Modifier.padding(start = 16.dp, end = 10.dp, bottom = 12.dp)
+                        )
+                    }
+                }
             }
         }
     }

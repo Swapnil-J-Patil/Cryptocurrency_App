@@ -1,5 +1,11 @@
 package com.example.cleanarchitectureproject.presentation.profile_screen.components.about_us
 
+import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,8 +14,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,21 +38,31 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.airbnb.lottie.compose.LottieAnimation
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.AboutUsData
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel.LuckyWheel
+import com.example.cleanarchitectureproject.presentation.profile_screen.components.lucky_wheel.WheelStand
 import com.example.cleanarchitectureproject.presentation.ui.theme.Poppins
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightBackground
 import com.example.cleanarchitectureproject.presentation.ui.theme.white
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun AboutUs(modifier: Modifier = Modifier) {
     val priorities = remember { mutableStateListOf(1f, 0.95f, 0.9f, 0.85f) }
-
+    val configuration = LocalConfiguration.current
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    val isTab = configuration.screenWidthDp >= 600 && configuration.screenHeightDp >= 600
     val aboutUsData = remember {
         mutableStateListOf(
             AboutUsData(
@@ -84,81 +103,392 @@ fun AboutUs(modifier: Modifier = Modifier) {
     val aboutMe =
         "DreamTrade is a POC — a one-man mission led by me, Swapnil Patil. No big team. No noise. Just vision, code, and execution."
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
-                    center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
-                    radius = 1500f // Adjust based on screen size
-                )
-            ),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    if (isTab && !isPortrait) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Transparent)
-                .padding(top = 50.dp, start = 16.dp, end = 8.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Currency Logo (10%)
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "logo",
+            Column(
                 modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
-            )
+                    .weight(1f)
+                    .fillMaxHeight() // Optional, if you want full height
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Splash Image",
+                    modifier = Modifier
+                        .size(220.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
+                )
+                Text(
+                    text = "DreamTrade",
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    textAlign = TextAlign.Center,
+                    fontSize = 35.sp,
+                    fontFamily = Poppins,
+                )
 
-            Spacer(modifier = Modifier.width(15.dp))
-            // Price and Percentage (20%)
-            Text(
-                text = "About Us",
-                color = Color.White,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start,
-                fontFamily = Poppins,
-                style = MaterialTheme.typography.displaySmall,
+            }
+            Spacer(
+                Modifier
+                    .width(2.dp)
+                    .fillMaxHeight()
+                    .background(MaterialTheme.colorScheme.background)
             )
-            //Spacer(modifier = Modifier.width(15.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
+                            center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
+                            radius = 1500f // Adjust based on screen size
+                        )
+                    ),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                        .padding(top = 50.dp, start = 16.dp, end = 8.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    // Currency Logo (10%)
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "logo",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
+                    )
+
+                    Spacer(modifier = Modifier.width(15.dp))
+                    // Price and Percentage (20%)
+                    Text(
+                        text = "About Us",
+                        color = Color.White,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = Poppins,
+                        style = MaterialTheme.typography.displaySmall,
+                    )
+                    //Spacer(modifier = Modifier.width(15.dp))
+                }
+                Text(
+                    text = aboutMe,
+                    modifier = Modifier.padding(start = 18.dp, end = 8.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontFamily = Poppins,
+                    color = white.copy(alpha = 0.8f)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    for (i in 3 downTo 0) {
+                        AboutUsCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.9f)
+                                .padding(bottom = 20.dp),
+                            data = aboutUsData[i],
+                            priority = priorities[i],
+                            index = i,
+                            onMoveToBack = {
+                                priorities.add(priorities.removeAt(0))
+                                aboutUsData.add(aboutUsData.removeAt(0))
+                            }
+                        )
+                    }
+
+                }
+            }
         }
-        Text(
-            text = aboutMe,
-            modifier = Modifier.padding(start = 18.dp, end = 8.dp),
-            style = MaterialTheme.typography.bodyLarge,
-            fontFamily = Poppins,
-            color = white.copy(alpha = 0.8f)
-        )
-        Box(
+    }
+    else if (!isTab && isPortrait) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(10.dp),
-            contentAlignment = Alignment.BottomCenter
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
+                        center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
+                        radius = 1500f // Adjust based on screen size
+                    )
+                ),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            for (i in 3 downTo 0) {
-                AboutUsCard(
-                    data = aboutUsData[i],
-                    priority = priorities[i],
-                    index = i,
-                    onMoveToBack = {
-                        priorities.add(priorities.removeAt(0))
-                        aboutUsData.add(aboutUsData.removeAt(0))
-                    }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(top = 50.dp, start = 16.dp, end = 8.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                // Currency Logo (10%)
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "logo",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
                 )
-            }
 
+                Spacer(modifier = Modifier.width(15.dp))
+                // Price and Percentage (20%)
+                Text(
+                    text = "About Us",
+                    color = Color.White,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start,
+                    fontFamily = Poppins,
+                    style = MaterialTheme.typography.displaySmall,
+                )
+                //Spacer(modifier = Modifier.width(15.dp))
+            }
+            Text(
+                text = aboutMe,
+                modifier = Modifier.padding(start = 18.dp, end = 8.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = Poppins,
+                color = white.copy(alpha = 0.8f)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                for (i in 3 downTo 0) {
+                    AboutUsCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.9f)
+                            .padding(bottom = 20.dp),
+                        data = aboutUsData[i],
+                        priority = priorities[i],
+                        index = i,
+                        onMoveToBack = {
+                            priorities.add(priorities.removeAt(0))
+                            aboutUsData.add(aboutUsData.removeAt(0))
+                        }
+                    )
+                }
+
+            }
         }
+    }
+    else if (isTab && isPortrait) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight() // Optional, if you want full height
+                    .background(MaterialTheme.colorScheme.background.copy(alpha = 0.3f)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "Splash Image",
+                    modifier = Modifier
+                        .size(220.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
+                )
+                Text(
+                    text = "DreamTrade",
+                    color = Color.White,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    textAlign = TextAlign.Center,
+                    fontSize = 35.sp,
+                    fontFamily = Poppins,
+                )
+
+            }
+            Spacer(
+                Modifier
+                    .fillMaxWidth()
+                    .height(2.dp)
+                    .background(MaterialTheme.colorScheme.background)
+            )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.radialGradient(
+                            colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
+                            center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
+                            radius = 1500f // Adjust based on screen size
+                        )
+                    ),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Transparent)
+                        .padding(top = 50.dp, start = 16.dp, end = 8.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    // Currency Logo (10%)
+                    Image(
+                        painter = painterResource(id = R.drawable.logo),
+                        contentDescription = "logo",
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
+                    )
+
+                    Spacer(modifier = Modifier.width(15.dp))
+                    // Price and Percentage (20%)
+                    Text(
+                        text = "About Us",
+                        color = Color.White,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start,
+                        fontFamily = Poppins,
+                        style = MaterialTheme.typography.displaySmall,
+                    )
+                    //Spacer(modifier = Modifier.width(15.dp))
+                }
+                Text(
+                    text = aboutMe,
+                    modifier = Modifier.padding(start = 18.dp, end = 8.dp),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontFamily = Poppins,
+                    color = white.copy(alpha = 0.8f)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    contentAlignment = Alignment.BottomCenter
+                ) {
+                    for (i in 3 downTo 0) {
+                        AboutUsCardLandscape(
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f)
+                                .fillMaxHeight(0.7f)
+                                .padding(bottom = 20.dp),
+                            data = aboutUsData[i],
+                            priority = priorities[i],
+                            index = i,
+                            onMoveToBack = {
+                                priorities.add(priorities.removeAt(0))
+                                aboutUsData.add(aboutUsData.removeAt(0))
+                            }
+                        )
+                    }
+
+                }
+            }
+        }
+    }
+    else {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF23af92), Color(0xFF121212)),
+                        center = Offset.Unspecified, // or specify a center like Offset(0f, 0f)
+                        radius = 1500f // Adjust based on screen size
+                    )
+                ),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            /*Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(top = 50.dp, start = 16.dp, end = 8.dp, bottom = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                // Currency Logo (10%)
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "logo",
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.FillBounds, // Keeps the center portion of the image
+                )
+
+                Spacer(modifier = Modifier.width(15.dp))
+                // Price and Percentage (20%)
+                Text(
+                    text = "About Us",
+                    color = Color.White,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start,
+                    fontFamily = Poppins,
+                    style = MaterialTheme.typography.displaySmall,
+                )
+                //Spacer(modifier = Modifier.width(15.dp))
+            }
+            Text(
+                text = aboutMe,
+                modifier = Modifier.padding(start = 18.dp, end = 8.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = Poppins,
+                color = white.copy(alpha = 0.8f)
+            )*/
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp),
+                contentAlignment = Alignment.BottomCenter
+            ) {
+                for (i in 3 downTo 0) {
+                    AboutUsCardLandscape(
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                            .fillMaxHeight(0.9f),
+                        data = aboutUsData[i],
+                        priority = priorities[i],
+                        index = i,
+                        onMoveToBack = {
+                            priorities.add(priorities.removeAt(0))
+                            aboutUsData.add(aboutUsData.removeAt(0))
+                        }
+                    )
+                }
+
+            }
+        }
+
     }
 }
 
-/*
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun  Preview() {
-    AboutUs()
-}*/
