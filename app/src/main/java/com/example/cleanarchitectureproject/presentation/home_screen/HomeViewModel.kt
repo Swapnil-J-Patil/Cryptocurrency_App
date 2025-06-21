@@ -71,7 +71,7 @@ class HomeViewModel @Inject constructor(
         fetchJob = viewModelScope.launch {
             while (isActive) { // Ensures cancellation if ViewModel is cleared
                 getLivePrices()
-                delay(2000)
+                delay(10000)
             }
         }
     }

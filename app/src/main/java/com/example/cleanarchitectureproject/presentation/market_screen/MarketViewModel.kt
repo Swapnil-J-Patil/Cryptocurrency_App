@@ -114,14 +114,14 @@ class MarketViewModel @Inject constructor(
                     val allCoins = result.data?.data?.cryptoCurrencyList ?: emptyList()
 
                     // Get the list of IDs from currencyList
-                    val selectedCoinIds = filteredCoins.value.map { it.id }
+                    /*val selectedCoinIds = filteredCoins.value.map { it.id }
 
                     // Extract only the prices of the selected coins
                     val coins = selectedCoinIds.mapNotNull { id ->
                         allCoins.find { it.id == id }
-                    }
+                    }*/
 
-                    processCoins(coins)
+                    processCoins(allCoins)
                 }
 
                 is Resource.Error -> { /* Handle Error */ }
