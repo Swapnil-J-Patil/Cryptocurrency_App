@@ -358,7 +358,8 @@ class MainActivity : AppCompatActivity() {
                                 animatedVisibilityScope = this,
                                 coinData = coinData,
                                 navController = navController,
-                                listType = listType
+                                listType = listType,
+                                darkTheme=isDark.value
                             )
                         }
 

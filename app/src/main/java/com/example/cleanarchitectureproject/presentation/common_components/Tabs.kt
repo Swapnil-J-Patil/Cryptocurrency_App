@@ -63,7 +63,8 @@ fun SharedTransitionScope.Tabs(
     dollars: Double =0.0,
     totalInvestment: Double? = 0.0,
     onFilter:() -> Unit,
-    onPortfolioItemClick:(PortfolioCoin)-> Unit = {}
+    onPortfolioItemClick:(PortfolioCoin)-> Unit = {},
+    darkTheme: Boolean = true
     ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabTitles.size })
     val coroutineScope = rememberCoroutineScope()
@@ -75,7 +76,7 @@ fun SharedTransitionScope.Tabs(
     val width = screenWidth * 0.3
     val height = if (screenWidth > 600) screenHeight * 0.9 else screenHeight * 0.5
     val isDarkTheme = isSystemInDarkTheme()
-    val theme = if (isDarkTheme) "Dark" else "Light"
+    val theme = if (darkTheme) "Dark" else "Light"
 
     val urls = remember {
         listOf(

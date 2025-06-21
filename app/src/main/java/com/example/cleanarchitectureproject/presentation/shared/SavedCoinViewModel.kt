@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,8 +53,9 @@ class SavedCoinViewModel @Inject constructor(
     private val _currencyList = MutableStateFlow<List<CryptocurrencyCoin>>(emptyList())
     private val currencyList: StateFlow<List<CryptocurrencyCoin>> = _currencyList
 
-    private val _coinLivePrice = MutableLiveData<Double>(0.0)
-    val coinLivePrice: LiveData<Double> = _coinLivePrice
+    private val _coinPrices = MutableStateFlow<Map<Int, Double>>(emptyMap())
+    val coinPrices: StateFlow<Map<Int, Double>> = _coinPrices
+
 
     private val _statsState = mutableStateOf(CoinStatsState())
     val statsState: State<CoinStatsState> = _statsState
@@ -102,16 +104,12 @@ class SavedCoinViewModel @Inject constructor(
             when (result) {
                 is Resource.Success -> {
                     val allCoins = result.data?.data?.cryptoCurrencyList ?: emptyList()
-
-                    // Get the list of IDs from currencyList
-
-                    // Extract only the prices of the selected coins
                     val filteredPrice = allCoins.find { it.id == id }?.quotes?.firstOrNull()?.price
-
-                    //Log.d("coinIssue", "prices: $filteredPrice ")
-
-                    // Update state with ordered filtered prices
-                    _coinLivePrice.value = filteredPrice?:0.0
+                    filteredPrice?.let { price ->
+                        _coinPrices.update { currentMap ->
+                            currentMap + (id to price)
+                        }
+                    }
                 }
 
                 is Resource.Error -> {
@@ -126,6 +124,7 @@ class SavedCoinViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
 
     private fun loadCrypto() {
         viewModelScope.launch {
@@ -255,5 +254,12 @@ class SavedCoinViewModel @Inject constructor(
             else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
         }
     }
+    fun formatPriceForSavedScreen(value: Double): String {
+        val priceStr = value.toBigDecimal().toPlainString() // Avoid scientific notation
 
+        return when {
+            priceStr.length >= 10 -> priceStr.substring(0, 5)  // Truncate if too long
+            else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
+        }
+    }
 }

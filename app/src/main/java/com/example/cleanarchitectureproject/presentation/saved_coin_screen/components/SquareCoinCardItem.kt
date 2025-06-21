@@ -32,7 +32,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +49,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.size.Size
 import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.data.remote.dto.coinmarket.QuoteCM
 import com.example.cleanarchitectureproject.presentation.common_components.FlipIcon
+import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightRed
 import com.example.cleanarchitectureproject.presentation.ui.theme.green
 import com.example.cleanarchitectureproject.presentation.ui.theme.lightGreen
@@ -74,6 +78,7 @@ fun SharedTransitionScope.SquareCoinCardItem(
     isTab: Boolean,
     listType:String,
     animatedVisibilityScope: AnimatedVisibilityScope,
+    savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
     coinId: String
 ) {
     val degree= if(isGainer) 270f else 90f
@@ -82,7 +87,9 @@ fun SharedTransitionScope.SquareCoinCardItem(
 
     val lineChartWidth = if(isTab) 190.dp else 160.dp
     val adaptiveWeightLogo = if (isTab) 0.08f else 0.2f
-
+    val coinPrices by savedCoinViewModel.coinPrices.collectAsState()
+    val currentCoinPrice = coinPrices[coinId.toInt()]
+    var livePrice by remember { mutableStateOf<String>(currentCoinPrice.toString()) }
     val isSelected= remember {
         mutableStateOf(false)
     }
@@ -94,7 +101,16 @@ fun SharedTransitionScope.SquareCoinCardItem(
             dampingRatio = Spring.DampingRatioMediumBouncy
         )
     )
+    LaunchedEffect(currentCoinPrice) {
+        val formattedPrice = currentCoinPrice?.let {
+            savedCoinViewModel.formatPriceForSavedScreen(it)
+        }
+        if (formattedPrice != null) {
+            livePrice = formattedPrice
+        }
+    }
     LaunchedEffect(Unit) {
+        savedCoinViewModel.startFetchingCoinStats(coinId.toInt())
         delay(1000L) // Delay for 1 second (1000 milliseconds)
         isSelected.value = true
     }
@@ -163,7 +179,7 @@ fun SharedTransitionScope.SquareCoinCardItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Text(
-                text = price,
+                text = "$ " +livePrice,
                 maxLines = 1,
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.secondary,

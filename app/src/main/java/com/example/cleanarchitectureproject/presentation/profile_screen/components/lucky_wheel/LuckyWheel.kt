@@ -94,7 +94,7 @@ fun LuckyWheel(
     var countdown by remember { mutableStateOf(countdownText) }
 
     LaunchedEffect(isButtonEnabled) {
-        isSpinButton = true
+        isSpinButton = isButtonEnabled
     }
     LaunchedEffect(countdownText) {
         countdown = countdownText

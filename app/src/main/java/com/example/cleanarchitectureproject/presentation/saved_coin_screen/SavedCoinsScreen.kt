@@ -232,7 +232,7 @@ fun SharedTransitionScope.SavedCoinsScreen(
                                                     val coinData = coin.toCryptoCoin()
                                                     val gson = Gson() // Or use kotlinx.serialization
                                                     val coinDataJson = gson.toJson(coinData)
-                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${price}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
+                                                    navController.navigate(Screen.CoinLivePriceScreen.route + "/${coin.id}/${coin.symbol}/${formattedPrice}/${coin.percentage}/${coin.isGainer}/${isSaved}/${coinDataJson}/${listType}") {
                                                         launchSingleTop = true
                                                     }
                                                 }

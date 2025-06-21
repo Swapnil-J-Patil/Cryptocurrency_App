@@ -43,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -94,6 +95,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     navController: NavController,
     listType: String,
     savedCoinViewModel: SavedCoinViewModel = hiltViewModel(),
+    darkTheme: Boolean
     ) {
     val coinImage = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coinId}.png"
     val prefix = if (isGainer) "+ " else ""
@@ -104,10 +106,10 @@ fun SharedTransitionScope.CoinLivePriceScreen(
     val isLowLiquidity = savedCoinViewModel.checkLiquidity(crypto = coinData)
     val screenWidth = configuration.screenWidthDp.dp
     val tabTitles = listOf("15 Min", "1 Hour", "4 Hours", "1 Day", "1 Week", "1 Month")
-    val coinValue by savedCoinViewModel.coinLivePrice.observeAsState()
-    var livePrice by remember {
-        mutableStateOf(coinPrice)
-    }
+    val coinPrices by savedCoinViewModel.coinPrices.collectAsState()
+    val currentCoinPrice = coinPrices[coinId.toInt()]
+    var livePrice by remember { mutableStateOf<String>("0.0000000") }
+
     val adaptiveHeight = if (screenWidth > 600.dp) 100.dp else 75.dp
     val adaptiveWeightLogo = if (screenWidth > 600.dp) 0.08f else 0.2f
     val adaptiveWeightDetails = if (screenWidth > 600.dp) 0.7f else 0.53f
@@ -140,11 +142,12 @@ fun SharedTransitionScope.CoinLivePriceScreen(
         delay(1000L) // Delay for 1 second (1000 milliseconds)
         isSelected.value = true
     }
-    LaunchedEffect(coinValue) {
-        val formattedPrice= coinValue?.let { savedCoinViewModel.formatPrice(it) }
+    LaunchedEffect(currentCoinPrice) {
+        val formattedPrice = currentCoinPrice?.let {
+            savedCoinViewModel.formatPrice(it)
+        }
         if (formattedPrice != null) {
-            //Log.d("FormattedPrice", "Price: $formattedPrice")
-            livePrice=formattedPrice
+            livePrice = formattedPrice
         }
     }
 
@@ -314,7 +317,8 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                     symbol = coinSymbol,
                     onAuthClick = { type, method, email, password ->
 
-                    }
+                    },
+                    darkTheme=darkTheme
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
