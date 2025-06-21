@@ -45,6 +45,35 @@ DreamTrade is a **paper-money crypto trading simulator** built with **Jetpack Co
   </tr>
 </table>
 
+<table>
+  <tr>
+    <th>Market Screen</th>
+    <th>Saved Coins Screen</th>
+    <th>Profile</th>
+  </tr>
+
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/d8b65d63-02af-4dea-9506-d3ad954632a6" alt="Card Animation" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/50c20eb9-6028-4dac-a2f0-f49805ce8cd8" alt="Card Animation" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/26448602-8cb4-498c-943a-b555805d66c3" alt="Card Animation" width="250"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th>Portfolio Screen</th>
+    <th>Settings</th>
+    <th>Lucky Wheel Screen</th>
+    <th>About Us Screen</th>
+  </tr>
+
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/2d62d9ab-db63-42d4-9e5a-1e6f2cb702df" alt="Card Animation" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/0646bc4c-c1a3-46de-84ef-1e2e800c7610" alt="Card Animation" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/19463592-fc82-40d7-b9b6-81a57c5572e5" alt="Card Animation" width="250"></td>
+    <td><img src="https://github.com/user-attachments/assets/23f3947b-0819-4a1b-a0ab-fe99b2bdc7bc" alt="Card Animation" width="250"></td>
+  </tr>
+</table>
 
 ## 🛠 Features
 
