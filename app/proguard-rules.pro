@@ -70,3 +70,17 @@
 -keepclassmembers,allowobfuscation class * {
     @retrofit2.http.* <methods>;
 }
+#firebase
+-keep class com.google.firebase.** { *; }
+-dontwarn com.google.firebase.**
+
+-keep class com.google.firebase.auth.** { *; }
+-dontwarn com.google.firebase.auth.**
+-keep class com.google.android.gms.measurement.** { *; }
+-dontwarn com.google.android.gms.measurement.**
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class com.google.android.gms.auth.api.identity.** { *; }
+-dontwarn com.google.android.gms.auth.api.identity.**
