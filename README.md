@@ -110,6 +110,12 @@ DreamTrade is a **paper-money crypto trading simulator** built with **Jetpack Co
 - Jetpack Compose Compiler 1.5.0+  
 - Firebase Project with Auth enabled  
 
+### Note
+
+- Firebase Auth may not work after cloning this project as the SHA-1 key will be different in your case.
+
+---
+
 ## 🛠️ License
 
 This project is licensed under the MIT License.
