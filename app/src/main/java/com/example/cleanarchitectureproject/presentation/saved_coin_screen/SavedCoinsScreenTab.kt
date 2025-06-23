@@ -147,7 +147,7 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(8.dp)), // Apply rounded corners
                             shape = RoundedCornerShape(8.dp),
-                            placeholder = { Text("Search by Name, Symbol or ID") },
+                            placeholder = { Text("Search by Name or Symbol") },
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Search,

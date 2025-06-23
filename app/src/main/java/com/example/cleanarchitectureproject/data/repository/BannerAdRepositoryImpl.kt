@@ -11,7 +11,7 @@ class BannerAdRepositoryImpl @Inject constructor() : BannerAdRepository {
 
     override fun createAdView(context: Context): AdView {
         val adView = AdView(context)
-        adView.setAdUnitId("ca-app-pub-7314588644257587/4337863507")  // <-- Test Ad Unit ID
+        adView.setAdUnitId("Your_TEST_ADMOB_ID")  // <-- Test Ad Unit ID
         adView.setAdSize(AdSize.BANNER)  // <-- setAdSize instead of direct assignment
 
         adView.loadAd(AdRequest.Builder().build())

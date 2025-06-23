@@ -16,7 +16,7 @@ class RewardedAdRepositoryImpl @Inject constructor(
 ) : RewardedAdRepository {
 
     private var rewardedAd: RewardedAd? = null
-    private val adUnitId = "ca-app-pub-7314588644257587/6005587835"  // Replace with your real AdUnit ID
+    private val adUnitId = "Your_TEST_ADMOB_ID"  // Replace with your real AdUnit ID
 
     override fun loadRewardedAd(activity: Activity, onLoaded: (Boolean) -> Unit) {
         RewardedAd.load(
