@@ -70,17 +70,52 @@
 -keepclassmembers,allowobfuscation class * {
     @retrofit2.http.* <methods>;
 }
-#firebase
--keep class com.google.firebase.** { *; }
--dontwarn com.google.firebase.**
-
+# Firebase Auth
 -keep class com.google.firebase.auth.** { *; }
 -dontwarn com.google.firebase.auth.**
--keep class com.google.android.gms.measurement.** { *; }
--dontwarn com.google.android.gms.measurement.**
--keep class com.google.gson.** { *; }
--dontwarn com.google.gson.**
--keepattributes Signature
--keepattributes *Annotation*
+
+# Firebase Auth internal deserialization fix
+# Wildcard version to avoid invalid characters in class names
+-keep class com.google.android.gms.internal.** { *; }
+-dontwarn com.google.android.gms.internal.**
+
+
+# Google Sign-In & One Tap APIs
 -keep class com.google.android.gms.auth.api.identity.** { *; }
 -dontwarn com.google.android.gms.auth.api.identity.**
+-keep class com.google.android.gms.auth.api.signin.** { *; }
+-dontwarn com.google.android.gms.auth.api.signin.**
+-keep class com.google.android.gms.common.api.internal.** { *; }
+-dontwarn com.google.android.gms.common.api.internal.**
+
+# GoogleSignInOptions Builder
+-keepclassmembers class com.google.android.gms.auth.api.signin.GoogleSignInOptions {
+    <fields>;
+    <methods>;
+}
+
+# One Tap request object
+-keepclassmembers class com.google.android.gms.auth.api.identity.BeginSignInRequest {
+    *;
+}
+
+# Google Tasks
+-keep class com.google.android.gms.tasks.** { *; }
+-dontwarn com.google.android.gms.tasks.**
+
+# SafeParcelable (internal to Google Play Services)
+-keep class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** NULL;
+}
+-keepclassmembers class * implements com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+    public static final *** CREATOR;
+}
+
+##################################
+# ✅ General
+##################################
+
+-keepnames class com.google.firebase.** { *; }
+-keepattributes *Annotation*
+-keepattributes Signature
+-dontwarn com.google.firebase.**
