@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -254,12 +255,29 @@ class SavedCoinViewModel @Inject constructor(
             else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
         }
     }
-    fun formatPriceForSavedScreen(value: Double): String {
-        val priceStr = value.toBigDecimal().toPlainString() // Avoid scientific notation
-
+    fun formatPriceForSavedScreenLandscape(value: Double): String {
+        val dfSmall = DecimalFormat("0.##") // Up to 6 decimal places
         return when {
-            priceStr.length >= 10 -> priceStr.substring(0, 5)  // Truncate if too long
-            else -> priceStr.padEnd(10, '0')  // Pad with zeros if too short
+            value < 0.001 -> "0.0.."  // Extremely small values
+            value < 100 -> dfSmall.format(value) // Up to 6 decimal places
+            else -> value.toInt().toString().take(2) + ".." // Large numbers (first 3 digits + "..")
+        }
+    }
+    fun formatPriceForSavedScreenLandscapeTab(value: Double): String {
+        val dfSmall = DecimalFormat("0.#######") // Up to 6 decimal places
+        return when {
+            //value < 0.0001 -> "0.0000.."  // Extremely small values
+            value < 100 -> dfSmall.format(value) // Up to 6 decimal places
+            else -> value.toInt().toString().take(7) + ".." // Large numbers (first 3 digits + "..")
+        }
+    }
+
+    fun formatPriceForSavedScreen(value: Double): String {
+        val dfSmall = DecimalFormat("0.###") // Up to 6 decimal places
+        return when {
+            value < 0.001 -> "0.00.."  // Extremely small values
+            value < 100 -> dfSmall.format(value) // Up to 6 decimal places
+            else -> value.toInt().toString().take(4) + ".." // Large numbers (first 3 digits + "..")
         }
     }
 }

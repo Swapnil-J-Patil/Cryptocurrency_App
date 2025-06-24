@@ -221,7 +221,7 @@ fun SharedTransitionScope.MarketScreenTab(
                                         currencyName = coin.name,
                                         symbol = coin.symbol,
                                         percentage = if (coin.isGainer) "+" + formattedPercentage + "%" else formattedPercentage+ "%",
-                                        price = formattedPrice,
+                                        price = "$ $formattedPrice",
                                         image = coin.graph,
                                         color = coin.color,
                                         logo = coin.logo,

@@ -249,7 +249,7 @@ fun SharedTransitionScope.CoinLivePriceScreen(
                             horizontalAlignment = Alignment.Start
                         ) {
                             Text(
-                                text = livePrice,
+                                text = "$ " +livePrice,
                                 maxLines = 1,
                                 style = MaterialTheme.typography.titleLarge,
                                 color = MaterialTheme.colorScheme.secondary,

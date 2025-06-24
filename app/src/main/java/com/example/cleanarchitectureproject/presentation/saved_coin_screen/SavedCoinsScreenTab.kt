@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.saved_coin_screen
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -48,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -63,6 +65,7 @@ import com.example.cleanarchitectureproject.R
 import com.example.cleanarchitectureproject.domain.model.toCryptoCoin
 import com.example.cleanarchitectureproject.presentation.Screen
 import com.example.cleanarchitectureproject.presentation.saved_coin_screen.components.SquareCoinCardItem
+import com.example.cleanarchitectureproject.presentation.saved_coin_screen.components.SquareCoinCardTabItem
 import com.example.cleanarchitectureproject.presentation.shared.SavedCoinViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
@@ -92,7 +95,9 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
 
     val screenWidth =
         LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
-
+    val configuration = LocalConfiguration.current
+    val isTab = configuration.screenWidthDp >= 600 && configuration.screenHeightDp >= 600
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     val listState = rememberLazyGridState()
     val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
 
@@ -203,11 +208,11 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                     "$ $formattedPrice"
                                     val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
                                     val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
-                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
+                                        if (coin.percentage.length > 4) coin.percentage.substring(0, 4)  else coin.percentage
                                     } else {
-                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 6) else coin.percentage
+                                        if (coin.percentage.length > 4) coin.percentage.substring(0, 5) else coin.percentage
                                     }
-                                    SquareCoinCardItem(
+                                    SquareCoinCardTabItem(
                                         currencyName = if(coin.name.length > 10) coin.name.substring(0,10) +".." else coin.name,
                                         symbol = coin.symbol,
                                         percentage = if (coin.isGainer) "+" + formattedPercentage + "%" else formattedPercentage + "%",
@@ -238,7 +243,8 @@ fun SharedTransitionScope.SavedCoinsScreenTab(
                                                     }
                                                 }
                                             },
-                                        isTab = true,
+                                        isTab = isTab,
+                                        isPortrait = isPortrait,
                                         coinId = coin.id.toString(),
                                         listType = listType,
                                         animatedVisibilityScope = animatedVisibilityScope

@@ -1,5 +1,6 @@
 package com.example.cleanarchitectureproject.presentation.saved_coin_screen
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -48,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -92,7 +94,9 @@ fun SharedTransitionScope.SavedCoinsScreen(
 
     val screenWidth =
         LocalDensity.current.run { androidx.compose.ui.platform.LocalContext.current.resources.displayMetrics.widthPixels / density }
-
+    val configuration = LocalConfiguration.current
+    val isTab = configuration.screenWidthDp >= 600 && configuration.screenHeightDp >= 600
+    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     val listState = rememberLazyGridState()
     val halfScreenWidth = if (screenWidth > 600) screenWidth / 3 else screenWidth
 
@@ -202,9 +206,9 @@ fun SharedTransitionScope.SavedCoinsScreen(
 
                                     val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
                                     val formattedPercentage = if (firstQuote!!.percentChange1h > 0) {
-                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 5)  else coin.percentage
+                                        if (coin.percentage.length > 4) coin.percentage.substring(0, 4)  else coin.percentage
                                     } else {
-                                        if (coin.percentage.length > 5) coin.percentage.substring(0, 6) else coin.percentage
+                                        if (coin.percentage.length > 4) coin.percentage.substring(0, 5) else coin.percentage
                                     }
                                     SquareCoinCardItem(
                                         currencyName = if(coin.name.length > 10) coin.name.substring(0,10) +".." else coin.name,
@@ -237,7 +241,8 @@ fun SharedTransitionScope.SavedCoinsScreen(
                                                     }
                                                 }
                                             },
-                                        isTab = false,
+                                        isTab = isTab,
+                                        isPortrait = isPortrait,
                                         coinId = coin.id.toString(),
                                         listType = listType,
                                         animatedVisibilityScope = animatedVisibilityScope

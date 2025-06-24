@@ -67,7 +67,7 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.SquareCoinCardItem(
+fun SharedTransitionScope.SquareCoinCardTabItem(
     currencyName: String,
     symbol: String,
     percentage: String,
@@ -106,18 +106,20 @@ fun SharedTransitionScope.SquareCoinCardItem(
         )
     )
     LaunchedEffect(currentCoinPrice) {
-        if(!isTab && !isPortrait)
+        if(isTab && !isPortrait)
         {
             val formattedPrice = currentCoinPrice?.let {
-                savedCoinViewModel.formatPriceForSavedScreenLandscape(it)
+                savedCoinViewModel.formatPriceForSavedScreenLandscapeTab(it)
             }
             if (formattedPrice != null) {
                 livePrice = formattedPrice
             }
+            //livePrice = currentCoinPrice.toString()
+
         }
-        else {
+        else{
             val formattedPrice = currentCoinPrice?.let {
-                savedCoinViewModel.formatPriceForSavedScreen(it)
+                savedCoinViewModel.formatPriceForSavedScreenLandscape(it)
             }
             if (formattedPrice != null) {
                 livePrice = formattedPrice
