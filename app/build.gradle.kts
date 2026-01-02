@@ -16,18 +16,18 @@ plugins {
 val localProperties = Properties()
 localProperties.load(rootProject.file("local.properties").inputStream())
 android {
-    namespace = "com.example.cleanarchitectureproject"
+    namespace = "com.swapnil.dreamtrade"
     compileSdk = 35
 
     buildFeatures {
         buildConfig = true
     }
     defaultConfig {
-        applicationId = "com.example.cleanarchitectureproject"
+        applicationId = "com.swapnil.dreamtrade"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

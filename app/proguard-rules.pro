@@ -55,13 +55,13 @@
 # Keep ViewModel annotated with @HiltViewModel
 -keep @dagger.hilt.android.lifecycle.HiltViewModel class * { *; }
 # If you have more data classes in this package, you can generalize the rule:
--keep class com.example.cleanarchitectureproject.data.remote.dto.coinmarket.** { *; }
--keep class com.example.cleanarchitectureproject.domain.model.** { *; }
+-keep class com.swapnil.dreamtrade.data.remote.dto.coinmarket.** { *; }
+-keep class com.swapnil.dreamtrade.domain.model.** { *; }
 
 # Keep Immutable annotation if you use androidx.compose.runtime.Immutable
 -keep @androidx.compose.runtime.Immutable class * { *; }
 # Keep the CoinMarketApi interface and its methods
--keep interface com.example.cleanarchitectureproject.data.remote.CoinMarketApi { *; }
+-keep interface com.swapnil.dreamtrade.data.remote.CoinMarketApi { *; }
 
 # Keep Retrofit annotations (like @GET, @POST, etc.)
 -keep @retrofit2.http.* class * { *; }

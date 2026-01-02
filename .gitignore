@@ -14,3 +14,4 @@
 .cxx
 local.properties
 app/build/generated/res/processDebugGoogleServices/values/
+app/google-services.json
