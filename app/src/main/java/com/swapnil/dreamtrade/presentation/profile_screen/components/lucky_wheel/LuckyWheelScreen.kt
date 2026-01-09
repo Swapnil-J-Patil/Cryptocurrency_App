@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -134,7 +135,8 @@ fun LuckyWheelScreen(
     if(isTab && !isPortrait) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .navigationBarsPadding(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
@@ -320,6 +322,7 @@ fun LuckyWheelScreen(
                         radius = 1500f // Adjust based on screen size
                     )
                 )
+                .navigationBarsPadding()
         )
         {
 
