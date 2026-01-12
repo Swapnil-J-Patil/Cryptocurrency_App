@@ -49,7 +49,7 @@ fun SplashScreen(navController: NavController,context: Context) {
         )
         flag = true
         circleScale.animateTo(
-            targetValue = if(isTab) 10f else 5f,
+            targetValue = if(isTab) 11f else 6f,
             animationSpec = tween(
                 durationMillis = 1000,
                 easing = { it } // Linear interpolation
