@@ -2,6 +2,8 @@
 
 DreamTrade is a **paper-money crypto trading simulator** built with **Jetpack Compose**, designed for aspiring traders, students, and enthusiasts who want to learn and practice trading with zero financial risk.
 
+**Google Play Store link:**  https://play.google.com/store/apps/details?id=com.swapnil.dreamtrade
+
 ## 📱 App Preview
 
 <table>
