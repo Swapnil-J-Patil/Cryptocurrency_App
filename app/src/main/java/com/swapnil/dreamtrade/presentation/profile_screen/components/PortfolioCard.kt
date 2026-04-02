@@ -190,7 +190,7 @@ fun SharedTransitionScope.PortfolioCard(
                         percentage = portfolioCoin.quotes.get(0).percentChange1h.toString(),
                 price = portfolioCoin.quotes.get(0).price.toString(),*/
                 if (portfolioCoins.isNotEmpty() && index < portfolioCoins.size) {
-                    val formattedPP = "$ ${df.format(portfolioCoin.purchasedAt)}"
+                    val formattedPP = "$ ${df.format((portfolioCoin.purchasedAt ?: 0.0) * (portfolioCoin.quantity ?: 0.0))}"
                     val formattedCP = "$ ${df.format(portfolioCoin.currentPrice)}"
                     val formattedQuantity = "${df.format(portfolioCoin.quantity)}"
 

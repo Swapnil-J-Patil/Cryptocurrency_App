@@ -209,39 +209,36 @@ class PortfolioViewModel @Inject constructor(
 
     private fun processCoins(coins: List<PortfolioCoin>, filteredPrices: List<Double>) {
         Log.d("portfolioViewmodelPVM", "Processing coins...")
-        portfolioValue.value = 0.0
-        totalInvestment.value = 0.0
-        val cryptocurrencyCoins = coins.mapIndexed { index, coin ->
-           // Log.d("portfolioViewmodelPVM", "Processing coins...")
+        var runningPortfolioValue = 0.0
+        var runningTotalInvestment = 0.0
 
-            /*if(coin.id== 35509 || coin.id== 35702)
-            {
-               *//* val livePrice=filteredPrices.getOrNull(index) ?: coin.quotes?.firstOrNull()?.price
-                val currentPrice = livePrice?.times((coin.quantity!!))
-                Log.d("coinIssue", "coin: ${livePrice} and quantity:${coin.quantity} price with quantity: $currentPrice")
-*//*
-                removeCrypto(coin)
-            }*/
-            val firstQuote = coin.quotes?.firstOrNull() // Handle missing quotes
+        val cryptocurrencyCoins = coins.mapIndexed { index, coin ->
+            val firstQuote = coin.quotes?.firstOrNull()
             val percentage = firstQuote?.percentChange1h?.toString() ?: "0.0"
+
+            // ✅ Use purchasedAt as unit price (per coin price at time of purchase)
+            val purchasedUnitPrice = coin.purchasedAt?.toDouble() ?: 0.0
             val livePrice = filteredPrices.getOrNull(index) ?: firstQuote?.price
 
-            val currentPrice = livePrice?.times((coin.quantity ?: 0.0))
-            val purchasedPrice = (coin.purchasedAt?.toDouble() ?: 0.0) * (coin.quantity ?: 0.0)
+            // ✅ Multiply by quantity here only — never store the multiplied result back
+            val currentPrice = (livePrice ?: 0.0) * (coin.quantity ?: 0.0)
+            val purchasedPrice = purchasedUnitPrice * (coin.quantity ?: 0.0)
+
+            val returns = currentPrice - purchasedPrice
+            val color = if (returns >= 0) green else lightRed
 
             val percentageChange = if (purchasedPrice > 0) {
-                ((currentPrice?.minus(purchasedPrice))?.div(purchasedPrice))?.times(100)
+                (returns / purchasedPrice) * 100
             } else {
                 0.0
             }
 
-            Log.d("percentageChange", "${coin.name}: price with quantity: $currentPrice $purchasedPrice $percentageChange ")
-            Log.d("percentageChange", "${coin.name}: price without quantity: $livePrice ${coin.purchasedAt} $percentageChange ")
+            // ✅ Accumulate into local vars, not LiveData directly
+            runningPortfolioValue += currentPrice
+            runningTotalInvestment += purchasedPrice
 
-            portfolioValue.value = (portfolioValue.value ?: 0.0) + currentPrice!!
-            totalInvestment.value = (totalInvestment.value ?: 0.0) + purchasedPrice
-            val returns=currentPrice- purchasedPrice
-            val color = if (currentPrice - purchasedPrice >= 0) green else lightRed
+            Log.d("percentageChange", "${coin.name}: currentPrice=$currentPrice purchasedPrice=$purchasedPrice change=$percentageChange%")
+            Log.d("percentageChange", "${coin.name}: livePrice=$livePrice purchasedUnitPrice=$purchasedUnitPrice quantity=${coin.quantity}")
 
             PortfolioCoin(
                 id = coin.id,
@@ -261,19 +258,21 @@ class PortfolioViewModel @Inject constructor(
                 quotes = coin.quotes,
                 isAudited = coin.isAudited ?: false,
                 badges = coin.badges ?: emptyList(),
-                purchasedAt = purchasedPrice,
+                purchasedAt = purchasedUnitPrice, // ✅ Always store unit price, NOT total
                 currentPrice = currentPrice,
                 logo = "https://s2.coinmarketcap.com/static/img/coins/64x64/${coin.id}.png",
                 graph = "https://s3.coinmarketcap.com/generated/sparklines/web/7d/usd/${coin.id}.png",
                 color = color,
-                isGainer = currentPrice - purchasedPrice >= 0,
+                isGainer = returns >= 0,
                 quantity = coin.quantity,
-                returnPercentage = percentageChange ?:0.0,
+                returnPercentage = percentageChange,
                 returns = returns
             )
         }
 
+        // ✅ Set LiveData once after the loop, not inside it
+        portfolioValue.value = runningPortfolioValue
+        totalInvestment.value = runningTotalInvestment
         _currencyList.value = cryptocurrencyCoins
     }
-
 }

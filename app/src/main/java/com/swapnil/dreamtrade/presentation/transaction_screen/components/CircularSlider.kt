@@ -64,23 +64,21 @@ fun CircularSlider(
 
     LaunchedEffect(flag) {
         if (isBuy) {
-            val usdValue = initialValue.toDouble()  // Since initialValue represents USD directly
-            val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0  // Avoid division by zero
-            formattedUsdValue = "%,.2f".format(usdValue)  // Format as currency
-            formattedAmount = "%,.2f".format(amountOfCoin)  // Format coin amount with precision
-
+            val usdValue = initialValue.toDouble()
+            val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
+            formattedUsdValue = "%,.2f".format(usdValue)
+            formattedAmount = "%,.2f".format(amountOfCoin)
             positionValue = initialValue
             oldPositionValue = initialValue
         } else {
-
-            val amountOfCoin =  (initialValue / 100.0) * (availableCoins ?: 0.0)
-            val usdValue = amountOfCoin * pricePerCoin
+            val amountOfCoin = (initialValue / 100.0) * (availableCoins ?: 0.0)
+            val usdValue = amountOfCoin * pricePerCoin  // ✅ use live price
             formattedUsdValue = "%,.2f".format(usdValue)
             formattedAmount = "%,.2f".format(amountOfCoin)
-
             positionValue = initialValue
             oldPositionValue = initialValue
         }
+        onBuyOrSell(formattedAmount, formattedUsdValue)  // ✅ always notify parent
     }
     LaunchedEffect(availableCoins) {
         if (isBuy) {
@@ -114,20 +112,18 @@ fun CircularSlider(
         }
     }
     LaunchedEffect(initialValue) {
-
         if (isBuy) {
             val usdValue = initialValue.toDouble()
-            val amountOfCoin = if (initialPrice > 0) usdValue / initialPrice else 0.0
+            val amountOfCoin = if (pricePerCoin > 0) usdValue / pricePerCoin else 0.0
             formattedUsdValue = "%,.2f".format(usdValue)
             formattedAmount = "%,.2f".format(amountOfCoin)
-            onBuyOrSell(formattedAmount,formattedUsdValue)
         } else {
-            val amountOfCoin =  (initialValue / 100.0) * (availableCoins ?: 0.0)
-            val usdValue = amountOfCoin * initialPrice
+            val amountOfCoin = (initialValue / 100.0) * (availableCoins ?: 0.0)
+            val usdValue = amountOfCoin * pricePerCoin  // ✅ use live price, not initialPrice
             formattedUsdValue = "%,.2f".format(usdValue)
             formattedAmount = "%,.2f".format(amountOfCoin)
-            onBuyOrSell(formattedAmount,formattedUsdValue)
         }
+        onBuyOrSell(formattedAmount, formattedUsdValue)  // ✅ always notify parent
     }
 
     Box(
